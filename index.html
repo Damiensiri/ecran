@@ -10,32 +10,19 @@
 
 <style>
 
-/* ================= ROOT VARIABLES ================= */
-
-:root{
-  --space-xs: clamp(6px, 0.8vh, 12px);
-  --space-sm: clamp(10px, 1.2vh, 18px);
-  --space-md: clamp(16px, 2vh, 32px);
-  --space-lg: clamp(24px, 3vh, 48px);
-}
-
 /* ================= BASE ================= */
 
 body{
   margin:0;
   font-family:'Montserrat',sans-serif;
-  background:radial-gradient(circle at top,#111 0%,#000 60%);
+  background:#000;
   color:white;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding-bottom:var(--space-lg); /* respiration premium */
 }
 
 /* ================= HEADER ================= */
 
 header{
-  height:clamp(70px,8vh,100px);
+  height:70px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -45,60 +32,43 @@ header{
 header img{
   position:absolute;
   left:25px;
-  height:clamp(30px,4vh,50px);
+  height:40px;
   filter:brightness(0) invert(1)
-         drop-shadow(0 0 8px rgba(255,255,255,0.6));
+         drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
   margin:0;
-  font-size:clamp(20px,2.4vw,34px);
+  font-size:26px;
   font-weight:700;
-  letter-spacing:1px;
 }
 
 #clock{
   position:absolute;
   right:25px;
-  font-size:clamp(18px,2.2vw,30px);
+  font-size:22px;
   font-weight:700;
 }
 
-/* ================= SECTION TITLES ================= */
+/* ================= TITRES ================= */
 
 .section-title{
-  margin:var(--space-md) 30px var(--space-xs);
-  font-size:clamp(16px,1.8vw,24px);
+  margin:20px 30px 10px;
+  font-size:18px;
   font-weight:700;
-  opacity:0.9;
-  letter-spacing:0.5px;
 }
 
-/* ================= CARDS ================= */
+/* ================= CARTES ================= */
 
 .card{
-  background:linear-gradient(
-    145deg,
-    rgba(255,255,255,0.08),
-    rgba(255,255,255,0.03)
-  );
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,0.15);
-  margin:0 30px var(--space-md);
-  padding:clamp(18px,1.5vw,28px);
-  border-radius:22px;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.7),
-    inset 0 0 20px rgba(255,255,255,0.04);
-  transition:transform 0.2s ease;
+  margin:0 30px 16px;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 8px 26px rgba(0,0,0,0.7);
 }
-
-.card:hover{
-  transform:scale(1.01);
-}
-
-/* ================= CARD HEADER ================= */
 
 .card-top{
   display:flex;
@@ -109,35 +79,32 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:clamp(10px,1vw,18px);
+  gap:10px;
 }
 
 .title-wrap img{
-  width:clamp(24px,2vw,34px);
+  width:26px;
 }
 
 .card-title{
-  font-size:clamp(20px,2.2vw,30px);
+  font-size:22px;
   font-weight:700;
 }
 
 .card-top img.statut{
-  width:clamp(24px,2vw,34px);
+  width:26px;
 }
-
-/* ================= CARD CONTENT ================= */
 
 .card-middle{
   display:flex;
   align-items:center;
-  gap:clamp(14px,1.5vw,26px);
-  margin-top:var(--space-sm);
-  flex-wrap:nowrap;
+  gap:16px;
+  margin-top:8px;
 }
 
 .badge{
   font-weight:700;
-  font-size:clamp(16px,1.6vw,22px);
+  font-size:16px;
 }
 
 .badge.oui{ color:#4caf50; }
@@ -145,39 +112,23 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:clamp(16px,1.6vw,22px);
+  font-size:16px;
   font-weight:600;
-  color:#f5f5f5;
 }
 
 .info{
-  margin-top:var(--space-sm);
-  font-size:clamp(15px,1.4vw,20px);
+  margin-top:8px;
+  font-size:15px;
   color:#ffb347;
   white-space:pre-line;
 }
 
-/* ================= MOBILE ================= */
+/* ================= MARGE BAS TV ================= */
 
-@media (max-width:768px){
-
-  .card-middle{
-    flex-wrap:wrap;
-  }
-
-  .horaire{
-    width:100%;
-    margin-left:0;
-  }
-
-  .card{
-    margin:0 15px var(--space-md);
-  }
-
-  .section-title{
-    margin-left:15px;
-  }
-
+body::after{
+  content:"";
+  display:block;
+  height:40px; /* respiration bas écran */
 }
 
 </style>
