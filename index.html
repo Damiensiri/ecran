@@ -10,13 +10,23 @@
 
 <style>
 
-/* ================= BASE ================= */
+/* ================= SAFE AREA TV ================= */
 
 body{
   margin:0;
-  font-family:'Montserrat',sans-serif;
   background:#000;
+  font-family:'Montserrat',sans-serif;
   color:white;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+/* Conteneur réduit de 3% pour compenser l’overscan */
+.safe-area{
+  width:96vw;
+  max-width:1850px;
+  padding-bottom:40px;
 }
 
 /* ================= HEADER ================= */
@@ -31,7 +41,7 @@ header{
 
 header img{
   position:absolute;
-  left:25px;
+  left:20px;
   height:40px;
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
@@ -45,7 +55,7 @@ header h1{
 
 #clock{
   position:absolute;
-  right:25px;
+  right:20px;
   font-size:22px;
   font-weight:700;
 }
@@ -53,7 +63,7 @@ header h1{
 /* ================= TITRES ================= */
 
 .section-title{
-  margin:20px 30px 10px;
+  margin:20px 25px 10px;
   font-size:18px;
   font-weight:700;
 }
@@ -64,7 +74,7 @@ header h1{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,0.15);
-  margin:0 30px 16px;
+  margin:0 25px 16px;
   padding:18px;
   border-radius:18px;
   box-shadow:0 8px 26px rgba(0,0,0,0.7);
@@ -123,18 +133,12 @@ header h1{
   white-space:pre-line;
 }
 
-/* ================= MARGE BAS TV ================= */
-
-body::after{
-  content:"";
-  display:block;
-  height:40px; /* respiration bas écran */
-}
-
 </style>
 </head>
 
 <body>
+
+<div class="safe-area">
 
 <header>
   <img src="image/logo.png">
@@ -152,6 +156,8 @@ body::after{
 <div class="card" id="maison"></div>
 <div class="card" id="grande-voie"></div>
 <div class="card" id="beudot"></div>
+
+</div>
 
 <script>
 
