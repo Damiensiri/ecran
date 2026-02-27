@@ -14,7 +14,7 @@ html, body{
   margin:0;
   height:100vh;
   overflow:hidden;
-  background:#000;
+  background:radial-gradient(circle at top,#111 0%,#000 70%);
   font-family:'Montserrat',sans-serif;
   color:white;
 }
@@ -24,10 +24,10 @@ body{
   flex-direction:column;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 
 header{
-  height:65px;
+  height:70px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -37,77 +37,76 @@ header{
 
 header img{
   position:absolute;
-  left:20px;
-  height:34px;
+  left:25px;
+  height:38px;
   filter:brightness(0) invert(1);
 }
 
 header h1{
   margin:0;
-  font-size:20px;
+  font-size:22px;
   font-weight:700;
+  letter-spacing:1px;
 }
 
 #clock{
   position:absolute;
-  right:20px;
+  right:25px;
   font-size:18px;
   font-weight:700;
 }
 
-/* MAIN GRID */
+/* ===== MAIN ===== */
 
 .main{
   flex:1;
   display:grid;
   grid-template-rows:
     auto
-    auto
-    auto
+    1.2fr
     auto
     1fr;
-  gap:10px;
-  padding:10px 20px 15px;
+  gap:14px;
+  padding:15px 30px 25px;
 }
 
-/* TITRES */
+/* ===== TITRES ===== */
 
 .section-title{
-  font-size:14px;
+  font-size:15px;
   font-weight:700;
+  opacity:0.9;
 }
 
-/* ESPACES TRAVAIL */
+/* ===== GRIDS ===== */
 
 .travail{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:14px;
 }
-
-/* PADDOCKS */
 
 .paddocks{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:14px;
 }
 
 .paddocks .card:last-child{
   grid-column:span 2;
 }
 
-/* CARTES */
+/* ===== CARTES ===== */
 
 .card{
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.15);
-  padding:10px 12px;
-  border-radius:12px;
+  padding:14px 16px;
+  border-radius:16px;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
 }
 
 .card-top{
@@ -119,33 +118,33 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
 
 .title-wrap img{
-  width:18px;
+  width:20px;
 }
 
 .card-title{
-  font-size:14px;
+  font-size:16px;
   font-weight:700;
 }
 
 .card-top img.statut{
-  width:18px;
+  width:20px;
 }
 
 .card-middle{
   display:flex;
   align-items:center;
-  gap:8px;
-  margin-top:4px;
-  font-size:12px;
+  gap:10px;
+  margin-top:6px;
+  font-size:13px;
 }
 
 .badge{
   font-weight:700;
-  font-size:12px;
+  font-size:13px;
 }
 
 .badge.oui{ color:#4caf50; }
@@ -153,13 +152,13 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:12px;
+  font-size:13px;
   font-weight:600;
 }
 
 .info{
-  margin-top:3px;
-  font-size:11px;
+  margin-top:5px;
+  font-size:12px;
   color:#ffb347;
   white-space:pre-line;
 }
