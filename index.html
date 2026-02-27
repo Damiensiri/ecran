@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- IMPORTANT POUR AMAZON SILK -->
+<meta name="viewport" content="width=1920, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Écran Informations - Écurie</title>
 
@@ -10,23 +12,18 @@
 
 <style>
 
-/* ================= SAFE AREA TV ================= */
+/* ===== Correction zoom Amazon Silk ===== */
+html{
+  zoom:0.95; /* compense le zoom interne Silk */
+}
+
+/* ================= BASE ================= */
 
 body{
   margin:0;
   background:#000;
   font-family:'Montserrat',sans-serif;
   color:white;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-}
-
-/* Conteneur réduit de 3% pour compenser l’overscan */
-.safe-area{
-  width:96vw;
-  max-width:1850px;
-  padding-bottom:40px;
 }
 
 /* ================= HEADER ================= */
@@ -41,7 +38,7 @@ header{
 
 header img{
   position:absolute;
-  left:20px;
+  left:25px;
   height:40px;
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
@@ -55,7 +52,7 @@ header h1{
 
 #clock{
   position:absolute;
-  right:20px;
+  right:25px;
   font-size:22px;
   font-weight:700;
 }
@@ -63,7 +60,7 @@ header h1{
 /* ================= TITRES ================= */
 
 .section-title{
-  margin:20px 25px 10px;
+  margin:20px 30px 10px;
   font-size:18px;
   font-weight:700;
 }
@@ -74,7 +71,7 @@ header h1{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,0.15);
-  margin:0 25px 16px;
+  margin:0 30px 16px;
   padding:18px;
   border-radius:18px;
   box-shadow:0 8px 26px rgba(0,0,0,0.7);
@@ -133,12 +130,17 @@ header h1{
   white-space:pre-line;
 }
 
+/* Petite marge bas sécurité */
+body::after{
+  content:"";
+  display:block;
+  height:40px;
+}
+
 </style>
 </head>
 
 <body>
-
-<div class="safe-area">
 
 <header>
   <img src="image/logo.png">
@@ -156,8 +158,6 @@ header h1{
 <div class="card" id="maison"></div>
 <div class="card" id="grande-voie"></div>
 <div class="card" id="beudot"></div>
-
-</div>
 
 <script>
 
