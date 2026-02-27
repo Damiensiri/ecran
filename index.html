@@ -74,7 +74,7 @@ header h1{
 }
 
 .weather-icon{
-  font-size:28px;
+  font-size:30px;
 }
 
 .weather-right{
@@ -249,22 +249,30 @@ setInterval(updateClock,1000);
 /* ===== METEO OPEN-METEO ===== */
 
 const WEATHER_URL =
-"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,precipitation&daily=precipitation_sum&timezone=Europe/Paris";
+"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,precipitation,is_day&daily=precipitation_sum&timezone=Europe/Paris";
 
-function weatherIcon(code){
-  if(code<=3) return "☀️";
-  if(code<=48) return "🌫";
-  if(code<=67) return "🌧";
-  if(code<=77) return "🌨";
-  if(code<=99) return "⛈";
+function weatherIcon(code, isDay){
+
+  if(code === 0) return isDay ? "☀️" : "🌙";
+  if(code === 1) return isDay ? "🌤" : "🌙☁️";
+  if(code === 2) return isDay ? "⛅" : "☁️🌙";
+  if(code === 3) return "☁️";
+
+  if(code >= 45 && code <= 48) return "🌫";
+  if(code >= 51 && code <= 67) return "🌧";
+  if(code >= 71 && code <= 77) return "🌨";
+  if(code >= 80 && code <= 82) return "🌦";
+  if(code >= 95 && code <= 99) return "⛈";
+
   return "☁️";
 }
 
 fetch(WEATHER_URL)
 .then(r=>r.json())
 .then(d=>{
+
   document.getElementById("weatherIcon").innerText =
-    weatherIcon(d.current.weathercode);
+    weatherIcon(d.current.weathercode, d.current.is_day);
 
   document.getElementById("weatherTemp").innerText =
     Math.round(d.current.temperature_2m)+"°C";
@@ -276,8 +284,7 @@ fetch(WEATHER_URL)
     "🌧 "+d.daily.precipitation_sum[0]+" mm";
 });
 
-/* ===== TON SCRIPT EXISTANT STATUTS ICI ===== */
-/* (je ne le remets pas pour éviter d’alourdir, tu gardes le tien inchangé) */
+/* ===== TON SCRIPT STATUTS ICI (inchangé) ===== */
 
 </script>
 
