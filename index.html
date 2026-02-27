@@ -10,67 +10,84 @@
 
 <style>
 
+:root{
+  --gap: clamp(8px,1vh,20px);
+}
+
+/* ===== BASE ===== */
+
 body{
   margin:0;
   font-family:'Montserrat',sans-serif;
   background:#000;
+  color:white;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
 /* ===== HEADER ===== */
 
 header{
-  height:70px;
+  height:clamp(60px,7vh,90px);
   background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
+  flex-shrink:0;
 }
 
 header img{
   position:absolute;
   left:15px;
-  height:40px;
+  height:clamp(28px,4vh,45px);
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
-  color:white;
   margin:0;
-  font-size:22px;
+  font-size:clamp(16px,2.2vw,28px);
   font-weight:700;
 }
 
 #clock{
   position:absolute;
   right:18px;
-  color:white;
-  font-size:20px;
+  font-size:clamp(14px,2vw,24px);
   font-weight:700;
 }
 
-/* ===== SECTIONS ===== */
+/* ===== MAIN LAYOUT ===== */
+
+main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:var(--gap);
+  padding-bottom:var(--gap);
+}
+
+/* ===== SECTION TITLES ===== */
 
 .section-title{
-  color:white;
-  margin:20px 15px 10px;
-  font-size:16px;
+  margin:0 15px;
+  font-size:clamp(14px,1.5vw,20px);
   font-weight:700;
 }
 
-/* ===== GLASS CARDS (PLUS VISIBLES) ===== */
+/* ===== CARDS ===== */
 
 .card{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border:1px solid rgba(255,255,255,0.18);
-  margin:0 15px 18px;
-  padding:16px;
+  margin:0 15px;
+  padding:clamp(12px,1.2vw,22px);
   border-radius:18px;
   box-shadow:0 8px 26px rgba(0,0,0,0.7);
-  color:white;
 }
 
 .card-top{
@@ -82,21 +99,20 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:clamp(6px,0.8vw,14px);
 }
 
 .title-wrap img{
-  width:26px;
+  width:clamp(20px,1.8vw,30px);
 }
 
 .card-title{
-  font-size:22px;
+  font-size:clamp(16px,2vw,26px);
   font-weight:700;
-  color:white;
 }
 
 .card-top img.statut{
-  width:26px;
+  width:clamp(20px,1.8vw,30px);
 }
 
 /* ===== LIGNE ===== */
@@ -104,14 +120,14 @@ header h1{
 .card-middle{
   display:flex;
   align-items:center;
-  gap:12px;
-  margin-top:8px;
+  gap:clamp(8px,1vw,18px);
+  margin-top:clamp(6px,0.8vh,14px);
   flex-wrap:nowrap;
 }
 
 .badge{
   font-weight:700;
-  font-size:14px;
+  font-size:clamp(12px,1.2vw,18px);
 }
 
 .badge.oui{ color:#4caf50; }
@@ -119,17 +135,32 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:14px;
+  font-size:clamp(12px,1.2vw,18px);
   font-weight:600;
   color:#f5f5f5;
 }
 
 .info{
-  margin-top:10px;
-  font-size:14px;
+  margin-top:clamp(6px,0.8vh,14px);
+  font-size:clamp(12px,1.2vw,18px);
   font-weight:500;
   color:#ffb347;
   white-space:pre-line;
+}
+
+/* ===== MOBILE ADAPT ===== */
+
+@media (max-width:768px){
+
+  .card-middle{
+    flex-wrap:wrap;
+  }
+
+  .horaire{
+    width:100%;
+    margin-left:0;
+  }
+
 }
 
 </style>
@@ -143,6 +174,8 @@ header h1{
   <div id="clock">--:--</div>
 </header>
 
+<main>
+
 <div class="section-title">ESPACES TRAVAIL</div>
 
 <div class="card" id="carriere"></div>
@@ -153,6 +186,8 @@ header h1{
 <div class="card" id="maison"></div>
 <div class="card" id="grande-voie"></div>
 <div class="card" id="beudot"></div>
+
+</main>
 
 <script>
 
@@ -219,8 +254,6 @@ function buildCard(e){
   `;
 }
 
-/* ===== LOAD DATA ===== */
-
 function loadData(){
 fetch(SHEET_URL,{cache:"no-store"})
 .then(r=>r.json())
@@ -235,8 +268,6 @@ fetch(SHEET_URL,{cache:"no-store"})
 
 loadData();
 setInterval(loadData,REFRESH);
-
-/* ===== CLOCK ===== */
 
 function updateClock(){
   const d=new Date();
