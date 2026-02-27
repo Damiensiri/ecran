@@ -2,9 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-
-<!-- IMPORTANT POUR AMAZON SILK -->
-<meta name="viewport" content="width=1920, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=1920, initial-scale=1.0">
 
 <title>Écran Informations - Écurie</title>
 
@@ -12,18 +10,20 @@
 
 <style>
 
-/* ===== Correction zoom Amazon Silk ===== */
-html{
-  zoom:0.95; /* compense le zoom interne Silk */
-}
+/* ================= STRUCTURE FIXE 1080 ================= */
 
-/* ================= BASE ================= */
-
-body{
+html, body{
   margin:0;
+  height:100vh;
+  overflow:hidden;
   background:#000;
   font-family:'Montserrat',sans-serif;
   color:white;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
 }
 
 /* ================= HEADER ================= */
@@ -34,47 +34,67 @@ header{
   align-items:center;
   justify-content:center;
   position:relative;
+  flex-shrink:0;
 }
 
 header img{
   position:absolute;
-  left:25px;
-  height:40px;
+  left:20px;
+  height:36px;
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
   margin:0;
-  font-size:26px;
+  font-size:22px;
   font-weight:700;
 }
 
 #clock{
   position:absolute;
-  right:25px;
-  font-size:22px;
+  right:20px;
+  font-size:18px;
   font-weight:700;
+}
+
+/* ================= CONTENU PRINCIPAL ================= */
+
+.main{
+  flex:1;
+  display:grid;
+  grid-template-rows:
+    auto  /* ESPACES TRAVAIL titre */
+    1fr   /* Carrière */
+    1fr   /* Manège */
+    auto  /* PADDOCKS titre */
+    1fr   /* Maison */
+    1fr   /* Grande voie */
+    1fr;  /* Beudot */
+  gap:10px;
+  padding:10px 25px 20px;
 }
 
 /* ================= TITRES ================= */
 
 .section-title{
-  margin:20px 30px 10px;
-  font-size:18px;
+  font-size:15px;
   font-weight:700;
+  display:flex;
+  align-items:end;
 }
 
 /* ================= CARTES ================= */
 
 .card{
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.15);
-  margin:0 30px 16px;
-  padding:18px;
-  border-radius:18px;
-  box-shadow:0 8px 26px rgba(0,0,0,0.7);
+  padding:12px 14px;
+  border-radius:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow:hidden;
 }
 
 .card-top{
@@ -86,32 +106,33 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 
 .title-wrap img{
-  width:26px;
+  width:20px;
 }
 
 .card-title{
-  font-size:22px;
+  font-size:16px;
   font-weight:700;
 }
 
 .card-top img.statut{
-  width:26px;
+  width:20px;
 }
 
 .card-middle{
   display:flex;
   align-items:center;
-  gap:16px;
-  margin-top:8px;
+  gap:10px;
+  margin-top:4px;
+  font-size:13px;
 }
 
 .badge{
   font-weight:700;
-  font-size:16px;
+  font-size:13px;
 }
 
 .badge.oui{ color:#4caf50; }
@@ -119,22 +140,15 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:16px;
+  font-size:13px;
   font-weight:600;
 }
 
 .info{
-  margin-top:8px;
-  font-size:15px;
+  margin-top:4px;
+  font-size:12px;
   color:#ffb347;
   white-space:pre-line;
-}
-
-/* Petite marge bas sécurité */
-body::after{
-  content:"";
-  display:block;
-  height:40px;
 }
 
 </style>
@@ -148,16 +162,18 @@ body::after{
   <div id="clock">--:--</div>
 </header>
 
-<div class="section-title">ESPACES TRAVAIL</div>
+<div class="main">
 
+<div class="section-title">ESPACES TRAVAIL</div>
 <div class="card" id="carriere"></div>
 <div class="card" id="manege"></div>
 
 <div class="section-title">PADDOCKS</div>
-
 <div class="card" id="maison"></div>
 <div class="card" id="grande-voie"></div>
 <div class="card" id="beudot"></div>
+
+</div>
 
 <script>
 
