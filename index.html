@@ -1,162 +1,123 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=1920, initial-scale=1.0">
-<title>Informations Écurie</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-/* ===== STYLE IDENTIQUE AU TIEN (inchangé) ===== */
 
-html, body{
-  margin:0;
-  height:100vh;
-  overflow:hidden;
-  background:radial-gradient(circle at top,#111 0%,#000 70%);
-  font-family:'Montserrat',sans-serif;
-  color:white;
+:root{
+  --max-width:1400px;
 }
+
+/* ===== GLOBAL ===== */
 
 body{
+  margin:0;
+  font-family:'Montserrat',sans-serif;
+  background:#000;
   display:flex;
-  flex-direction:column;
+  justify-content:center;
 }
 
+.wrapper{
+  width:100%;
+  max-width:var(--max-width);
+}
+
+/* ===== HEADER ===== */
+
 header{
-  height:65px;
+  height:clamp(60px,8vw,90px);
+  background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
+  padding:0 16px;
 }
 
 header img{
   position:absolute;
-  left:25px;
-  height:34px;
-  filter:brightness(0) invert(1);
+  left:16px;
+  height:clamp(30px,4vw,50px);
+  filter:brightness(0) invert(1)
+         drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
+  color:white;
   margin:0;
-  font-size:20px;
+  font-size:clamp(16px,3vw,28px);
   font-weight:700;
+  text-align:center;
 }
 
 #clock{
   position:absolute;
-  right:25px;
-  font-size:18px;
+  right:16px;
+  color:white;
+  font-size:clamp(16px,3vw,24px);
   font-weight:700;
 }
 
-/* METEO */
-
-.weather{
-  margin:0 30px 10px;
-  padding:12px 18px;
-  border-radius:16px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.15);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  font-size:14px;
-}
-
-.weather-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.weather-icon{
-  font-size:30px;
-}
-
-.weather-right{
-  display:flex;
-  gap:18px;
-  font-size:13px;
-}
-
-.main{
-  flex:1;
-  display:grid;
-  grid-template-rows:auto 1.2fr auto 1fr;
-  gap:12px;
-  padding:10px 30px 20px;
-}
+/* ===== SECTIONS ===== */
 
 .section-title{
-  font-size:14px;
+  color:white;
+  margin:clamp(16px,3vw,28px) 16px 10px;
+  font-size:clamp(14px,2.2vw,20px);
   font-weight:700;
 }
 
-.travail{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.paddocks{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.paddocks .card:last-child{
-  grid-column:span 2;
-}
+/* ===== CARDS ===== */
 
 .card{
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.15);
-  padding:12px 14px;
-  border-radius:14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.18);
+  margin:0 16px clamp(14px,2.5vw,24px);
+  padding:clamp(14px,2.5vw,22px);
+  border-radius:18px;
+  box-shadow:0 8px 26px rgba(0,0,0,0.7);
+  color:white;
 }
 
 .card-top{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  flex-wrap:nowrap;
 }
 
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
 
 .title-wrap img{
-  width:18px;
+  width:clamp(20px,3vw,30px);
 }
 
 .card-title{
-  font-size:14px;
+  font-size:clamp(18px,3.5vw,26px);
   font-weight:700;
+  color:white;
 }
 
 .card-top img.statut{
-  width:18px;
+  width:clamp(20px,3vw,30px);
 }
+
+/* ===== LIGNE ===== */
 
 .card-middle{
   display:flex;
   align-items:center;
-  gap:8px;
-  margin-top:4px;
-  font-size:12px;
+  gap:clamp(8px,2vw,16px);
+  margin-top:10px;
+  flex-wrap:wrap;
 }
 
 .badge{
   font-weight:700;
-  font-size:12px;
+  font-size:clamp(12px,2.2vw,16px);
 }
 
 .badge.oui{ color:#4caf50; }
@@ -164,174 +125,32 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:12px;
+  font-size:clamp(12px,2.2vw,16px);
   font-weight:600;
+  color:#f5f5f5;
 }
 
 .info{
-  margin-top:4px;
-  font-size:11px;
+  margin-top:12px;
+  font-size:clamp(12px,2.2vw,16px);
+  font-weight:500;
   color:#ffb347;
   white-space:pre-line;
 }
+
+/* ===== LARGE SCREEN OPTIMISATION ===== */
+
+@media (min-width:1200px){
+
+  .section-title{
+    margin-left:0;
+  }
+
+  .card{
+    margin-left:0;
+    margin-right:0;
+  }
+
+}
+
 </style>
-</head>
-
-<body>
-
-<header>
-  <img src="image/logo.png">
-  <h1>INFORMATIONS ÉCURIE</h1>
-  <div id="clock">--:--</div>
-</header>
-
-<div class="weather">
-  <div class="weather-left">
-    <div class="weather-icon" id="weatherIcon">--</div>
-    <div>
-      <strong>Brienne-le-Château</strong><br>
-      <span id="weatherTemp">--°C</span>
-    </div>
-  </div>
-  <div class="weather-right">
-    <div id="weatherWind">💨 -- km/h</div>
-    <div id="weatherRain">🌧 -- mm</div>
-  </div>
-</div>
-
-<div class="main">
-
-<div class="section-title">ESPACES TRAVAIL</div>
-
-<div class="travail">
-  <div class="card" id="carriere"></div>
-  <div class="card" id="manege"></div>
-</div>
-
-<div class="section-title">PADDOCKS</div>
-
-<div class="paddocks">
-  <div class="card" id="maison"></div>
-  <div class="card" id="grande-voie"></div>
-  <div class="card" id="beudot"></div>
-</div>
-
-</div>
-
-<script>
-
-/* ===== CLOCK ===== */
-function updateClock(){
-  const d=new Date();
-  document.getElementById("clock").innerText =
-    String(d.getHours()).padStart(2,"0")+":"+
-    String(d.getMinutes()).padStart(2,"0");
-}
-updateClock();
-setInterval(updateClock,1000);
-
-/* ===== METEO ===== */
-
-const WEATHER_URL =
-"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,precipitation,is_day&daily=precipitation_sum&timezone=Europe/Paris";
-
-function weatherIcon(code,isDay){
-  if(code===0) return isDay?"☀️":"🌙";
-  if(code===1) return isDay?"🌤":"🌙☁️";
-  if(code===2) return isDay?"⛅":"☁️🌙";
-  if(code===3) return "☁️";
-  if(code>=45&&code<=48) return "🌫";
-  if(code>=51&&code<=67) return "🌧";
-  if(code>=71&&code<=77) return "🌨";
-  if(code>=80&&code<=82) return "🌦";
-  if(code>=95&&code<=99) return "⛈";
-  return "☁️";
-}
-
-fetch(WEATHER_URL)
-.then(r=>r.json())
-.then(d=>{
-  document.getElementById("weatherIcon").innerText=
-    weatherIcon(d.current.weathercode,d.current.is_day);
-  document.getElementById("weatherTemp").innerText=
-    Math.round(d.current.temperature_2m)+"°C";
-  document.getElementById("weatherWind").innerText=
-    "💨 "+Math.round(d.current.wind_speed_10m)+" km/h";
-  document.getElementById("weatherRain").innerText=
-    "🌧 "+d.daily.precipitation_sum[0]+" mm";
-});
-
-/* ===== STATUTS (REMIS) ===== */
-
-const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
-const REFRESH=60000;
-
-const ICONS_STATUT={
-  "ouvert":"image/ouvert.png",
-  "ferme":"image/ferme.png",
-  "prevision":"image/prevision.png",
-  "hors-service":"image/horsservice.png"
-};
-
-const TITRES={
-  "carriere":"Carrière",
-  "manege":"Manège",
-  "maison":"Maison",
-  "grande-voie":"Grande voie",
-  "beudot":"Beudot"
-};
-
-function badgeYN(v){
-  if(v==="oui") return `<span class="badge oui">OUI</span>`;
-  if(v==="non") return `<span class="badge non">NON</span>`;
-  return "";
-}
-
-function buildCard(e){
-  const isTravail=(e.espace==="carriere"||e.espace==="manege");
-  return `
-    <div class="card-top">
-      <div class="title-wrap">
-        <img src="image/travail.svg">
-        <div class="card-title">${TITRES[e.espace]}</div>
-      </div>
-      <img class="statut" src="${ICONS_STATUT[e.statut_auto]}">
-    </div>
-    ${
-      isTravail
-      ? `
-      <div class="card-middle">
-        <div>Liberté</div>
-        ${badgeYN(e.liberte)}
-        <div>Longe</div>
-        ${badgeYN(e.longe)}
-        <div class="horaire">${e.horaire_affiche||""}</div>
-      </div>`
-      : `
-      <div class="card-middle">
-        <div class="horaire">${e.horaire_affiche||""}</div>
-      </div>`
-    }
-    <div class="info">${e.info||""}</div>
-  `;
-}
-
-function loadData(){
-fetch(SHEET_URL,{cache:"no-store"})
-.then(r=>r.json())
-.then(data=>{
-  ["carriere","manege","maison","grande-voie","beudot"].forEach(espace=>{
-    const row=data.find(e=>e.espace===espace);
-    if(!row)return;
-    document.getElementById(espace).innerHTML=buildCard(row);
-  });
-});
-}
-
-loadData();
-setInterval(loadData,REFRESH);
-
-</script>
-
-</body>
-</html>
