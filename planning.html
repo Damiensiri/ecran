@@ -62,7 +62,7 @@ td:first-child, th:first-child{
   background:#111;
 }
 
-/* COULEURS */
+/* COULEURS ACTIVITÉS */
 
 .paddock      { background:#4CAF50; }
 .travail      { background:#ff9800; }
@@ -85,9 +85,9 @@ td:first-child, th:first-child{
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsRfugRPkX7opuYZU0Vlpp8XcMYEkqOvYa-r4sxxLf_0hLWzFuN9MaCWYIKfbaS-Al/exec";
-
+const SHEET_ID = "1Vp9pNL0d-oC6UmHQyCdvHwKl3h36NASIdSJ_vg1wz38";
 const JOURS=["cheval","lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const TIMEOUT_LOGOUT = 60000;
 
 let currentDate = new Date();
 let currentYear;
@@ -128,7 +128,7 @@ function textClasse(txt){
 async function loadWeek(year,week){
 
   const name = sheetName(year,week);
-  const url  = SCRIPT_URL + "?sheet=" + name;
+  const url  = `https://opensheet.elk.sh/${SHEET_ID}/${name}`;
 
   document.getElementById("weekLabel").innerText =
     "Semaine "+String(week).padStart(2,"0");
@@ -138,8 +138,7 @@ async function loadWeek(year,week){
     const data = await res.json();
     drawTable(data);
   }catch(e){
-    document.getElementById("planningTable").innerHTML =
-      "<tr><td style='color:red;padding:20px;'>Erreur chargement planning</td></tr>";
+    document.getElementById("planningTable").innerHTML = "";
   }
 }
 
@@ -190,6 +189,30 @@ document.getElementById("nextWeek").onclick = ()=>{
   currentWeek++;
   loadWeek(currentYear,currentWeek);
 };
+
+/* REDIRECTION AUTO 1 MIN */
+
+let timer;
+function resetTimer(){
+  clearTimeout(timer);
+  timer = setTimeout(()=> location.href="index.html", TIMEOUT_LOGOUT);
+}
+
+["click","mousemove","touchstart","scroll"].forEach(ev=>{
+  window.addEventListener(ev,resetTimer);
+});
+resetTimer();
+
+/* DOUBLE CLIC POUR RETOUR INDEX */
+
+let lastClick = 0;
+document.body.addEventListener("click",()=>{
+  const now = Date.now();
+  if(now - lastClick < 400){
+    location.href="index.html";
+  }
+  lastClick = now;
+});
 
 loadWeek(currentYear,currentWeek);
 
