@@ -16,8 +16,6 @@ body{
   overflow:hidden;
 }
 
-/* HEADER */
-
 header{
   height:70px;
   display:flex;
@@ -35,11 +33,7 @@ header{
   user-select:none;
   opacity:0.7;
 }
-.nav-btn:hover{
-  opacity:1;
-}
-
-/* TABLE */
+.nav-btn:hover{ opacity:1; }
 
 table{
   width:100%;
@@ -68,15 +62,11 @@ td:first-child, th:first-child{
   background:#111;
 }
 
-/* COULEURS ACTIVITE */
-
 .paddock      { background:#4CAF50; }
 .travail      { background:#ff9800; }
 .longe        { background:#2196F3; }
 .proprietaire { background:#e53935; }
 .repos        { background:#e53935; }
-
-/* VALIDATION */
 
 td.done{
   filter: brightness(0.6);
@@ -108,10 +98,7 @@ td.done::after{
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsRfugRPkX7opuYZU0Vlpp8XcMYEkqOvYa-r4sxxLf_0hLWzFuN9MaCWYIKfbaS-Al/exec";
 const SHEET_ID = "1Vp9pNL0d-oC6UmHQyCdvHwKl3h36NASIdSJ_vg1wz38";
-const TIMEOUT_LOGOUT = 60000;
-
 const JOURS=["cheval","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
 let currentDate = new Date();
@@ -138,7 +125,6 @@ function sheetName(y,w){
   return `Semaine_${y}-${ww}`;
 }
 
-/* Détection couleur basée UNIQUEMENT sur la première ligne */
 function textClasse(txt){
   if(!txt) return "";
   const firstLine = txt.split("\n")[0].toLowerCase();
@@ -152,18 +138,27 @@ function textClasse(txt){
 }
 
 async function loadWeek(year,week){
+
   const name = sheetName(year,week);
   const url  = `https://opensheet.elk.sh/${SHEET_ID}/${name}`;
 
   document.getElementById("weekLabel").innerText =
     "Semaine "+String(week).padStart(2,"0");
 
+  console.log("URL appelée :", url);
+
   try{
     const res = await fetch(url);
     const data = await res.json();
+
+    console.log("DATA reçue :", data);
+    alert("Nombre de lignes reçues : " + data.length);
+
     drawTable(data,name);
+
   }catch(e){
-    console.error("Erreur lecture sheet",e);
+    console.error("Erreur fetch :", e);
+    alert("Erreur lors du fetch !");
   }
 }
 
@@ -172,7 +167,6 @@ function drawTable(data, sheet){
   const table = document.getElementById("planningTable");
   table.innerHTML = "";
 
-  /* HEADER */
   const head = document.createElement("tr");
 
   JOURS.forEach(h=>{
@@ -183,29 +177,24 @@ function drawTable(data, sheet){
 
   table.appendChild(head);
 
-  /* LIGNES */
   data.forEach(item=>{
 
-    if(!item.cheval) return; // sécurité minimale
+    if(!item.cheval){
+      console.log("Ligne ignorée car pas de cheval :", item);
+      return;
+    }
 
     const tr = document.createElement("tr");
 
     JOURS.forEach(col=>{
-
       const td = document.createElement("td");
 
       if(col==="cheval"){
         td.innerText = item.cheval;
       }else{
-
         const value = item[col] || "";
-
         td.innerHTML = value.replace(/\n/g,"<br>");
         td.classList.add(textClasse(value));
-
-        td.addEventListener("click",()=>{
-          toggleDone(sheet,item.cheval,col);
-        });
       }
 
       tr.appendChild(td);
@@ -213,22 +202,6 @@ function drawTable(data, sheet){
 
     table.appendChild(tr);
   });
-}
-
-async function toggleDone(sheet,cheval,jour){
-
-  const payload = {
-    sheet: sheet,
-    cheval: cheval,
-    jour: jour
-  };
-
-  await fetch(SCRIPT_URL,{
-    method:"POST",
-    body: JSON.stringify(payload)
-  });
-
-  loadWeek(currentYear,currentWeek);
 }
 
 document.getElementById("prevWeek").onclick = ()=>{
@@ -240,29 +213,6 @@ document.getElementById("nextWeek").onclick = ()=>{
   currentWeek++;
   loadWeek(currentYear,currentWeek);
 };
-
-/* AUTO LOGOUT */
-
-let timer;
-function resetTimer(){
-  clearTimeout(timer);
-  timer = setTimeout(()=> location.href="index.html", TIMEOUT_LOGOUT);
-}
-["click","mousemove","touchstart","scroll"].forEach(ev=>{
-  window.addEventListener(ev,resetTimer);
-});
-resetTimer();
-
-/* Double clic retour écran info */
-
-let lastClick = 0;
-document.body.addEventListener("click",()=>{
-  const now = Date.now();
-  if(now - lastClick < 400){
-    location.href="index.html";
-  }
-  lastClick = now;
-});
 
 loadWeek(currentYear,currentWeek);
 
