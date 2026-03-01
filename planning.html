@@ -16,7 +16,7 @@ body{
   overflow:hidden;
 }
 
-/* ===== HEADER + NAV ===== */
+/* HEADER */
 
 header{
   height:70px;
@@ -39,7 +39,7 @@ header{
   opacity:1;
 }
 
-/* ===== TABLE ===== */
+/* TABLE */
 
 table{
   width:100%;
@@ -57,7 +57,10 @@ th, td{
   white-space:pre-line;
 }
 
-th{ background:#111; height:60px; }
+th{
+  background:#111;
+  height:60px;
+}
 
 td:first-child, th:first-child{
   width:220px;
@@ -65,7 +68,7 @@ td:first-child, th:first-child{
   background:#111;
 }
 
-/* ===== COULEURS ACTIVITE ===== */
+/* COULEURS ACTIVITE */
 
 .paddock      { background:#4CAF50; }
 .travail      { background:#ff9800; }
@@ -73,7 +76,7 @@ td:first-child, th:first-child{
 .proprietaire { background:#e53935; }
 .repos        { background:#e53935; }
 
-/* ===== VALIDATION ===== */
+/* VALIDATION */
 
 td.done{
   filter: brightness(0.6);
@@ -105,22 +108,16 @@ td.done::after{
 
 <script>
 
-// 📍 CONFIG ------------------------------------------------
-
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsRfugRPkX7opuYZU0Vlpp8XcMYEkqOvYa-r4sxxLf_0hLWzFuN9MaCWYIKfbaS-Al/exec";
-
-// jours dans Sheet
-const JOURS=["Cheval","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
-
-// reseau
+const SHEET_ID = "1Vp9pNL0d-oC6UmHQyCdvHwKl3h36NASIdSJ_vg1wz38";
 const TIMEOUT_LOGOUT = 60000;
 
-// stockage semaine
+// ⚠ cheval en minuscule (OpenSheet)
+const JOURS=["cheval","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+
 let currentDate = new Date();
 let currentYear;
 let currentWeek;
-
-// ----------------------------------------------------------
 
 function getISOWeek(d) {
   d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -131,7 +128,6 @@ function getISOWeek(d) {
   return [d.getUTCFullYear(),weekNo];
 }
 
-// calcule iso
 (function(){
   const [y,w] = getISOWeek(currentDate);
   currentYear = y;
@@ -156,11 +152,9 @@ function textClasse(txt){
   return "";
 }
 
-// 🚀 CHARGER LES DONNEES SHEET
-
 async function loadWeek(year,week){
   const name = sheetName(year,week);
-  const url  = `https://opensheet.elk.sh/1Vp9pNL0d-oC6UmHQyCdvHwKl3h36NASIdSJ_vg1wz38/${name}`;
+  const url  = `https://opensheet.elk.sh/${SHEET_ID}/${name}`;
 
   document.getElementById("weekLabel").innerText = "Semaine "+String(week).padStart(2,"0");
 
@@ -173,42 +167,42 @@ async function loadWeek(year,week){
   }
 }
 
-// 🌈 DESSIN DU TABLEAU
-
 function drawTable(data, sheet){
   const table = document.getElementById("planningTable");
   table.innerHTML = "";
 
+  // HEADER
   const head = document.createElement("tr");
   JOURS.forEach(h=>{
     const th = document.createElement("th");
-    th.innerText = h;
+    th.innerText = h.charAt(0).toUpperCase() + h.slice(1);
     head.appendChild(th);
   });
   table.appendChild(head);
 
+  // LIGNES
   data.forEach(item=>{
     const tr = document.createElement("tr");
+
     JOURS.forEach(col=>{
       const td = document.createElement("td");
-      if(col==="Cheval"){
-        td.innerText=item[col]||"";
+
+      if(col==="cheval"){
+        td.innerText=item["cheval"]||"";
       } else {
         td.innerText=item[col]||"";
-        td.classList.add( textClasse(item[col]||"") );
-        td.addEventListener("click",()=>toggleDone(td,sheet,item["cheval"],col));
+        td.classList.add(textClasse(item[col]||""));
+        td.addEventListener("click",()=>toggleDone(sheet,item["cheval"],col));
       }
+
       tr.appendChild(td);
     });
+
     table.appendChild(tr);
   });
 }
 
-// 🗸 VALIDATION — ENVOI VERS APPS SCRIPT
-
-async function toggleDone(td,sheet,cheval,jour){
-  const grey = "#e6e6e6";
-
+async function toggleDone(sheet,cheval,jour){
   const payload = {
     sheet: sheet,
     cheval: cheval,
@@ -220,11 +214,8 @@ async function toggleDone(td,sheet,cheval,jour){
     body: JSON.stringify(payload)
   });
 
-  // on recharge la semaine pour forcer l'état des backgrounds
   loadWeek(currentYear,currentWeek);
 }
-
-// 🔁 NAVIGATION SEMAINE
 
 document.getElementById("prevWeek").onclick = ()=>{
   currentWeek--;
@@ -236,8 +227,6 @@ document.getElementById("nextWeek").onclick = ()=>{
   loadWeek(currentYear,currentWeek);
 };
 
-// ⏱ AUTO LOGOUT
-
 let timer;
 function resetTimer(){
   clearTimeout(timer);
@@ -248,10 +237,7 @@ function resetTimer(){
 });
 resetTimer();
 
-// 📦 DOUBLE CLIC POUR SORTIR
-
 let lastClick = 0;
-
 document.body.addEventListener("click",()=>{
   const now = Date.now();
   if(now - lastClick < 400){
