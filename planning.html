@@ -62,26 +62,13 @@ td:first-child, th:first-child{
   background:#111;
 }
 
+/* COULEURS */
+
 .paddock      { background:#4CAF50; }
 .travail      { background:#ff9800; }
 .longe        { background:#2196F3; }
 .proprietaire { background:#e53935; }
 .repos        { background:#e53935; }
-
-td.done{
-  filter: brightness(0.6);
-  position:relative;
-}
-
-td.done::after{
-  content:"✔";
-  position:absolute;
-  top:4px;
-  right:6px;
-  font-size:18px;
-  color:white;
-  font-weight:700;
-}
 
 </style>
 </head>
@@ -99,7 +86,8 @@ td.done::after{
 <script>
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsRfugRPkX7opuYZU0Vlpp8XcMYEkqOvYa-r4sxxLf_0hLWzFuN9MaCWYIKfbaS-Al/exec";
-const JOURS=["cheval","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+
+const JOURS=["cheval","lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
 let currentDate = new Date();
 let currentYear;
@@ -145,24 +133,17 @@ async function loadWeek(year,week){
   document.getElementById("weekLabel").innerText =
     "Semaine "+String(week).padStart(2,"0");
 
-  console.log("URL appelée :", url);
-
   try{
     const res = await fetch(url);
     const data = await res.json();
-
-    console.log("DATA reçue :", data);
-    alert("Nombre de lignes reçues : " + data.length);
-
-    drawTable(data,name);
-
+    drawTable(data);
   }catch(e){
-    console.error("Erreur fetch :", e);
-    alert("Erreur lors du fetch !");
+    document.getElementById("planningTable").innerHTML =
+      "<tr><td style='color:red;padding:20px;'>Erreur chargement planning</td></tr>";
   }
 }
 
-function drawTable(data, sheet){
+function drawTable(data){
 
   const table = document.getElementById("planningTable");
   table.innerHTML = "";
@@ -178,11 +159,7 @@ function drawTable(data, sheet){
   table.appendChild(head);
 
   data.forEach(item=>{
-
-    if(!item.cheval){
-      console.log("Ligne ignorée car pas de cheval :", item);
-      return;
-    }
+    if(!item.cheval) return;
 
     const tr = document.createElement("tr");
 
