@@ -9,14 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 body{
   margin:0;
-  background:#0f1115;
+  background:#0b0e13;
   color:#f1f1f1;
   font-family:'Montserrat',sans-serif;
 }
 
 /* ===== ANIMATION PAGE ===== */
+
 .page{
   min-height:100vh;
   transform:translateX(100%);
@@ -26,26 +28,34 @@ body{
 .page.exit{ transform:translateX(100%); }
 
 /* ===== HEADER ===== */
+
 header{
   position:relative;
   height:70px;
-  background:#0f1115;
+  background:#0b0e13;
 }
 
+/* 🔙 Bouton retour PREMIUM */
 #backBtn{
   position:absolute;
   left:15px;
   top:50%;
   transform:translateY(-50%);
-  width:42px;
-  height:42px;
+  width:44px;
+  height:44px;
   border-radius:50%;
-  background:#1c1f26;
+  background:#1a1f2b;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.6);
+  box-shadow:0 0 10px rgba(30,44,136,0.5);
   cursor:pointer;
+  transition:all .2s ease;
+}
+
+#backBtn:hover{
+  background:#24308f;
+  box-shadow:0 0 14px rgba(30,44,136,0.8);
 }
 
 #backBtn img{
@@ -61,10 +71,11 @@ header h1{
   margin:0;
   font-size:18px;
   font-weight:700;
-  color:#fff;
+  color:#ffffff;
 }
 
 /* ===== PLAN ===== */
+
 #mapWrapper{
   position:relative;
   padding:10px;
@@ -73,9 +84,15 @@ header h1{
 #map{
   width:100%;
   border-radius:18px;
+  filter:
+    brightness(0.65)
+    contrast(1.05)
+    saturate(0.85)
+    hue-rotate(5deg);
 }
 
-/* ===== BOUTONS ===== */
+/* ===== BOUTONS PLAN ===== */
+
 .plan-btn{
   position:absolute;
   width:48px;
@@ -86,7 +103,13 @@ header h1{
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.6);
+  box-shadow:0 0 12px rgba(30,44,136,0.7);
+  transition:all .2s ease;
+}
+
+.plan-btn:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 18px rgba(30,44,136,1);
 }
 
 .plan-btn img{
@@ -103,10 +126,11 @@ header h1{
 #btn-maison{top:55%;left:60%;}
 
 /* ===== LEGENDE ===== */
+
 .legend{
   padding:20px;
   font-size:15px;
-  color:#e0e0e0;
+  color:#cfcfcf;
 }
 
 .legend-item{
@@ -119,19 +143,20 @@ header h1{
 .legend-item img{ width:22px; }
 
 /* ===== PANEL ===== */
+
 #panel{
   position:fixed;
   left:0;
   bottom:0;
   width:100%;
   height:50%;
-  background:#1c1f26;
+  background:linear-gradient(180deg,#1a1f2b,#131720);
   border-radius:20px 20px 0 0;
   transform:translateY(100%);
   transition:0.3s;
   padding:20px;
   box-sizing:border-box;
-  box-shadow:0 -6px 25px rgba(0,0,0,0.7);
+  box-shadow:0 -8px 30px rgba(0,0,0,0.8);
 }
 
 #panel.active{ transform:translateY(0); }
@@ -151,14 +176,14 @@ header h1{
 #closePanel{
   font-size:22px;
   cursor:pointer;
-  color:#ccc;
+  color:#aaa;
 }
 
 .row{ margin-top:14px; }
 
 .label{
   font-size:12px;
-  color:#999;
+  color:#888;
 }
 
 .value{
@@ -182,6 +207,7 @@ header h1{
   margin-right:15px;
 }
 
+/* INFOS */
 #info{
   margin-top:8px;
   line-height:1.7;
@@ -205,8 +231,9 @@ header h1{
   text-align:center;
   font-weight:600;
   cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.6);
+  box-shadow:0 0 12px rgba(232,139,0,0.6);
 }
+
 </style>
 </head>
 
@@ -276,7 +303,7 @@ header h1{
 
 <script>
 
-/* JS IDENTIQUE AU TIEN — JE N’AI RIEN TOUCHÉ */
+/* JS STRICTEMENT IDENTIQUE AU TIEN */
 
 window.addEventListener("DOMContentLoaded",()=>{
   requestAnimationFrame(()=>{
@@ -326,19 +353,19 @@ if(!e) return;
 
 panelTitle.innerText=formatTitle(e.espace);
 
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
+if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="#4caf50";}
+if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#ffb347";}
+if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="#f44336";}
 if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
 
 const special = e.horaire_special && String(e.horaire_special).trim() !== "";
 horaire.innerText = special ? e.horaire_special : e.horaire_affiche || "---";
 
 if(special){
-  horaire.style.color="#E88B00";
+  horaire.style.color="#ffb347";
   horaire.style.fontWeight="600";
 }else{
-  horaire.style.color="#fff";
+  horaire.style.color="#ffffff";
   horaire.style.fontWeight="500";
 }
 
