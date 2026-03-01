@@ -35,7 +35,6 @@ header{
   background:#0b0e13;
 }
 
-/* 🔙 Bouton retour PREMIUM */
 #backBtn{
   position:absolute;
   left:15px;
@@ -83,12 +82,13 @@ header h1{
 
 #map{
   width:100%;
-  border-radius:18px;
+  border-radius:22px;
   filter:
     brightness(0.65)
     contrast(1.05)
-    saturate(0.85)
-    hue-rotate(5deg);
+    saturate(0.85);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 88%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, black 88%, transparent 100%);
 }
 
 /* ===== BOUTONS PLAN ===== */
@@ -207,7 +207,6 @@ header h1{
   margin-right:15px;
 }
 
-/* INFOS */
 #info{
   margin-top:8px;
   line-height:1.7;
@@ -303,7 +302,7 @@ header h1{
 
 <script>
 
-/* JS STRICTEMENT IDENTIQUE AU TIEN */
+/* JS IDENTIQUE À TA VERSION */
 
 window.addEventListener("DOMContentLoaded",()=>{
   requestAnimationFrame(()=>{
