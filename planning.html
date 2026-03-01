@@ -98,7 +98,7 @@ td.done::after{
 
 <script>
 
-const SHEET_ID = "1Vp9pNL0d-oC6UmHQyCdvHwKl3h36NASIdSJ_vg1wz38";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsRfugRPkX7opuYZU0Vlpp8XcMYEkqOvYa-r4sxxLf_0hLWzFuN9MaCWYIKfbaS-Al/exec";
 const JOURS=["cheval","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
 let currentDate = new Date();
@@ -140,7 +140,7 @@ function textClasse(txt){
 async function loadWeek(year,week){
 
   const name = sheetName(year,week);
-  const url  = `https://opensheet.elk.sh/${SHEET_ID}/${name}`;
+  const url  = SCRIPT_URL + "?sheet=" + name;
 
   document.getElementById("weekLabel").innerText =
     "Semaine "+String(week).padStart(2,"0");
