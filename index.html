@@ -16,8 +16,6 @@
   --accent:#ffb347;
 }
 
-/* ===== HARD LOCK HEIGHT ===== */
-
 html,body{
   margin:0;
   padding:0;
@@ -28,14 +26,12 @@ html,body{
   color:white;
 }
 
-/* MAIN WRAPPER */
 .wrapper{
   height:100dvh;
   display:flex;
   flex-direction:column;
 }
 
-/* HEADER 10% EXACT */
 header{
   height:10%;
   min-height:70px;
@@ -65,7 +61,6 @@ header h1{
   font-size:clamp(16px,1.8vw,22px);
 }
 
-/* MAIN */
 .main{
   flex:1;
   display:grid;
@@ -75,36 +70,30 @@ header h1{
   box-sizing:border-box;
 }
 
-/* SECTION */
 .section{
   display:grid;
   grid-template-rows: auto 1fr;
   gap:6px;
 }
 
-/* TITRE */
 .section-title{
   font-weight:700;
   font-size:clamp(14px,1.5vw,18px);
 }
 
-/* CARDS GRID */
 .cards{
   display:grid;
   gap:8px;
 }
 
-/* 2 cartes en haut */
 .section:first-child .cards{
   grid-template-rows: 1fr 1fr;
 }
 
-/* 3 cartes en bas */
 .section:last-child .cards{
   grid-template-rows: 1fr 1fr 1fr;
 }
 
-/* CARD */
 .card{
   background:var(--glass);
   backdrop-filter:blur(10px);
@@ -117,7 +106,6 @@ header h1{
   overflow:hidden;
 }
 
-/* CARD CONTENT */
 .card-top{
   display:flex;
   justify-content:space-between;
@@ -239,13 +227,17 @@ function buildCard(e){
 
   const isTravail=(e.espace==="carriere"||e.espace==="manege");
 
+  const iconType = isTravail
+    ? "image/travail.svg"
+    : "image/paddock.svg";
+
   return `
     <div class="card-top">
       <div class="title-wrap">
-        <img src="image/travail.svg">
+        <img src="${iconType}">
         <div class="card-title">${TITRES[e.espace]}</div>
       </div>
-      <img class="statut" src="${ICONS_STATUT[e.statut_auto]}">
+      <img class="statut" src="${ICONS_STATUT[e.statut_auto] || ""}">
     </div>
 
     ${
