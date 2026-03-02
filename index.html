@@ -28,7 +28,6 @@
   --section-bg:#181E3B;
   --section-text:#ffffff;
   --shadow:0 6px 18px rgba(0,0,0,0.08);
-  --badge-bg:red;
 }
 
 @media (prefers-color-scheme: dark){
@@ -40,6 +39,13 @@
     --section-bg:#ffffff;
     --section-text:#000000;
     --shadow:0 10px 30px rgba(0,0,0,0.6);
+  }
+
+  /* Logo blanc premium en dark */
+  .header-left img{
+    filter:
+      brightness(0) invert(1)
+      drop-shadow(0 0 6px rgba(255,255,255,0.5));
   }
 }
 
@@ -77,6 +83,7 @@ header{
 
 .header-left img{
   height:40px;
+  transition:filter .3s ease;
 }
 
 header h1{
@@ -99,7 +106,7 @@ header h1{
   position:absolute;
   top:-6px;
   right:-6px;
-  background:var(--badge-bg);
+  background:red;
   color:white;
   width:16px;
   height:16px;
@@ -252,7 +259,6 @@ header h1{
 function go(url){ window.location.href=url; }
 function openExternal(url){ window.open(url,"_blank"); }
 
-/* ===== Theme color auto ===== */
 if(window.matchMedia('(prefers-color-scheme: dark)').matches){
   document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
 }
