@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Horaires</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= BASE ================= */
+
+body{
+  margin:0;
+  font-family:'Montserrat',sans-serif;
+  background:#f4f4f4;
+  color:#000;
+  transition:background .3s ease,color .3s ease;
+}
+
+/* ===== SLIDE ANIMATION ===== */
+
+body{
+  transform:translateX(100%);
+  animation:slideIn 0.35s ease forwards;
+}
+
+@keyframes slideIn{
+  to{ transform:translateX(0); }
+}
+
+body.slide-out{
+  animation:slideOut 0.35s ease forwards;
+}
+
+@keyframes slideOut{
+  to{ transform:translateX(100%); }
+}
+
+/* ================= HEADER ================= */
+
+header{
+  position:relative;
+  height:70px;
+}
+
+#backBtn{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+}
+
+#backBtn img{
+  width:22px;
+  height:22px;
+}
+
+header h1{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+}
+
+/* ================= LISTE ================= */
+
+#list{
+  padding:10px;
+}
+
+.card{
+  background:white;
+  margin:0 10px 16px;
+  padding:14px 16px;
+  border-radius:16px;
+  box-shadow:0 5px 12px rgba(0,0,0,0.12);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  transition:background .3s ease, box-shadow .3s ease;
+}
+
+.card img{
+  width:28px;
+  height:28px;
+}
+
+.day{
+  font-weight:700;
+  font-size:18px;
+}
+
+.time{
+  font-weight:600;
+  font-size:18px;
+}
+
+/* ===== MOBILE SAFE ===== */
+
+@media(max-width:480px){
+  .day,.time{
+    font-size:17px;
+  }
+}
+
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+  body{
+    background:#0f1115;
+    color:#ffffff;
+  }
+
+  header h1{
+    color:#ffffff;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  #backBtn img{
+    filter:brightness(0) invert(1);
+  }
+
+  .card{
+    background:#1c1f26;
+    box-shadow:0 20px 50px rgba(0,0,0,0.75);
+  }
+
+  .day,
+  .time{
+    color:#e5e5e5;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div id="backBtn" onclick="goBack()">
+    <img src="image/back.svg">
+  </div>
+  <h1>HORAIRES</h1>
+</header>
+
+<div id="list"></div>
+
+<script>
+
+/* ===== CONFIG ===== */
+
+const SHEET_URL = "https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/horaires";
+const REFRESH = 60000;
+
+/* ===== FORMAT JOUR ===== */
+
+function capitalize(txt){
+  return txt.charAt(0).toUpperCase() + txt.slice(1);
+}
+
+/* ===== LOAD ===== */
+
+function loadHoraires(){
+
+fetch(SHEET_URL,{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+
+  const list=document.getElementById("list");
+  list.innerHTML="";
+
+  data.forEach(row=>{
+
+    if(!row.jour || !row.ouvert || !row.ferme) return;
+
+    const card=document.createElement("div");
+    card.className="card";
+
+    card.innerHTML=`
+      <img src="image/time.svg">
+      <div class="day">${capitalize(row.jour)} :</div>
+      <div class="time">${row.ouvert.substring(0,5)} - ${row.ferme.substring(0,5)}</div>
+    `;
+
+    list.appendChild(card);
+
+  });
+
+});
+}
+
+/* ===== NAV ===== */
+
+function goBack(){
+  document.body.classList.add("slide-out");
+  setTimeout(()=>{
+    location.href="index.html";
+  },350);
+}
+
+loadHoraires();
+setInterval(loadHoraires,REFRESH);
+
+</script>
+
+</body>
+</html>
