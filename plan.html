@@ -9,46 +9,52 @@
 
 <style>
 
-/* ================= VARIABLES ================= */
+/* ===== BASE ===== */
 
-:root{
-  --bg:#f4f4f4;
-  --text:#000;
-  --panel:#ffffff;
-  --shadow:0 6px 18px rgba(0,0,0,0.08);
-  --reserve:#E88B00;
+body{
+  margin:0;
+  background:#f4f4f4;
+  font-family:'Montserrat',sans-serif;
 }
 
+/* ===== DARK SIMPLE ===== */
+
 @media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0f1115;
-    --text:#ffffff;
-    --panel:#1c1f26;
-    --shadow:0 18px 45px rgba(0,0,0,0.6);
-    --reserve:#c87400;
+
+  body{
+    background:#0f1115;
+    color:white;
+  }
+
+  header h1{
+    color:white;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 10px 25px rgba(0,0,0,0.6);
   }
 
   #backBtn img{
     filter:brightness(0) invert(1);
   }
 
-  /* image mieux intégrée sans halo */
+  #panel{
+    background:#1c1f26;
+    box-shadow:0 20px 50px rgba(0,0,0,0.7);
+  }
+
   #map{
-    filter:brightness(0.9) contrast(0.95) saturate(0.95);
+    filter:brightness(0.9) contrast(0.95);
     box-shadow:
-      0 35px 80px rgba(0,0,0,0.8),
+      0 30px 70px rgba(0,0,0,0.8),
       0 0 0 1px rgba(255,255,255,0.04);
   }
-}
 
-/* ================= BASE ================= */
+  #reserveBox{
+    background:#c87400;
+  }
 
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:'Montserrat',sans-serif;
-  color:var(--text);
-  transition:background .3s ease,color .3s ease;
 }
 
 /* ===== ANIMATION ===== */
@@ -77,11 +83,11 @@ header{
   width:42px;
   height:42px;
   border-radius:50%;
-  background:var(--panel);
+  background:white;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:var(--shadow);
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
   cursor:pointer;
 }
 
@@ -106,8 +112,7 @@ header h1{
 
 #map{
   width:100%;
-  border-radius:22px;
-  transition:filter .3s ease, box-shadow .3s ease;
+  border-radius:18px;
 }
 
 /* ===== BOUTONS ===== */
@@ -117,7 +122,7 @@ header h1{
   width:48px;
   height:48px;
   background:#1e2c88;
-  border-radius:14px;
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -161,13 +166,12 @@ header h1{
   bottom:0;
   width:100%;
   height:50%;
-  background:var(--panel);
+  background:#fff;
   border-radius:20px 20px 0 0;
   transform:translateY(100%);
   transition:0.3s;
   padding:20px;
   box-sizing:border-box;
-  box-shadow:var(--shadow);
 }
 
 #panel.active{ transform:translateY(0); }
@@ -227,26 +231,58 @@ header h1{
   overflow-y:auto;
 }
 
-/* ===== BOUTON RESERVER ===== */
-
 #reserveBox{
   display:none;
   margin-top:20px;
-  background:var(--reserve);
+  background:#E88B00;
   color:white;
   padding:12px;
-  border-radius:12px;
+  border-radius:10px;
   text-align:center;
   font-weight:600;
   cursor:pointer;
-  box-shadow:var(--shadow);
 }
 
 </style>
 </head>
+
 <body>
 
-<!-- TON HTML ET TON JS RESTENT STRICTEMENT IDENTIQUES ICI -->
+<div class="page" id="page">
+
+<header>
+  <div id="backBtn" onclick="goBack()">
+    <img src="image/back.svg">
+  </div>
+  <h1>PLAN INTERACTIF</h1>
+</header>
+
+<div id="mapWrapper">
+  <img id="map" src="image/plan.png">
+
+  <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
+  <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
+  <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
+  <div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
+  <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
+  <div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
+  <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
+  <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
+</div>
+
+<div id="panel"></div>
+
+</div>
+
+<script>
+window.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("page").classList.add("active");
+});
+</script>
 
 </body>
 </html>
