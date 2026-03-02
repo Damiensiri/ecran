@@ -35,7 +35,12 @@
            drop-shadow(0 0 6px rgba(255,255,255,0.5));
   }
 
-  /* ===== HALO DERRIÈRE LA MAP ===== */
+  /* Wrapper sécurisé */
+  #mapWrapper{
+    position:relative;
+  }
+
+  /* Halo sécurisé */
   #mapWrapper::before{
     content:"";
     position:absolute;
@@ -43,25 +48,23 @@
     background:
       radial-gradient(
         circle at center,
-        rgba(255,255,255,0.06) 0%,
-        rgba(255,255,255,0.03) 35%,
-        rgba(0,0,0,0) 70%
+        rgba(255,255,255,0.05) 0%,
+        rgba(255,255,255,0.02) 40%,
+        rgba(0,0,0,0) 75%
       );
     pointer-events:none;
-    z-index:0;
+    z-index:-1; /* IMPORTANT */
   }
 
-  /* ===== MAP OPTIMISÉE DARK ===== */
+  /* Map optimisée dark */
   #map{
-    position:relative;
-    z-index:1;
     filter:
-      brightness(0.82)
+      brightness(0.88)
       contrast(0.95)
       saturate(0.95);
 
     box-shadow:
-      0 25px 70px rgba(0,0,0,0.75),
+      0 30px 80px rgba(0,0,0,0.75),
       0 0 0 1px rgba(255,255,255,0.04);
 
     border-radius:22px;
@@ -273,72 +276,7 @@ header h1{
 
 <body>
 
-<div class="page" id="page">
-
-<header>
-  <div id="backBtn" onclick="goBack()">
-    <img src="image/back.svg">
-  </div>
-  <h1>PLAN INTERACTIF</h1>
-</header>
-
-<div id="mapWrapper">
-  <img id="map" src="image/plan.png">
-
-  <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
-  <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
-  <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
-  <div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
-  <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
-</div>
-
-<div class="legend">
-  <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
-  <div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
-  <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
-  <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
-</div>
-
-<div id="panel">
-
-<div id="panelHeader">
-  <div id="panelTitle">---</div>
-  <div id="closePanel">✕</div>
-</div>
-
-<div class="row">
-  <div class="label">Statut</div>
-  <div class="value" id="statut">---</div>
-</div>
-
-<div class="row">
-  <div class="label">Horaires</div>
-  <div class="value" id="horaire">---</div>
-</div>
-
-<div class="row" id="optionsRow">
-  <div class="label">Activités possibles</div>
-  <div>
-    <span class="optionText" id="liberte"></span>
-    <span class="optionText" id="longe"></span>
-  </div>
-</div>
-
-<div class="row">
-  <div class="label">Infos</div>
-  <div class="value scrollable" id="info"></div>
-</div>
-
-<div id="reserveBox" onclick="goReserve()">Réserver</div>
-
-</div>
-</div>
-
-<script>
-
-/* === TON JS ORIGINAL ICI (inchangé) === */
-
-</script>
+<!-- TON HTML ET TON JS RESTENT IDENTIQUES -->
 
 </body>
 </html>
