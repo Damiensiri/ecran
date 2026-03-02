@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Concours</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= BASE ================= */
+
+body{
+  margin:0;
+  background:#f4f4f4;
+  font-family:'Montserrat',sans-serif;
+  color:#000;
+  transition:background .3s ease,color .3s ease;
+}
+
+/* ================= ANIMATION ================= */
+
+.page{
+  min-height:100vh;
+  transform:translateX(100%);
+  transition:transform .35s ease;
+}
+
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
+
+/* ================= HEADER ================= */
+
+header{
+  position:relative;
+  height:70px;
+}
+
+#backBtn{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+}
+
+#backBtn img{
+  width:22px;
+  height:22px;
+}
+
+header h1{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+  background:white;
+  margin:0 15px 20px;
+  padding:15px;
+  border-radius:18px;
+  box-shadow:0 5px 12px rgba(0,0,0,0.12);
+  transition:background .3s ease, box-shadow .3s ease;
+}
+
+/* ================= CALENDAR ================= */
+
+.calendar-wrapper{
+  width:100%;
+  height:420px;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.calendar-wrapper iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+/* ================= TEXT ================= */
+
+.note{
+  text-align:center;
+  font-size:13px;
+  color:#666;
+  margin-top:10px;
+}
+
+.tarifs-title{
+  font-weight:700;
+  margin-bottom:8px;
+  text-align:center;
+}
+
+.tarifs{
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+  body{
+    background:#0f1115;
+    color:#ffffff;
+  }
+
+  header h1{
+    color:#ffffff;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  #backBtn img{
+    filter:brightness(0) invert(1);
+  }
+
+  .card{
+    background:#1c1f26;
+    box-shadow:0 20px 50px rgba(0,0,0,0.7);
+  }
+
+  .note{
+    color:#aaaaaa;
+  }
+
+  .tarifs{
+    color:#e5e5e5;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+
+<header>
+  <div id="backBtn" onclick="goBack()">
+    <img src="image/back.svg">
+  </div>
+  <h1>CONCOURS</h1>
+</header>
+
+<!-- ===== PLANNING ===== -->
+
+<div class="card">
+  <div class="calendar-wrapper">
+    <iframe src="https://calendar.google.com/calendar/embed?height=503&wkst=2&bgcolor=%23ffffff&ctz=Europe%2FParis&showCalendars=0&showTz=0&showTabs=0&showTitle=0&showPrint=0&src=Y2FsZW5kcmllci5kYW1pZW5zaXJpQGdtYWlsLmNvbQ&src=2b1f61f5adb93a5c51f3ac30d5978fa1b2310ba76408273f5adb977ef90ce081@group.calendar.google.com&color=%23EF6C00&color=%23009688" scrolling="no"></iframe>
+  </div>
+
+  <div class="note">
+    Le bouton "+" permet de s'abonner au calendrier (optionnel)
+  </div>
+</div>
+
+<!-- ===== TARIFS ===== -->
+
+<div class="card">
+  <div class="tarifs-title">Tarifs</div>
+  <div class="tarifs">
+    <strong>Transport</strong><br>
+    Brienne 1 jour : 5€<br>
+    2 jours : 8€<br>
+    3 jours : 10€<br>
+    Forfait : 120€ jusqu’à environ 270km aller retour inclus hors frais d’autoroute.<br><br>
+
+    <strong>Coaching</strong><br>
+    1er parcours : 25€<br>
+    Parcours supplémentaires : 15€
+  </div>
+</div>
+
+</div>
+
+<script>
+
+/* ===== ANIMATION ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+  requestAnimationFrame(()=>{
+    document.getElementById("page").classList.add("active");
+  });
+});
+
+function goBack(){
+  const page=document.getElementById("page");
+  page.classList.remove("active");
+  page.classList.add("exit");
+  setTimeout(()=>{
+    window.location.href="index.html";
+  },300);
+}
+
+</script>
+
+</body>
+</html>
