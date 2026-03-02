@@ -3,163 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Écran Informations - Écurie</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Ecurie Damien Siri</title>
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="apple-touch-icon" href="image/icon-192x192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ecurie DS">
+<meta name="theme-color" content="#f4f4f4">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
 
+/* ================= VARIABLES ================= */
+
 :root{
-  --bg:#000;
-  --glass:rgba(255,255,255,0.08);
-  --border:rgba(255,255,255,0.18);
-  --accent:#ffb347;
+  --bg:#f4f4f4;
+  --header-bg:#f4f4f4;
+  --text:#181E3B;
+  --card-bg:#ffffff;
+  --section-bg:#181E3B;
+  --section-text:#ffffff;
+  --shadow:0 6px 18px rgba(0,0,0,0.08);
+  --badge-bg:red;
 }
 
-html,body{
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1115;
+    --header-bg:#0f1115;
+    --text:#ffffff;
+    --card-bg:#1c1f26;
+    --section-bg:#ffffff;
+    --section-text:#000000;
+    --shadow:0 10px 30px rgba(0,0,0,0.6);
+  }
+}
+
+/* ================= BASE ================= */
+
+body{
   margin:0;
-  padding:0;
-  height:100dvh;
-  overflow:hidden;
-  background:var(--bg);
   font-family:'Montserrat',sans-serif;
-  color:white;
+  background:var(--bg);
+  color:var(--text);
+  overflow-y:auto;
+  transition:background .3s ease,color .3s ease;
 }
 
-.wrapper{
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-}
+/* ================= HEADER ================= */
 
 header{
-  height:10%;
-  min-height:70px;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:70px;
+  background:var(--header-bg);
+  z-index:1000;
   display:flex;
   align-items:center;
   justify-content:center;
-  position:relative;
-  padding:0 20px;
+  transition:background .3s ease;
 }
 
-header img{
+.header-left{
   position:absolute;
-  left:20px;
-  height:45%;
-  filter:brightness(0) invert(1);
+  left:12px;
+}
+
+.header-left img{
+  height:40px;
 }
 
 header h1{
   margin:0;
-  font-size:clamp(18px,2vw,26px);
-}
-
-#clock{
-  position:absolute;
-  right:20px;
+  font-size:20px;
   font-weight:700;
-  font-size:clamp(16px,1.8vw,22px);
+  color:var(--text);
 }
 
-.main{
-  flex:1;
-  display:grid;
-  grid-template-rows: 1fr 1fr;
-  gap:10px;
-  padding:10px 20px 15px;
-  box-sizing:border-box;
+/* ================= BELL ================= */
+
+#bellBox{
+  position:absolute;
+  right:12px;
+  font-size:22px;
+  cursor:pointer;
 }
 
-.section{
-  display:grid;
-  grid-template-rows: auto 1fr;
-  gap:6px;
+#bellBadge{
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  background:var(--badge-bg);
+  color:white;
+  width:16px;
+  height:16px;
+  font-size:10px;
+  border-radius:50%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= CONTENT ================= */
+
+.page-content{
+  margin-top:70px;
+}
+
+/* ================= TITLES ================= */
+
+#welcome{
+  text-align:center;
+  font-size:36px;
+  font-weight:700;
+  margin:10px 0 20px;
 }
 
 .section-title{
-  font-weight:700;
-  font-size:clamp(14px,1.5vw,18px);
+  background:var(--section-bg);
+  color:var(--section-text);
+  display:inline-block;
+  padding:6px 14px;
+  margin:20px 15px 10px;
+  border-radius:6px;
+  font-size:14px;
+  letter-spacing:0.5px;
 }
 
-.cards{
+/* ================= GRID ================= */
+
+.grid{
   display:grid;
-  gap:8px;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  padding:0 15px;
 }
 
-.section:first-child .cards{
-  grid-template-rows: 1fr 1fr;
-}
-
-.section:last-child .cards{
-  grid-template-rows: 1fr 1fr 1fr;
-}
+/* ================= CARDS ================= */
 
 .card{
-  background:var(--glass);
-  backdrop-filter:blur(10px);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:10px 14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  overflow:hidden;
+  background:var(--card-bg);
+  border-radius:22px;
+  padding:22px;
+  text-align:center;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
 }
 
-.card-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.card:hover{
+  transform:translateY(-3px);
 }
 
-.title-wrap{
-  display:flex;
-  align-items:center;
-  gap:8px;
+.card img{
+  width:55px;
+  margin-bottom:12px;
 }
 
-.title-wrap img{
-  width:20px;
-}
-
-.card-title{
-  font-size:clamp(14px,1.6vw,20px);
+.card div{
+  font-size:16px;
   font-weight:700;
 }
 
-.statut{
-  width:20px;
-}
+/* ================= LIST BUTTON ================= */
 
-.card-middle{
+.list-btn{
+  background:var(--card-bg);
+  margin:12px 15px;
+  padding:18px;
+  border-radius:22px;
   display:flex;
-  gap:10px;
-  margin-top:4px;
   align-items:center;
-  flex-wrap:wrap;
-}
-
-.badge{
+  gap:12px;
+  box-shadow:var(--shadow);
   font-weight:700;
-  font-size:clamp(12px,1.2vw,14px);
+  cursor:pointer;
+  transition:transform .15s ease;
 }
 
-.badge.oui{ color:#4caf50; }
-.badge.non{ color:#f44336; }
-
-.horaire{
-  margin-left:auto;
-  font-size:clamp(12px,1.2vw,14px);
-  font-weight:600;
+.list-btn:hover{
+  transform:translateY(-2px);
 }
 
-.info{
-  margin-top:4px;
-  font-size:clamp(11px,1vw,13px);
-  color:var(--accent);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.list-btn img{
+  width:26px;
 }
 
 </style>
@@ -167,130 +200,62 @@ header h1{
 
 <body>
 
-<div class="wrapper">
-
 <header>
-  <img src="image/logo.png">
-  <h1>INFORMATIONS ÉCURIE</h1>
-  <div id="clock">--:--</div>
+  <div class="header-left">
+    <img src="image/logo.png">
+  </div>
+  <h1>ECURIE DAMIEN SIRI</h1>
+  <div id="bellBox" onclick="go('notifications.html')">
+    🔔
+    <span id="bellBadge"></span>
+  </div>
 </header>
 
-<div class="main">
+<div class="page-content">
 
-  <div class="section">
-    <div class="section-title">ESPACES TRAVAIL</div>
-    <div class="cards">
-      <div class="card" id="carriere"></div>
-      <div class="card" id="manege"></div>
-    </div>
-  </div>
+<div id="welcome">BIENVENUE</div>
 
-  <div class="section">
-    <div class="section-title">PADDOCKS</div>
-    <div class="cards">
-      <div class="card" id="maison"></div>
-      <div class="card" id="grande-voie"></div>
-      <div class="card" id="beudot"></div>
-    </div>
-  </div>
+<div class="section-title">ESPACES</div>
 
+<div class="grid">
+  <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
+  <div class="card" onclick="go('paddocks.html')"><img src="image/paddock.svg"><div>PADDOCK</div></div>
 </div>
+
+<div class="list-btn" onclick="go('plan.html')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
+
+<div class="section-title">PRATIQUE</div>
+
+<div class="grid">
+  <div class="card" onclick="go('horaires.html')"><img src="image/time.svg"><div>HORAIRES</div></div>
+  <div class="card" onclick="go('meteo.html')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
+  <div class="card" onclick="openExternal('https://ce-grand-rang.cavasoft.fr')"><img src="image/cavasoft.svg"><div>COURS</div></div>
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/book-online?category=194a368e-8a4f-4212-a33e-ae1656e4de8a')"><img src="image/service.svg"><div>SERVICES</div></div>
+  <div class="card" onclick="go('concours.html')"><img src="image/concours.svg"><div>CONCOURS</div></div>
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/category/soins')"><img src="image/soins.svg"><div>SOINS</div></div>
+</div>
+
+<div class="section-title">AUTRES</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/category/laverie')"><img src="image/laverie.svg"> LAVERIE</div>
+<div class="list-btn" onclick="openExternal('tarifs.pdf')"><img src="image/tarif.svg"> TARIFS</div>
+
+<div class="section-title">COMPTE</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/profile/my/profile')"><img src="image/compte.svg"> MON COMPTE</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/my-bookings')"><img src="image/reservation.svg"> MES RÉSERVATIONS</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/cart-page')"><img src="image/panier.svg"> MON PANIER</div>
+
 </div>
 
 <script>
+function go(url){ window.location.href=url; }
+function openExternal(url){ window.open(url,"_blank"); }
 
-const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
-const REFRESH=60000;
-
-const ICONS_STATUT={
-  "ouvert":"image/ouvert.png",
-  "ferme":"image/ferme.png",
-  "prevision":"image/prevision.png",
-  "hors-service":"image/horsservice.png"
-};
-
-const TITRES={
-  "carriere":"Carrière",
-  "manege":"Manège",
-  "maison":"Maison",
-  "grande-voie":"Grande voie",
-  "beudot":"Beudot"
-};
-
-function badgeYN(v){
-  if(v==="oui") return `<span class="badge oui">OUI</span>`;
-  if(v==="non") return `<span class="badge non">NON</span>`;
-  return "";
+/* ===== Theme color auto ===== */
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
 }
-
-function buildCard(e){
-
-  const isTravail=(e.espace==="carriere"||e.espace==="manege");
-
-  const iconType = isTravail
-    ? "image/travail.svg"
-    : "image/paddock.svg";
-
-  return `
-    <div class="card-top">
-      <div class="title-wrap">
-        <img src="${iconType}">
-        <div class="card-title">${TITRES[e.espace]}</div>
-      </div>
-      <img class="statut" src="${ICONS_STATUT[e.statut_auto] || ""}">
-    </div>
-
-    ${
-      isTravail
-      ? `
-        <div class="card-middle">
-          <div>Liberté</div>
-          ${badgeYN(e.liberte)}
-          <div>Longe</div>
-          ${badgeYN(e.longe)}
-          <div class="horaire" style="color:${e.horaire_special ? "#ffb347":"#fff"}">
-            ${e.horaire_special || e.horaire_affiche || ""}
-          </div>
-        </div>
-      `
-      : `
-        <div class="card-middle">
-          <div class="horaire" style="color:${e.horaire_special ? "#ffb347":"#fff"}">
-            ${e.horaire_special || e.horaire_affiche || ""}
-          </div>
-        </div>
-      `
-    }
-
-    <div class="info">${e.info || ""}</div>
-  `;
-}
-
-function loadData(){
-fetch(SHEET_URL,{cache:"no-store"})
-.then(r=>r.json())
-.then(data=>{
-  ["carriere","manege","maison","grande-voie","beudot"].forEach(espace=>{
-    const row=data.find(e=>e.espace===espace);
-    if(!row) return;
-    document.getElementById(espace).innerHTML=buildCard(row);
-  });
-});
-}
-
-loadData();
-setInterval(loadData,REFRESH);
-
-function updateClock(){
-  const d=new Date();
-  const h=String(d.getHours()).padStart(2,"0");
-  const m=String(d.getMinutes()).padStart(2,"0");
-  document.getElementById("clock").innerText=h+":"+m;
-}
-
-updateClock();
-setInterval(updateClock,1000);
-
 </script>
 
 </body>
