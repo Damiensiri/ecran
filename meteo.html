@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Météo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= BASE ================= */
+
+body{
+  margin:0;
+  background:#f4f4f4;
+  font-family:'Montserrat',sans-serif;
+  color:#000;
+  transition:background .3s ease,color .3s ease;
+}
+
+/* ================= PAGE ANIM ================= */
+
+.page{
+  min-height:100vh;
+  transform:translateX(100%);
+  transition:0.35s;
+}
+
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
+
+/* ================= HEADER ================= */
+
+header{
+  position:relative;
+  height:70px;
+}
+
+#backBtn{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+}
+
+#backBtn img{
+  width:22px;
+  height:22px;
+}
+
+header h1{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+}
+
+/* ================= CARD ================= */
+
+.card{
+  background:white;
+  margin:20px;
+  padding:22px;
+  border-radius:22px;
+  box-shadow:0 5px 12px rgba(0,0,0,0.12);
+  text-align:center;
+  transition:background .3s ease, box-shadow .3s ease;
+}
+
+.city{
+  font-size:20px;
+  color:#777;
+  margin-bottom:12px;
+}
+
+.temp{
+  font-size:48px;
+  font-weight:700;
+}
+
+.desc{
+  font-size:16px;
+  color:#777;
+  margin-top:4px;
+}
+
+/* ================= EXTRA INFOS ================= */
+
+.extras{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  font-size:14px;
+}
+
+.extra-item{
+  background:#f4f4f4;
+  padding:10px;
+  border-radius:10px;
+}
+
+/* ================= FORECAST ================= */
+
+.forecast{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:22px;
+}
+
+.day{
+  flex:1;
+  background:#f4f4f4;
+  padding:14px 6px;
+  border-radius:14px;
+  text-align:center;
+}
+
+.day-name{
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.day-temp{
+  margin-top:6px;
+  font-size:14px;
+}
+
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+  body{
+    background:#0f1115;
+    color:#ffffff;
+  }
+
+  header h1{
+    color:#ffffff;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  #backBtn img{
+    filter:brightness(0) invert(1);
+  }
+
+  .card{
+    background:#1c1f26;
+    box-shadow:0 25px 60px rgba(0,0,0,0.75);
+  }
+
+  .city,
+  .desc{
+    color:#b5b5b5;
+  }
+
+  .extra-item{
+    background:#252a33;
+  }
+
+  .day{
+    background:#252a33;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+
+<header>
+  <div id="backBtn" onclick="goBack()">
+    <img src="image/back.svg">
+  </div>
+  <h1>MÉTÉO</h1>
+</header>
+
+<div class="card">
+
+  <div class="city">Brienne-le-Château</div>
+
+  <div id="icon"></div>
+
+  <div class="temp" id="temp">--°C</div>
+  <div class="desc" id="desc">---</div>
+
+  <div class="extras">
+    <div class="extra-item" id="wind">💨 Vent : -- km/h</div>
+    <div class="extra-item" id="gust">🌬 Rafales : -- km/h</div>
+    <div class="extra-item" id="rainChance">☔ Pluie : -- %</div>
+    <div class="extra-item" id="rainAmount">🌧 Cumul : -- mm</div>
+  </div>
+
+  <div class="forecast" id="forecast"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ===== ANIM ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+  requestAnimationFrame(()=>{
+    document.getElementById("page").classList.add("active");
+  });
+});
+
+/* ===== API Open-Meteo ===== */
+
+const URL =
+"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,wind_gusts_10m,precipitation_probability,precipitation,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=Europe/Paris";
+
+function icon(code, isDay){
+  if(code === 0) return isDay ? "☀️" : "🌙";
+  if(code === 1) return isDay ? "🌤" : "🌙☁️";
+  if(code === 2) return isDay ? "⛅" : "☁️🌙";
+  if(code === 3) return "☁️";
+  if(code >= 45 && code <= 48) return "🌫";
+  if(code >= 51 && code <= 67) return "🌧";
+  if(code >= 71 && code <= 77) return "🌨";
+  if(code >= 80 && code <= 82) return "🌦";
+  if(code >= 95 && code <= 99) return "⛈";
+  return "☁️";
+}
+
+function dayName(i){
+  return ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."][i%7];
+}
+
+fetch(URL)
+.then(r=>r.json())
+.then(d=>{
+
+  document.getElementById("icon").innerHTML =
+    `<div style="font-size:48px">${icon(d.current.weathercode, d.current.is_day)}</div>`;
+
+  document.getElementById("temp").innerText =
+    Math.round(d.current.temperature_2m)+"°C";
+
+  document.getElementById("desc").innerText="Conditions actuelles";
+
+  document.getElementById("wind").innerText =
+    "💨 Vent : "+Math.round(d.current.wind_speed_10m)+" km/h";
+
+  document.getElementById("gust").innerText =
+    "🌬 Rafales : "+Math.round(d.current.wind_gusts_10m)+" km/h";
+
+  document.getElementById("rainChance").innerText =
+    "☔ Pluie : "+d.daily.precipitation_probability_max[0]+" %";
+
+  document.getElementById("rainAmount").innerText =
+    "🌧 Cumul : "+d.daily.precipitation_sum[0]+" mm";
+
+  const f=document.getElementById("forecast");
+  f.innerHTML="";
+
+  for(let i=0;i<3;i++){
+    f.innerHTML+=`
+      <div class="day">
+        <div class="day-name">${dayName(new Date().getDay()+i)}</div>
+        <div>${icon(d.daily.weathercode[i], true)}</div>
+        <div class="day-temp">
+          ${Math.round(d.daily.temperature_2m_min[i])}° /
+          ${Math.round(d.daily.temperature_2m_max[i])}°
+        </div>
+      </div>
+    `;
+  }
+
+});
+
+function goBack(){
+  const p=document.getElementById("page");
+  p.classList.remove("active");
+  p.classList.add("exit");
+  setTimeout(()=>{ location.href="index.html"; },300);
+}
+
+</script>
+
+</body>
+</html>
