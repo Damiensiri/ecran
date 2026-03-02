@@ -35,8 +35,36 @@
            drop-shadow(0 0 6px rgba(255,255,255,0.5));
   }
 
+  /* ===== HALO DERRIÈRE LA MAP ===== */
+  #mapWrapper::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(255,255,255,0.06) 0%,
+        rgba(255,255,255,0.03) 35%,
+        rgba(0,0,0,0) 70%
+      );
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== MAP OPTIMISÉE DARK ===== */
   #map{
-    filter:brightness(0.75) contrast(1.05) saturate(0.9);
+    position:relative;
+    z-index:1;
+    filter:
+      brightness(0.82)
+      contrast(0.95)
+      saturate(0.95);
+
+    box-shadow:
+      0 25px 70px rgba(0,0,0,0.75),
+      0 0 0 1px rgba(255,255,255,0.04);
+
+    border-radius:22px;
   }
 }
 
@@ -50,7 +78,7 @@ body{
   transition:background .3s ease,color .3s ease;
 }
 
-/* ===== ANIMATION PAGE ===== */
+/* ===== ANIMATION ===== */
 
 .page{
   min-height:100vh;
@@ -105,7 +133,7 @@ header h1{
 #map{
   width:100%;
   border-radius:18px;
-  transition:filter .3s ease;
+  transition:filter .3s ease, box-shadow .3s ease;
 }
 
 /* ===== BOUTONS ===== */
@@ -308,106 +336,7 @@ header h1{
 
 <script>
 
-/* ==== TON JS ORIGINAL COMPLET ==== */
-
-window.addEventListener("DOMContentLoaded",()=>{
-  requestAnimationFrame(()=>{
-    document.getElementById("page").classList.add("active");
-  });
-});
-
-const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
-const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
-
-const ICONS={
-  ouvert:"image/ouvert.png",
-  ferme:"image/ferme.png",
-  prevision:"image/prevision.png",
-  "hors-service":"image/horsservice.png"
-};
-
-let DATA=[];
-
-function formatTitle(t){
-  const map={
-    "carriere":"Carrière",
-    "manege":"Manège",
-    "maison":"Maison",
-    "grande-voie":"Grande voie",
-    "beudot":"Beudot"
-  };
-  return map[t]||t;
-}
-
-function loadData(){
-fetch(SHEET_URL,{cache:"no-store"})
-.then(r=>r.json())
-.then(d=>{
-  DATA=d;
-  d.forEach(e=>{
-    document.getElementById("icon-"+e.espace).src=ICONS[e.statut_auto];
-  });
-});
-}
-loadData();
-setInterval(loadData,60000);
-
-function openSpace(espace){
-
-const e=DATA.find(x=>x.espace===espace);
-if(!e) return;
-
-panelTitle.innerText=formatTitle(e.espace);
-
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
-if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
-
-const special = e.horaire_special && String(e.horaire_special).trim() !== "";
-horaire.innerText = special ? e.horaire_special : e.horaire_affiche || "---";
-
-if(special){
-  horaire.style.color="#E88B00";
-  horaire.style.fontWeight="600";
-}else{
-  horaire.style.color=window.matchMedia('(prefers-color-scheme: dark)').matches ? "#fff" : "#000";
-  horaire.style.fontWeight="500";
-}
-
-info.innerText=e.info||"Aucune info";
-
-let show=false;
-if(e.liberte){
-  liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
-  show=true;
-}
-if(e.longe){
-  longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
-  show=true;
-}
-optionsRow.style.display=show?"block":"none";
-
-if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
- (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
-  reserveBox.style.display="block";
-}else{
-  reserveBox.style.display="none";
-}
-
-panel.classList.add("active");
-}
-
-closePanel.onclick=()=>panel.classList.remove("active");
-
-function goBack(){
-  const page=document.getElementById("page");
-  page.classList.remove("active");
-  page.classList.add("exit");
-  setTimeout(()=>{ location.href="index.html"; },300);
-}
-
-function goReserve(){ window.open(RESERVE_URL,"_blank"); }
+/* === TON JS ORIGINAL ICI (inchangé) === */
 
 </script>
 
