@@ -74,7 +74,7 @@ header h1{
 #map{
   width:100%;
   border-radius:20px;
-  transition:filter .3s ease, box-shadow .3s ease;
+  transition:box-shadow .3s ease;
 }
 
 /* ================= BOUTONS ================= */
@@ -138,60 +138,8 @@ header h1{
 
 #panel.active{ transform:translateY(0); }
 
-#panelHeader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-#panelTitle{
-  font-size:20px;
-  font-weight:700;
-}
-
-#closePanel{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.row{ margin-top:14px; }
-
-.label{
-  font-size:12px;
-  color:#888;
-}
-
-.value{
-  font-size:14px;
-  font-weight:500;
-}
-
-#statut{
-  font-size:18px;
-  font-weight:700;
-}
-
-#horaire{
-  font-size:14px;
-  font-weight:500;
-}
-
-.optionText{
-  font-size:13px;
-  margin-right:15px;
-}
-
-#info{
-  margin-top:8px;
-  line-height:1.7;
-  font-size:14px;
-  font-weight:550;
-}
-
-.scrollable{
-  max-height:160px;
-  overflow-y:auto;
-}
+.label{ font-size:12px; color:#888; }
+.value{ font-size:14px; font-weight:500; }
 
 #reserveBox{
   display:none;
@@ -205,6 +153,8 @@ header h1{
   cursor:pointer;
 }
 
+/* ================= DARK MODE ================= */
+
 @media (prefers-color-scheme: dark){
 
   body{
@@ -212,9 +162,7 @@ header h1{
     color:#ffffff;
   }
 
-  header h1{
-    color:#ffffff;
-  }
+  header h1{ color:#ffffff; }
 
   #backBtn{
     background:#1c1f26;
@@ -230,28 +178,26 @@ header h1{
     box-shadow:0 25px 60px rgba(0,0,0,0.75);
   }
 
-  .label{
-    color:#9aa0a6;
+  .label{ color:#9aa0a6; }
+  .value{ color:#e5e5e5; }
+  .legend{ color:#ddd; }
+
+  /* === IMAGE DARK PROPRE === */
+
+  #map{
+    box-shadow:
+      0 25px 60px rgba(0,0,0,0.85),
+      0 0 0 1px rgba(255,255,255,0.04);
   }
 
-  .value{
-    color:#e5e5e5;
+  #mapWrapper::after{
+    content:"";
+    position:absolute;
+    inset:10px;
+    border-radius:20px;
+    background:rgba(0,0,0,0.16);
+    pointer-events:none;
   }
-
-  .legend{
-    color:#ddd;
-  }
-
-#map{
-  filter:
-    brightness(0.90)
-    contrast(1.01)
-    saturate(0.98);
-
-  box-shadow:
-    0 20px 50px rgba(0,0,0,0.85),
-    0 0 0 1px rgba(255,255,255,0.02);
-}
 
   #reserveBox{
     background:#c87400;
@@ -292,37 +238,35 @@ header h1{
 </div>
 
 <div id="panel">
-
-<div id="panelHeader">
-  <div id="panelTitle">---</div>
-  <div id="closePanel">✕</div>
-</div>
-
-<div class="row">
-  <div class="label">Statut</div>
-  <div class="value" id="statut">---</div>
-</div>
-
-<div class="row">
-  <div class="label">Horaires</div>
-  <div class="value" id="horaire">---</div>
-</div>
-
-<div class="row" id="optionsRow">
-  <div class="label">Activités possibles</div>
-  <div>
-    <span class="optionText" id="liberte"></span>
-    <span class="optionText" id="longe"></span>
+  <div id="panelHeader">
+    <div id="panelTitle">---</div>
+    <div id="closePanel">✕</div>
   </div>
-</div>
 
-<div class="row">
-  <div class="label">Infos</div>
-  <div class="value scrollable" id="info"></div>
-</div>
+  <div class="row">
+    <div class="label">Statut</div>
+    <div class="value" id="statut">---</div>
+  </div>
 
-<div id="reserveBox" onclick="goReserve()">Réserver</div>
+  <div class="row">
+    <div class="label">Horaires</div>
+    <div class="value" id="horaire">---</div>
+  </div>
 
+  <div class="row" id="optionsRow">
+    <div class="label">Activités possibles</div>
+    <div>
+      <span class="optionText" id="liberte"></span>
+      <span class="optionText" id="longe"></span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="label">Infos</div>
+    <div class="value scrollable" id="info"></div>
+  </div>
+
+  <div id="reserveBox" onclick="goReserve()">Réserver</div>
 </div>
 
 </div>
@@ -375,7 +319,6 @@ loadData();
 setInterval(loadData,60000);
 
 function openSpace(espace){
-
 const e=DATA.find(x=>x.espace===espace);
 if(!e) return;
 
