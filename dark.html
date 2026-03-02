@@ -3,36 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Plan interactif</title>
+<title>Météo</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
+/* ================= BASE ================= */
+
 body{
   margin:0;
-  background:#0b0e13;
-  color:#f1f1f1;
+  background:#f4f4f4;
   font-family:'Montserrat',sans-serif;
+  color:#000;
+  transition:background .3s ease,color .3s ease;
 }
 
-/* ===== ANIMATION PAGE ===== */
+/* ================= PAGE ANIM ================= */
 
 .page{
   min-height:100vh;
   transform:translateX(100%);
-  transition:transform .35s ease;
+  transition:0.35s;
 }
+
 .page.active{ transform:translateX(0); }
 .page.exit{ transform:translateX(100%); }
 
-/* ===== HEADER ===== */
+/* ================= HEADER ================= */
 
 header{
   position:relative;
   height:70px;
-  background:#0b0e13;
 }
 
 #backBtn{
@@ -40,26 +42,20 @@ header{
   left:15px;
   top:50%;
   transform:translateY(-50%);
-  width:44px;
-  height:44px;
+  width:42px;
+  height:42px;
   border-radius:50%;
-  background:#1a1f2b;
+  background:white;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 0 10px rgba(30,44,136,0.5);
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
   cursor:pointer;
-  transition:all .2s ease;
-}
-
-#backBtn:hover{
-  background:#24308f;
-  box-shadow:0 0 14px rgba(30,44,136,0.8);
 }
 
 #backBtn img{
   width:22px;
-  filter:brightness(0) invert(1);
+  height:22px;
 }
 
 header h1{
@@ -70,167 +66,120 @@ header h1{
   margin:0;
   font-size:18px;
   font-weight:700;
-  color:#ffffff;
 }
 
-/* ===== PLAN ===== */
+/* ================= CARD ================= */
 
-#mapWrapper{
-  position:relative;
-  padding:10px;
-}
-
-#map{
-  width:100%;
+.card{
+  background:white;
+  margin:20px;
+  padding:22px;
   border-radius:22px;
-  filter:
-    brightness(0.65)
-    contrast(1.05)
-    saturate(0.85);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 88%, transparent 100%);
-  mask-image: radial-gradient(ellipse at center, black 88%, transparent 100%);
+  box-shadow:0 5px 12px rgba(0,0,0,0.12);
+  text-align:center;
+  transition:background .3s ease, box-shadow .3s ease;
 }
 
-/* ===== BOUTONS PLAN ===== */
-
-.plan-btn{
-  position:absolute;
-  width:48px;
-  height:48px;
-  background:#1e2c88;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  box-shadow:0 0 12px rgba(30,44,136,0.7);
-  transition:all .2s ease;
+.city{
+  font-size:20px;
+  color:#777;
+  margin-bottom:12px;
 }
 
-.plan-btn:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 18px rgba(30,44,136,1);
+.temp{
+  font-size:48px;
+  font-weight:700;
 }
 
-.plan-btn img{
-  width:26px;
-  height:26px;
-  object-fit:contain;
+.desc{
+  font-size:16px;
+  color:#777;
+  margin-top:4px;
 }
 
-/* positions */
-#btn-carriere{top:20%;left:25%;}
-#btn-beudot{top:20%;left:55%;}
-#btn-manege{top:35%;left:38%;}
-#btn-grande{top:38%;left:69%;}
-#btn-maison{top:55%;left:60%;}
+/* ================= EXTRA INFOS ================= */
 
-/* ===== LEGENDE ===== */
-
-.legend{
-  padding:20px;
-  font-size:15px;
-  color:#cfcfcf;
+.extras{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  font-size:14px;
 }
 
-.legend-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
+.extra-item{
+  background:#f4f4f4;
+  padding:10px;
+  border-radius:10px;
 }
 
-.legend-item img{ width:22px; }
+/* ================= FORECAST ================= */
 
-/* ===== PANEL ===== */
-
-#panel{
-  position:fixed;
-  left:0;
-  bottom:0;
-  width:100%;
-  height:50%;
-  background:linear-gradient(180deg,#1a1f2b,#131720);
-  border-radius:20px 20px 0 0;
-  transform:translateY(100%);
-  transition:0.3s;
-  padding:20px;
-  box-sizing:border-box;
-  box-shadow:0 -8px 30px rgba(0,0,0,0.8);
-}
-
-#panel.active{ transform:translateY(0); }
-
-#panelHeader{
+.forecast{
   display:flex;
   justify-content:space-between;
-  align-items:center;
+  gap:10px;
+  margin-top:22px;
 }
 
-#panelTitle{
-  font-size:20px;
-  font-weight:700;
-  color:white;
-}
-
-#closePanel{
-  font-size:22px;
-  cursor:pointer;
-  color:#aaa;
-}
-
-.row{ margin-top:14px; }
-
-.label{
-  font-size:12px;
-  color:#888;
-}
-
-.value{
-  font-size:14px;
-  font-weight:500;
-  color:#f1f1f1;
-}
-
-#statut{
-  font-size:18px;
-  font-weight:700;
-}
-
-#horaire{
-  font-size:14px;
-  font-weight:500;
-}
-
-.optionText{
-  font-size:13px;
-  margin-right:15px;
-}
-
-#info{
-  margin-top:8px;
-  line-height:1.7;
-  font-size:14px;
-  font-weight:550;
-  color:#ffb347;
-}
-
-.scrollable{
-  max-height:160px;
-  overflow-y:auto;
-}
-
-#reserveBox{
-  display:none;
-  margin-top:20px;
-  background:#E88B00;
-  color:white;
-  padding:12px;
-  border-radius:10px;
+.day{
+  flex:1;
+  background:#f4f4f4;
+  padding:14px 6px;
+  border-radius:14px;
   text-align:center;
+}
+
+.day-name{
   font-weight:600;
-  cursor:pointer;
-  box-shadow:0 0 12px rgba(232,139,0,0.6);
+  margin-bottom:6px;
+}
+
+.day-temp{
+  margin-top:6px;
+  font-size:14px;
+}
+
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+  body{
+    background:#0f1115;
+    color:#ffffff;
+  }
+
+  header h1{
+    color:#ffffff;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  #backBtn img{
+    filter:brightness(0) invert(1);
+  }
+
+  .card{
+    background:#1c1f26;
+    box-shadow:0 25px 60px rgba(0,0,0,0.75);
+  }
+
+  .city,
+  .desc{
+    color:#b5b5b5;
+  }
+
+  .extra-item{
+    background:#252a33;
+  }
+
+  .day{
+    background:#252a33;
+  }
+
 }
 
 </style>
@@ -244,57 +193,26 @@ header h1{
   <div id="backBtn" onclick="goBack()">
     <img src="image/back.svg">
   </div>
-  <h1>PLAN INTERACTIF</h1>
+  <h1>MÉTÉO</h1>
 </header>
 
-<div id="mapWrapper">
-  <img id="map" src="image/plan.png">
+<div class="card">
 
-  <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
-  <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
-  <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
-  <div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
-  <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
-</div>
+  <div class="city">Brienne-le-Château</div>
 
-<div class="legend">
-  <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
-  <div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
-  <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
-  <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
-</div>
+  <div id="icon"></div>
 
-<div id="panel">
+  <div class="temp" id="temp">--°C</div>
+  <div class="desc" id="desc">---</div>
 
-<div id="panelHeader">
-  <div id="panelTitle">---</div>
-  <div id="closePanel">✕</div>
-</div>
-
-<div class="row">
-  <div class="label">Statut</div>
-  <div class="value" id="statut">---</div>
-</div>
-
-<div class="row">
-  <div class="label">Horaires</div>
-  <div class="value" id="horaire">---</div>
-</div>
-
-<div class="row" id="optionsRow">
-  <div class="label">Activités possibles</div>
-  <div>
-    <span class="optionText" id="liberte"></span>
-    <span class="optionText" id="longe"></span>
+  <div class="extras">
+    <div class="extra-item" id="wind">💨 Vent : -- km/h</div>
+    <div class="extra-item" id="gust">🌬 Rafales : -- km/h</div>
+    <div class="extra-item" id="rainChance">☔ Pluie : -- %</div>
+    <div class="extra-item" id="rainAmount">🌧 Cumul : -- mm</div>
   </div>
-</div>
 
-<div class="row">
-  <div class="label">Infos</div>
-  <div class="value scrollable" id="info"></div>
-</div>
-
-<div id="reserveBox" onclick="goReserve()">Réserver</div>
+  <div class="forecast" id="forecast"></div>
 
 </div>
 
@@ -302,7 +220,7 @@ header h1{
 
 <script>
 
-/* JS IDENTIQUE À TA VERSION */
+/* ===== ANIM ===== */
 
 window.addEventListener("DOMContentLoaded",()=>{
   requestAnimationFrame(()=>{
@@ -310,97 +228,113 @@ window.addEventListener("DOMContentLoaded",()=>{
   });
 });
 
-const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
-const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
+/* ===== API Open-Meteo ===== */
 
-const ICONS={
-  ouvert:"image/ouvert.png",
-  ferme:"image/ferme.png",
-  prevision:"image/prevision.png",
-  "hors-service":"image/horsservice.png"
-};
+const URL =
+"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,wind_gusts_10m,precipitation_probability,precipitation,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=Europe/Paris";
 
-let DATA=[];
+/* ===== EMOJI + TEXTE PRÉCIS ===== */
 
-function formatTitle(t){
-  const map={
-    "carriere":"Carrière",
-    "manege":"Manège",
-    "maison":"Maison",
-    "grande-voie":"Grande voie",
-    "beudot":"Beudot"
+function weatherInfo(code, isDay){
+
+  const map = {
+
+    0:{icon:isDay?"☀️":"🌙", text:"Ciel dégagé"},
+    1:{icon:"🌤", text:"Peu nuageux"},
+    2:{icon:"⛅", text:"Partiellement nuageux"},
+    3:{icon:"☁️", text:"Couvert"},
+
+    45:{icon:"🌫", text:"Brouillard"},
+    48:{icon:"🌫", text:"Brouillard givrant"},
+
+    51:{icon:"🌦", text:"Bruine légère"},
+    53:{icon:"🌦", text:"Bruine modérée"},
+    55:{icon:"🌧", text:"Bruine dense"},
+
+    61:{icon:"🌦", text:"Pluie faible"},
+    63:{icon:"🌧", text:"Pluie modérée"},
+    65:{icon:"🌧", text:"Pluie forte"},
+
+    66:{icon:"🌧❄️", text:"Pluie verglaçante légère"},
+    67:{icon:"🌧❄️", text:"Pluie verglaçante forte"},
+
+    71:{icon:"🌨", text:"Neige faible"},
+    73:{icon:"🌨", text:"Neige modérée"},
+    75:{icon:"❄️", text:"Neige forte"},
+    77:{icon:"🌨", text:"Grains de neige"},
+
+    80:{icon:"🌦", text:"Averses faibles"},
+    81:{icon:"🌧", text:"Averses modérées"},
+    82:{icon:"🌧", text:"Averses fortes"},
+
+    85:{icon:"🌨", text:"Averses neige faibles"},
+    86:{icon:"❄️", text:"Averses neige fortes"},
+
+    95:{icon:"⛈", text:"Orage"},
+    96:{icon:"⛈❄️", text:"Orage avec grêle"},
+    99:{icon:"⛈❄️", text:"Orage violent avec grêle"}
   };
-  return map[t]||t;
+
+  return map[code] || {icon:"☁️", text:"Conditions variables"};
 }
 
-function loadData(){
-fetch(SHEET_URL,{cache:"no-store"})
+function dayName(i){
+  return ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."][i%7];
+}
+
+fetch(URL)
 .then(r=>r.json())
 .then(d=>{
-  DATA=d;
-  d.forEach(e=>{
-    document.getElementById("icon-"+e.espace).src=ICONS[e.statut_auto];
-  });
+
+  const currentWeather = weatherInfo(d.current.weathercode, d.current.is_day);
+
+  document.getElementById("icon").innerHTML =
+    `<div style="font-size:48px">${currentWeather.icon}</div>`;
+
+  document.getElementById("temp").innerText =
+    Math.round(d.current.temperature_2m)+"°C";
+
+  document.getElementById("desc").innerText = currentWeather.text;
+
+  document.getElementById("wind").innerText =
+    "💨 Vent : "+Math.round(d.current.wind_speed_10m)+" km/h";
+
+  document.getElementById("gust").innerText =
+    "🌬 Rafales : "+Math.round(d.current.wind_gusts_10m)+" km/h";
+
+  document.getElementById("rainChance").innerText =
+    "☔ Pluie : "+d.daily.precipitation_probability_max[0]+" %";
+
+  document.getElementById("rainAmount").innerText =
+    "🌧 Cumul : "+d.daily.precipitation_sum[0]+" mm";
+
+  const f=document.getElementById("forecast");
+  f.innerHTML="";
+
+  for(let i=0;i<3;i++){
+    const dailyWeather = weatherInfo(d.daily.weathercode[i], true);
+
+    f.innerHTML+=`
+      <div class="day">
+        <div class="day-name">${dayName(new Date().getDay()+i)}</div>
+        <div>${dailyWeather.icon}</div>
+        <div style="font-size:12px;margin-top:4px;">${dailyWeather.text}</div>
+        <div class="day-temp">
+          ${Math.round(d.daily.temperature_2m_min[i])}° /
+          ${Math.round(d.daily.temperature_2m_max[i])}°
+        </div>
+      </div>
+    `;
+  }
+
 });
-}
-loadData();
-setInterval(loadData,60000);
-
-function openSpace(espace){
-const e=DATA.find(x=>x.espace===espace);
-if(!e) return;
-
-panelTitle.innerText=formatTitle(e.espace);
-
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="#4caf50";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#ffb347";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="#f44336";}
-if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
-
-const special = e.horaire_special && String(e.horaire_special).trim() !== "";
-horaire.innerText = special ? e.horaire_special : e.horaire_affiche || "---";
-
-if(special){
-  horaire.style.color="#ffb347";
-  horaire.style.fontWeight="600";
-}else{
-  horaire.style.color="#ffffff";
-  horaire.style.fontWeight="500";
-}
-
-info.innerText=e.info||"Aucune info";
-
-let show=false;
-if(e.liberte){
-  liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"#4caf50":"#f44336"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
-  show=true;
-}
-if(e.longe){
-  longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"#4caf50":"#f44336"};font-weight:700">${e.longe.toUpperCase()}</span>`;
-  show=true;
-}
-optionsRow.style.display=show?"block":"none";
-
-if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
- (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
-  reserveBox.style.display="block";
-}else{
-  reserveBox.style.display="none";
-}
-
-panel.classList.add("active");
-}
-
-closePanel.onclick=()=>panel.classList.remove("active");
 
 function goBack(){
-  const page=document.getElementById("page");
-  page.classList.remove("active");
-  page.classList.add("exit");
+  const p=document.getElementById("page");
+  p.classList.remove("active");
+  p.classList.add("exit");
   setTimeout(()=>{ location.href="index.html"; },300);
 }
-
-function goReserve(){ window.open(RESERVE_URL,"_blank"); }
 
 </script>
 
