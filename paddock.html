@@ -30,8 +30,8 @@
     --text:#ffffff;
     --card-bg:#1c1f26;
     --shadow:0 10px 30px rgba(0,0,0,0.6);
-    --info:#ffb347;
-    --reserve-bg:#c87400; /* orange plus doux */
+    --info:#E88B00; /* reste orange même en dark */
+    --reserve-bg:#c87400;
   }
 
   #backBtn img{
@@ -51,14 +51,13 @@ body{
   transition:background .3s ease,color .3s ease;
 }
 
-/* ================= PAGE WRAPPER ================= */
+/* ================= PAGE ================= */
 
 .page{
   min-height:100vh;
   transform:translateX(100%);
   transition:transform .35s ease;
 }
-
 .page.active{ transform:translateX(0); }
 .page.exit{ transform:translateX(100%); }
 
@@ -127,7 +126,6 @@ header h1{
 
 .left-title img{
   width:26px;
-  height:26px;
 }
 
 .card-title{
@@ -137,7 +135,6 @@ header h1{
 
 .card-top img.statut{
   width:26px;
-  height:26px;
 }
 
 .card-middle{
@@ -294,7 +291,6 @@ const ICONS_STATUT={
 };
 
 const ESPACES=["maison","grande-voie","beudot"];
-
 const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
 
 function loadData(){
@@ -314,7 +310,17 @@ fetch(SHEET_URL,{cache:"no-store"})
       ICONS_STATUT[row.statut_auto] || "";
 
     const horaire=row.horaire_special || row.horaire_affiche || "";
-    document.getElementById(espace+"-horaire").innerText=horaire;
+    const el=document.getElementById(espace+"-horaire");
+    el.innerText=horaire;
+
+    // 🟠 toujours orange si horaire spécial
+    if(row.horaire_special){
+      el.style.color="#E88B00";
+      el.style.fontWeight="600";
+    }else{
+      el.style.color="var(--text)";
+      el.style.fontWeight="400";
+    }
 
     document.getElementById(espace+"-info").innerText=row.info || "";
 
