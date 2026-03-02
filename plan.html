@@ -9,30 +9,32 @@
 
 <style>
 
-/* ===== BASE ===== */
+/* ================= BASE ================= */
 
 body{
   margin:0;
   background:#f4f4f4;
   font-family:'Montserrat',sans-serif;
+  color:#000;
+  transition:background .3s ease,color .3s ease;
 }
 
-/* ===== DARK SIMPLE ===== */
+/* ================= DARK MODE ================= */
 
 @media (prefers-color-scheme: dark){
 
   body{
     background:#0f1115;
-    color:white;
+    color:#fff;
   }
 
   header h1{
-    color:white;
+    color:#fff;
   }
 
   #backBtn{
     background:#1c1f26;
-    box-shadow:0 10px 25px rgba(0,0,0,0.6);
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
   }
 
   #backBtn img{
@@ -41,11 +43,23 @@ body{
 
   #panel{
     background:#1c1f26;
-    box-shadow:0 20px 50px rgba(0,0,0,0.7);
+    box-shadow:0 20px 60px rgba(0,0,0,0.7);
+  }
+
+  .label{
+    color:#aaa;
+  }
+
+  .value{
+    color:#e5e5e5;
+  }
+
+  .legend{
+    color:#ddd;
   }
 
   #map{
-    filter:brightness(0.9) contrast(0.95);
+    filter:brightness(0.92) contrast(0.95);
     box-shadow:
       0 30px 70px rgba(0,0,0,0.8),
       0 0 0 1px rgba(255,255,255,0.04);
@@ -53,11 +67,12 @@ body{
 
   #reserveBox{
     background:#c87400;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
   }
 
 }
 
-/* ===== ANIMATION ===== */
+/* ================= ANIMATION ================= */
 
 .page{
   min-height:100vh;
@@ -68,7 +83,7 @@ body{
 .page.active{ transform:translateX(0); }
 .page.exit{ transform:translateX(100%); }
 
-/* ===== HEADER ===== */
+/* ================= HEADER ================= */
 
 header{
   position:relative;
@@ -103,7 +118,7 @@ header h1{
   font-weight:700;
 }
 
-/* ===== PLAN ===== */
+/* ================= PLAN ================= */
 
 #mapWrapper{
   position:relative;
@@ -112,17 +127,18 @@ header h1{
 
 #map{
   width:100%;
-  border-radius:18px;
+  border-radius:20px;
+  transition:filter .3s ease, box-shadow .3s ease;
 }
 
-/* ===== BOUTONS ===== */
+/* ================= BOUTONS ================= */
 
 .plan-btn{
   position:absolute;
   width:48px;
   height:48px;
   background:#1e2c88;
-  border-radius:12px;
+  border-radius:14px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -142,7 +158,7 @@ header h1{
 #btn-grande{top:38%;left:69%;}
 #btn-maison{top:55%;left:60%;}
 
-/* ===== LEGENDE ===== */
+/* ================= LEGENDE ================= */
 
 .legend{
   padding:20px;
@@ -158,7 +174,7 @@ header h1{
 
 .legend-item img{ width:22px; }
 
-/* ===== PANEL ===== */
+/* ================= PANEL ================= */
 
 #panel{
   position:fixed;
@@ -237,7 +253,7 @@ header h1{
   background:#E88B00;
   color:white;
   padding:12px;
-  border-radius:10px;
+  border-radius:12px;
   text-align:center;
   font-weight:600;
   cursor:pointer;
@@ -274,14 +290,148 @@ header h1{
   <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
 </div>
 
-<div id="panel"></div>
+<div id="panel">
+
+<div id="panelHeader">
+  <div id="panelTitle">---</div>
+  <div id="closePanel">✕</div>
+</div>
+
+<div class="row">
+  <div class="label">Statut</div>
+  <div class="value" id="statut">---</div>
+</div>
+
+<div class="row">
+  <div class="label">Horaires</div>
+  <div class="value" id="horaire">---</div>
+</div>
+
+<div class="row" id="optionsRow">
+  <div class="label">Activités possibles</div>
+  <div>
+    <span class="optionText" id="liberte"></span>
+    <span class="optionText" id="longe"></span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="label">Infos</div>
+  <div class="value scrollable" id="info"></div>
+</div>
+
+<div id="reserveBox" onclick="goReserve()">Réserver</div>
+
+</div>
 
 </div>
 
 <script>
+
 window.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("page").classList.add("active");
+  requestAnimationFrame(()=>{
+    document.getElementById("page").classList.add("active");
+  });
 });
+
+const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
+const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
+
+const ICONS={
+  "ouvert":"image/ouvert.png",
+  "ferme":"image/ferme.png",
+  "prevision":"image/prevision.png",
+  "hors-service":"image/horsservice.png"
+};
+
+let DATA=[];
+
+function formatTitle(t){
+  const map={
+    "carriere":"Carrière",
+    "manege":"Manège",
+    "maison":"Maison",
+    "grande-voie":"Grande voie",
+    "beudot":"Beudot"
+  };
+  return map[t]||t;
+}
+
+function loadData(){
+  fetch(SHEET_URL,{cache:"no-store"})
+  .then(r=>r.json())
+  .then(d=>{
+    DATA=d;
+    d.forEach(e=>{
+      const icon = ICONS[e.statut_auto?.toLowerCase()];
+      if(icon){
+        const el=document.getElementById("icon-"+e.espace);
+        if(el) el.src=icon;
+      }
+    });
+  });
+}
+
+loadData();
+setInterval(loadData,60000);
+
+function openSpace(espace){
+
+const e=DATA.find(x=>x.espace===espace);
+if(!e) return;
+
+panelTitle.innerText=formatTitle(e.espace);
+
+if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
+if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
+if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
+if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
+
+const special = e.horaire_special && String(e.horaire_special).trim() !== "";
+horaire.innerText = special ? e.horaire_special : e.horaire_affiche || "---";
+
+if(special){
+  horaire.style.color="#E88B00";
+  horaire.style.fontWeight="600";
+}else{
+  horaire.style.color="";
+  horaire.style.fontWeight="500";
+}
+
+info.innerText=e.info||"Aucune info";
+
+let show=false;
+if(e.liberte){
+  liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
+  show=true;
+}
+if(e.longe){
+  longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
+  show=true;
+}
+optionsRow.style.display=show?"block":"none";
+
+if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
+ (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
+  reserveBox.style.display="block";
+}else{
+  reserveBox.style.display="none";
+}
+
+panel.classList.add("active");
+}
+
+closePanel.onclick=()=>panel.classList.remove("active");
+
+function goBack(){
+  const page=document.getElementById("page");
+  page.classList.remove("active");
+  page.classList.add("exit");
+  setTimeout(()=>{ location.href="index.html"; },300);
+}
+
+function goReserve(){ window.open(RESERVE_URL,"_blank"); }
+
 </script>
 
 </body>
