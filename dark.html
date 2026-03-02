@@ -3,59 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Météo</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Ecurie Damien Siri</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- OneSignal -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({
+    appId: "85a477ff-3d8d-4975-960d-c7e69100a0ff",
+  });
+});
+</script>
 
 <style>
 
-/* ================= BASE ================= */
-
 body{
   margin:0;
-  background:#f4f4f4;
   font-family:'Montserrat',sans-serif;
-  color:#000;
-  transition:background .3s ease,color .3s ease;
+  background:#f4f4f4;
 }
-
-/* ================= PAGE ANIM ================= */
-
-.page{
-  min-height:100vh;
-  transform:translateX(100%);
-  transition:0.35s;
-}
-
-.page.active{ transform:translateX(0); }
-.page.exit{ transform:translateX(100%); }
 
 /* ================= HEADER ================= */
 
 header{
   position:relative;
+  background:#f4f4f4;
+  padding:15px 12px;
   height:70px;
 }
 
-#backBtn{
+.header-left{
   position:absolute;
-  left:15px;
+  left:12px;
   top:50%;
   transform:translateY(-50%);
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 3px 8px rgba(0,0,0,0.15);
-  cursor:pointer;
 }
 
-#backBtn img{
-  width:22px;
-  height:22px;
+.header-left img{
+  height:40px;
 }
 
 header h1{
@@ -64,122 +53,127 @@ header h1{
   top:50%;
   transform:translate(-50%,-50%);
   margin:0;
-  font-size:18px;
+  font-size:20px;
   font-weight:700;
+  color:#181E3B;
+  white-space:nowrap;
 }
 
-/* ================= CARD ================= */
+/* CLOCHE */
+
+#bellBox{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:22px;
+  cursor:pointer;
+}
+
+#bellBadge{
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  background:red;
+  color:white;
+  width:16px;
+  height:16px;
+  font-size:10px;
+  border-radius:50%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= BIENVENUE ================= */
+
+#welcome{
+  text-align:center;
+  font-size:36px;
+  font-weight:700;
+  color:#181E3B;
+  margin:4px 0 15px; /* 👈 remonté */
+}
+
+/* ================= BANDEAU ================= */
+
+#alert-wrapper{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+#alert-box{
+  width:100%;
+  height:27px;
+  background:#E88B00;
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  box-sizing:border-box;
+  color:white;
+  font-size:14px;
+  font-weight:500;
+}
+
+/* ================= SECTIONS ================= */
+
+.section-title{
+  background:#181E3B;
+  color:white;
+  display:inline-block;
+  padding:6px 12px;
+  margin:20px 15px 10px;
+  border-radius:4px;
+  font-size:14px;
+}
+
+/* ================= GRID ================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  padding:0 15px;
+}
 
 .card{
   background:white;
-  margin:20px;
-  padding:22px;
-  border-radius:22px;
-  box-shadow:0 5px 12px rgba(0,0,0,0.12);
+  border-radius:20px;
+  padding:20px;
   text-align:center;
-  transition:background .3s ease, box-shadow .3s ease;
+  box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  cursor:pointer;
 }
 
-.city{
-  font-size:20px;
-  color:#777;
-  margin-bottom:12px;
+.card img{
+  width:55px;
+  margin-bottom:10px;
 }
 
-.temp{
-  font-size:48px;
+.card div{
+  font-size:16px;
   font-weight:700;
 }
 
-.desc{
-  font-size:16px;
-  color:#777;
-  margin-top:4px;
-}
+/* ================= LIST ================= */
 
-/* ================= EXTRA INFOS ================= */
-
-.extras{
-  margin-top:18px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  font-size:14px;
-}
-
-.extra-item{
-  background:#f4f4f4;
-  padding:10px;
-  border-radius:10px;
-}
-
-/* ================= FORECAST ================= */
-
-.forecast{
+.list-btn{
+  background:white;
+  margin:10px 15px;
+  padding:18px;
+  border-radius:20px;
   display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:22px;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  font-weight:700;
+  cursor:pointer;
 }
 
-.day{
-  flex:1;
-  background:#f4f4f4;
-  padding:14px 6px;
-  border-radius:14px;
-  text-align:center;
-}
-
-.day-name{
-  font-weight:600;
-  margin-bottom:6px;
-}
-
-.day-temp{
-  margin-top:6px;
-  font-size:14px;
-}
-
-/* ================= DARK MODE ================= */
-
-@media (prefers-color-scheme: dark){
-
-  body{
-    background:#0f1115;
-    color:#ffffff;
-  }
-
-  header h1{
-    color:#ffffff;
-  }
-
-  #backBtn{
-    background:#1c1f26;
-    box-shadow:0 12px 30px rgba(0,0,0,0.6);
-  }
-
-  #backBtn img{
-    filter:brightness(0) invert(1);
-  }
-
-  .card{
-    background:#1c1f26;
-    box-shadow:0 25px 60px rgba(0,0,0,0.75);
-  }
-
-  .city,
-  .desc{
-    color:#b5b5b5;
-  }
-
-  .extra-item{
-    background:#252a33;
-  }
-
-  .day{
-    background:#252a33;
-  }
-
+.list-btn img{
+  width:26px;
 }
 
 </style>
@@ -187,154 +181,187 @@ header h1{
 
 <body>
 
-<div class="page" id="page">
-
 <header>
-  <div id="backBtn" onclick="goBack()">
-    <img src="image/back.svg">
+  <div class="header-left">
+    <img src="apple-touch-icon.png">
   </div>
-  <h1>MÉTÉO</h1>
+
+  <h1>ECURIE DAMIEN SIRI</h1>
+
+  <div id="bellBox" onclick="go('notifications.html')">
+    🔔
+    <span id="bellBadge"></span>
+  </div>
 </header>
 
-<div class="card">
+<div id="welcome">BIENVENUE</div>
 
-  <div class="city">Brienne-le-Château</div>
-
-  <div id="icon"></div>
-
-  <div class="temp" id="temp">--°C</div>
-  <div class="desc" id="desc">---</div>
-
-  <div class="extras">
-    <div class="extra-item" id="wind">💨 Vent : -- km/h</div>
-    <div class="extra-item" id="gust">🌬 Rafales : -- km/h</div>
-    <div class="extra-item" id="rainChance">☔ Pluie : -- %</div>
-    <div class="extra-item" id="rainAmount">🌧 Cumul : -- mm</div>
-  </div>
-
-  <div class="forecast" id="forecast"></div>
-
+<!-- BANDEAU -->
+<div id="alert-wrapper">
+  <div id="alert-box"></div>
 </div>
 
+<!-- ESPACES -->
+<div class="section-title">ESPACES</div>
+
+<div class="grid">
+  <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
+  <div class="card" onclick="go('paddocks.html')"><img src="image/paddock.svg"><div>PADDOCK</div></div>
 </div>
+
+<div class="list-btn" onclick="go('plan.html')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
+
+<!-- PRATIQUE -->
+<div class="section-title">PRATIQUE</div>
+
+<div class="grid">
+  <div class="card" onclick="go('horaires.html')"><img src="image/time.svg"><div>HORAIRES</div></div>
+  <div class="card" onclick="go('notifications.html')"><img src="info.svg"><div>NEWS</div></div>
+
+  <div class="card" onclick="openExternal('https://ce-grand-rang.cavasoft.fr')"><img src="rider.svg"><div>COURS</div></div>
+
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/book-online?category=194a368e-8a4f-4212-a33e-ae1656e4de8a')"><img src="bell.svg"><div>SERVICES</div></div>
+
+  <div class="card" onclick="go('concours.html')"><img src="calendar.svg"><div>CONCOURS</div></div>
+
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/category/soins')"><img src="care.svg"><div>SOINS</div></div>
+</div>
+
+<!-- AUTRES -->
+<div class="section-title">AUTRES</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/category/laverie')"><img src="wash.svg"> LAVERIE</div>
+<div class="list-btn" onclick="openExternal('tarifs.pdf')"><img src="euro.svg"> TARIFS</div>
+
+<!-- COMPTE -->
+<div class="section-title">COMPTE</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/profile/my/profile')"><img src="user.svg"> MON COMPTE</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/my-bookings')"><img src="bell.svg"> MES RÉSERVATIONS</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/cart-page')"><img src="bag.svg"> MON PANIER</div>
 
 <script>
 
-/* ===== ANIM ===== */
+/* NAV */
 
-window.addEventListener("DOMContentLoaded",()=>{
-  requestAnimationFrame(()=>{
-    document.getElementById("page").classList.add("active");
-  });
-});
-
-/* ===== API Open-Meteo ===== */
-
-const URL =
-"https://api.open-meteo.com/v1/forecast?latitude=48.391&longitude=4.527&current=temperature_2m,weathercode,wind_speed_10m,wind_gusts_10m,precipitation_probability,precipitation,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=Europe/Paris";
-
-/* ===== EMOJI + TEXTE PRÉCIS ===== */
-
-function weatherInfo(code, isDay){
-
-  const map = {
-
-    0:{icon:isDay?"☀️":"🌙", text:"Ciel dégagé"},
-    1:{icon:"🌤", text:"Peu nuageux"},
-    2:{icon:"⛅", text:"Partiellement nuageux"},
-    3:{icon:"☁️", text:"Couvert"},
-
-    45:{icon:"🌫", text:"Brouillard"},
-    48:{icon:"🌫", text:"Brouillard givrant"},
-
-    51:{icon:"🌦", text:"Bruine légère"},
-    53:{icon:"🌦", text:"Bruine modérée"},
-    55:{icon:"🌧", text:"Bruine dense"},
-
-    61:{icon:"🌦", text:"Pluie faible"},
-    63:{icon:"🌧", text:"Pluie modérée"},
-    65:{icon:"🌧", text:"Pluie forte"},
-
-    66:{icon:"🌧❄️", text:"Pluie verglaçante légère"},
-    67:{icon:"🌧❄️", text:"Pluie verglaçante forte"},
-
-    71:{icon:"🌨", text:"Neige faible"},
-    73:{icon:"🌨", text:"Neige modérée"},
-    75:{icon:"❄️", text:"Neige forte"},
-    77:{icon:"🌨", text:"Grains de neige"},
-
-    80:{icon:"🌦", text:"Averses faibles"},
-    81:{icon:"🌧", text:"Averses modérées"},
-    82:{icon:"🌧", text:"Averses fortes"},
-
-    85:{icon:"🌨", text:"Averses neige faibles"},
-    86:{icon:"❄️", text:"Averses neige fortes"},
-
-    95:{icon:"⛈", text:"Orage"},
-    96:{icon:"⛈❄️", text:"Orage avec grêle"},
-    99:{icon:"⛈❄️", text:"Orage violent avec grêle"}
-  };
-
-  return map[code] || {icon:"☁️", text:"Conditions variables"};
+function go(url){
+  window.location.href = url;
 }
 
-function dayName(i){
-  return ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."][i%7];
+function openExternal(url){
+  window.open(url, "_blank");
 }
 
-fetch(URL)
-.then(r=>r.json())
-.then(d=>{
+/* ===== STORAGE ===== */
 
-  const currentWeather = weatherInfo(d.current.weathercode, d.current.is_day);
+const STORAGE_KEY="alerts_lues";
 
-  document.getElementById("icon").innerHTML =
-    `<div style="font-size:48px">${currentWeather.icon}</div>`;
+function getLues(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+}
 
-  document.getElementById("temp").innerText =
-    Math.round(d.current.temperature_2m)+"°C";
+/* ===== DATE PARSER ===== */
 
-  document.getElementById("desc").innerText = currentWeather.text;
+function parseDateFR(str){
+  if(!str) return null;
 
-  document.getElementById("wind").innerText =
-    "💨 Vent : "+Math.round(d.current.wind_speed_10m)+" km/h";
-
-  document.getElementById("gust").innerText =
-    "🌬 Rafales : "+Math.round(d.current.wind_gusts_10m)+" km/h";
-
-  document.getElementById("rainChance").innerText =
-    "☔ Pluie : "+d.daily.precipitation_probability_max[0]+" %";
-
-  document.getElementById("rainAmount").innerText =
-    "🌧 Cumul : "+d.daily.precipitation_sum[0]+" mm";
-
-  const f=document.getElementById("forecast");
-  f.innerHTML="";
-
-  for(let i=0;i<3;i++){
-    const dailyWeather = weatherInfo(d.daily.weathercode[i], true);
-
-    f.innerHTML+=`
-      <div class="day">
-        <div class="day-name">${dayName(new Date().getDay()+i)}</div>
-        <div>${dailyWeather.icon}</div>
-        <div style="font-size:12px;margin-top:4px;">${dailyWeather.text}</div>
-        <div class="day-temp">
-          ${Math.round(d.daily.temperature_2m_min[i])}° /
-          ${Math.round(d.daily.temperature_2m_max[i])}°
-        </div>
-      </div>
-    `;
+  if(str.includes("T")){
+    const d=new Date(str);
+    d.setHours(0,0,0,0);
+    return d;
   }
 
-});
+  if(str.includes("-")){
+    const p=str.split("-");
+    return new Date(p[0],p[1]-1,p[2],0,0,0);
+  }
 
-function goBack(){
-  const p=document.getElementById("page");
-  p.classList.remove("active");
-  p.classList.add("exit");
-  setTimeout(()=>{ location.href="index.html"; },300);
+  if(str.includes("/")){
+    const p=str.split("/");
+    return new Date(p[2],p[1]-1,p[0],0,0,0);
+  }
+
+  return null;
 }
+
+/* ===== BANDEAU WIX LOGIC ===== */
+
+const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
+const ESPACE="accueil";
+
+function loadAlert(){
+  fetch(SHEET_URL,{cache:"no-store"})
+  .then(r=>r.json())
+  .then(data=>{
+    const row=data.find(e=>e.espace===ESPACE);
+    const box=document.getElementById("alert-box");
+
+    box.innerHTML="";
+    box.style.display="none";
+
+    if(!row||!row.alerte||row.alerte.trim()==="") return;
+
+    box.style.display="flex";
+
+    const icon=document.createElement("img");
+    icon.src="https://static.wixstatic.com/shapes/ff7f34_8db0b910e97b4e37af20514452d5c4f4.svg";
+    icon.style.width="16px";
+
+    const text=document.createElement("div");
+    text.textContent=row.alerte;
+
+    box.appendChild(icon);
+    box.appendChild(text);
+  });
+}
+
+loadAlert();
+setInterval(loadAlert,60000);
+
+/* ===== BADGE ===== */
+
+const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
+
+async function updateBell(){
+
+  const res=await fetch(API_URL);
+  const data=await res.json();
+
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
+  const lues=getLues();
+  let count=0;
+
+  data.filter(n=>{
+    if(n.epingle==="oui") return true;
+    if(n.active!=="oui") return false;
+
+    if(!n.expire){
+      const d=parseDateFR(n.date);
+      if(!d) return true;
+      return d>=today;
+    }
+
+    const exp=parseDateFR(n.expire);
+    if(!exp) return true;
+    return exp>=today;
+  }).forEach(n=>{
+    if(!lues.includes(n.id)) count++;
+  });
+
+  const badge=document.getElementById("bellBadge");
+
+  if(count>0){
+    badge.style.display="flex";
+    badge.textContent=count;
+  }else{
+    badge.style.display="none";
+  }
+}
+
+updateBell();
+setInterval(updateBell,60000);
 
 </script>
 
