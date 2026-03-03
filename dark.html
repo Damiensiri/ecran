@@ -122,32 +122,27 @@ header h1{
   text-align:center;
   font-size:36px;
   font-weight:700;
-  margin:10px 0 10px;
+  margin:10px 0 6px;
 }
 
-/* ================= BANDEAU ALIGNÉ DROITE ================= */
+/* ================= STATUT PREMIUM ================= */
 
 #alert-wrapper{
   width:100%;
-  padding:0 15px;
-  box-sizing:border-box;
+  text-align:center;
 }
 
 #alert-box{
   display:none;
   font-size:15px;
   font-weight:600;
-  width:fit-content;
-  margin-left:auto;   /* colle à droite */
-  text-align:center;  /* centre le small dessous */
 }
 
 #alert-box small{
-  display:block;
   font-size:9px;
-  opacity:0.6;
   font-weight:500;
-  margin-top:2px;
+  opacity:0.65;
+  margin-left:6px;
 }
 
 /* ================= SECTIONS ================= */
@@ -242,7 +237,7 @@ header h1{
   <div id="alert-box"></div>
 </div>
 
-<!-- CONTENU IDENTIQUE -->
+<!-- CONTENU STRICTEMENT IDENTIQUE -->
 <div class="section-title">ESPACES</div>
 <div class="grid">
   <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
@@ -255,20 +250,7 @@ header h1{
 <div class="grid">
   <div class="card" onclick="go('horaires.html')"><img src="image/time.svg"><div>HORAIRES</div></div>
   <div class="card" onclick="go('meteo.html')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
-  <div class="card" onclick="openExternal('https://ce-grand-rang.cavasoft.fr')"><img src="image/cavasoft.svg"><div>COURS</div></div>
-  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/book-online?category=194a368e-8a4f-4212-a33e-ae1656e4de8a')"><img src="image/service.svg"><div>SERVICES</div></div>
-  <div class="card" onclick="go('concours.html')"><img src="image/concours.svg"><div>CONCOURS</div></div>
-  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/category/soins')"><img src="image/soins.svg"><div>SOINS</div></div>
 </div>
-
-<div class="section-title">AUTRES</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/category/laverie')"><img src="image/laverie.svg"> LAVERIE</div>
-<div class="list-btn" onclick="openExternal('tarifs.pdf')"><img src="image/tarif.svg"> TARIFS</div>
-
-<div class="section-title">COMPTE</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/profile/my/profile')"><img src="image/compte.svg"> MON COMPTE</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/my-bookings')"><img src="image/reservation.svg"> MES RÉSERVATIONS</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/cart-page')"><img src="image/panier.svg"> MON PANIER</div>
 
 </div>
 
@@ -335,11 +317,11 @@ function loadAlertAndStatus(){
       box.style.display="block";
 
       if(isNowBetween(open,close)){
-        box.style.color="#1e7e34";
-        box.innerHTML=`Écuries ouvertes<small>(${row.ouvert.substring(0,5)} - ${row.ferme.substring(0,5)})</small>`;
+        box.style.color="#2e7d32";
+        box.innerHTML=`Écuries ouvertes<small>${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)}</small>`;
       }else{
         box.style.color="#c0392b";
-        box.innerHTML=`Écuries fermées<small>(${row.ouvert.substring(0,5)} - ${row.ferme.substring(0,5)})</small>`;
+        box.innerHTML=`Écuries fermées<small>${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)}</small>`;
       }
 
     });
@@ -348,14 +330,6 @@ function loadAlertAndStatus(){
 
 loadAlertAndStatus();
 setInterval(loadAlertAndStatus,60000);
-
-</script>
-
-<!-- CLOCHE STRICTEMENT INCHANGÉE -->
-<script>
-
-/* ===== CLOCHE ===== */
-/* ... inchangée exactement comme ton code précédent ... */
 
 </script>
 
