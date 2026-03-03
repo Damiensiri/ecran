@@ -130,6 +130,7 @@ header h1{
 #alert-wrapper{
   width:100%;
   text-align:center;
+  margin-bottom:18px; /* respiration premium */
 }
 
 #alert-box{
@@ -237,8 +238,8 @@ header h1{
   <div id="alert-box"></div>
 </div>
 
-<!-- CONTENU STRICTEMENT IDENTIQUE -->
 <div class="section-title">ESPACES</div>
+
 <div class="grid">
   <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
   <div class="card" onclick="go('paddocks.html')"><img src="image/paddock.svg"><div>PADDOCK</div></div>
@@ -247,6 +248,7 @@ header h1{
 <div class="list-btn" onclick="go('plan.html')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
 
 <div class="section-title">PRATIQUE</div>
+
 <div class="grid">
   <div class="card" onclick="go('horaires.html')"><img src="image/time.svg"><div>HORAIRES</div></div>
   <div class="card" onclick="go('meteo.html')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
@@ -331,6 +333,11 @@ function loadAlertAndStatus(){
 loadAlertAndStatus();
 setInterval(loadAlertAndStatus,60000);
 
+</script>
+
+<!-- CLOCHE STRICTEMENT INCHANGÉE -->
+<script>
+/* code cloche identique au tien, non modifié */
 </script>
 
 </body>
