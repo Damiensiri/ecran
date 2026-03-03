@@ -55,10 +55,6 @@ body{
   transition:background .3s ease,color .3s ease;
 }
 
-.page-content{
-  margin-top:70px;
-}
-
 /* ================= HEADER ================= */
 
 header{
@@ -113,7 +109,11 @@ header h1{
   justify-content:center;
 }
 
-/* ================= WELCOME ================= */
+/* ================= CONTENT ================= */
+
+.page-content{
+  margin-top:70px;
+}
 
 #welcome{
   text-align:center;
@@ -122,14 +122,13 @@ header h1{
   margin:10px 0 6px;
 }
 
-/* ================= STATUS DISCRET ================= */
+/* ================= STATUS ================= */
 
 #alert-wrapper{
   width:100%;
-  display:flex;
-  justify-content:flex-end;
   padding:0 15px;
   box-sizing:border-box;
+  text-align:right;
 }
 
 #alert-box{
@@ -137,20 +136,11 @@ header h1{
   font-size:15px;
   font-weight:600;
   margin-top:4px;
-  align-items:center;
-  gap:8px;
-}
-
-.status-dot{
-  width:9px;
-  height:9px;
-  border-radius:50%;
 }
 
 #alert-box small{
   font-size:12px;
-  opacity:0.75;
-  margin-left:4px;
+  opacity:0.7;
 }
 
 /* ================= SECTIONS ================= */
@@ -179,11 +169,6 @@ header h1{
   text-align:center;
   box-shadow:var(--shadow);
   cursor:pointer;
-  transition:transform .15s ease;
-}
-
-.card:hover{
-  transform:translateY(-3px);
 }
 
 .card img{
@@ -261,7 +246,7 @@ function go(url){ window.location.href=url; }
 
 <script>
 
-/* ===== STATUS OUVERTURE ===== */
+/* ===== STATUS + PRIORITÉ ALERTE ===== */
 
 const SHEET_ID="1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI";
 const STATUTS_URL=`https://opensheet.elk.sh/${SHEET_ID}/statuts`;
@@ -273,13 +258,17 @@ function getTodayName(){
 
 function toMin(t){
   const p=t.split(":");
-  return parseInt(p[0])*60+parseInt(p[1]);
+  return parseInt(p[0])*60 + parseInt(p[1]);
 }
 
 function isOpen(open,close){
   const now=new Date();
-  const m=now.getHours()*60+now.getMinutes();
-  return m>=toMin(open)&&m<=toMin(close);
+  const nowMin=now.getHours()*60 + now.getMinutes();
+  return nowMin>=toMin(open) && nowMin<=toMin(close);
+}
+
+function formatHour(h){
+  return h.replace(":", "h");
 }
 
 async function loadOpening(){
@@ -290,44 +279,38 @@ async function loadOpening(){
 
   try{
 
-    const [sRes,hRes]=await Promise.all([
+    const [statRes, horRes] = await Promise.all([
       fetch(STATUTS_URL,{cache:"no-store"}),
       fetch(HORAIRES_URL,{cache:"no-store"})
     ]);
 
-    const statuts=await sRes.json();
-    const horaires=await hRes.json();
+    const statuts = await statRes.json();
+    const horaires = await horRes.json();
 
-    const accueil=statuts.find(e=>e.espace==="accueil");
+    const accueil = statuts.find(e=>e.espace==="accueil");
 
+    /* PRIORITÉ ALERTE */
     if(accueil && accueil.alerte && accueil.alerte.trim()!==""){
-      return; // bandeau spécial prioritaire
+      box.style.display="block";
+      box.style.color="#E88B00";
+      box.textContent = accueil.alerte;
+      return;
     }
 
     const today=getTodayName();
     const row=horaires.find(h=>h.jour?.toLowerCase()===today);
-    if(!row) return;
+
+    if(!row || !row.ouverture || !row.fermeture) return;
 
     const open=isOpen(row.ouverture,row.fermeture);
 
-    box.style.display="flex";
+    box.style.display="block";
+    box.style.color=open ? "#1DB954" : "#e53935";
 
-    const dot=document.createElement("div");
-    dot.className="status-dot";
-    dot.style.background=open?"#1DB954":"#e53935";
-
-    const main=document.createElement("span");
-    main.textContent=open?"Écuries ouvertes":"Écuries fermées";
-    main.style.color=open?"#1DB954":"#e53935";
-
-    const sub=document.createElement("small");
-    sub.textContent=open?
-      `(jusqu'à ${row.fermeture})`:
-      `(ouvre à ${row.ouverture})`;
-
-    box.appendChild(dot);
-    box.appendChild(main);
-    box.appendChild(sub);
+    box.innerHTML = `
+      ${open ? "Écuries ouvertes" : "Écuries fermées"}
+      <small>(${formatHour(row.ouverture)}-${formatHour(row.fermeture)})</small>
+    `;
 
   }catch(e){
     box.style.display="none";
@@ -336,69 +319,6 @@ async function loadOpening(){
 
 loadOpening();
 setInterval(loadOpening,60000);
-
-</script>
-
-<script>
-
-/* ===== CLOCHE (INTACTE) ===== */
-
-const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
-
-const STORAGE_KEY="alerts_lues";
-
-function getLues(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}
-  catch(e){return [];}
-}
-
-function parseDateFR(str){
-  if(!str)return null;
-  if(str.includes("-")){
-    const p=str.split("-");
-    return new Date(p[0],p[1]-1,p[2],0,0,0);
-  }
-  if(str.includes("/")){
-    const p=str.split("/");
-    return new Date(p[2],p[1]-1,p[0],0,0,0);
-  }
-  return null;
-}
-
-async function updateBell(){
-  const badge=document.getElementById("bellBadge");
-  try{
-    const res=await fetch(API_URL,{cache:"no-store"});
-    const data=await res.json();
-    const today=new Date();today.setHours(0,0,0,0);
-    const lues=getLues().map(String);
-    let count=0;
-
-    data.filter(n=>{
-      if(n.epingle==="oui")return true;
-      if(n.active!=="oui")return false;
-      if(!n.expire){
-        const d=parseDateFR(n.date);
-        if(!d)return true;
-        return d>=today;
-      }
-      const exp=parseDateFR(n.expire);
-      if(!exp)return true;
-      return exp>=today;
-    }).forEach(n=>{
-      if(!lues.includes(String(n.id)))count++;
-    });
-
-    badge.style.display=count>0?"flex":"none";
-    badge.textContent=count;
-
-  }catch(e){
-    badge.style.display="none";
-  }
-}
-
-updateBell();
-setInterval(updateBell,60000);
 
 </script>
 
