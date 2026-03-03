@@ -3,207 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plan interactif</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Ecurie Damien Siri</title>
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="apple-touch-icon" href="image/icon-192x192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ecurie DS">
+<meta name="theme-color" content="#f4f4f4">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* ================= VARIABLES ================= */
+
+:root{
+  --bg:#f4f4f4;
+  --header-bg:#f4f4f4;
+  --text:#181E3B;
+  --card-bg:#ffffff;
+  --section-bg:#181E3B;
+  --section-text:#ffffff;
+  --shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1115;
+    --header-bg:#0f1115;
+    --text:#ffffff;
+    --card-bg:#1c1f26;
+    --section-bg:#ffffff;
+    --section-text:#000000;
+    --shadow:0 10px 30px rgba(0,0,0,0.6);
+  }
+
+  .header-left img{
+    filter:brightness(0) invert(1)
+            drop-shadow(0 0 6px rgba(255,255,255,0.5));
+  }
+}
 
 /* ================= BASE ================= */
 
 body{
   margin:0;
-  background:#f4f4f4;
   font-family:'Montserrat',sans-serif;
-  color:#000;
+  background:var(--bg);
+  color:var(--text);
+  overflow-y:auto;
   transition:background .3s ease,color .3s ease;
 }
-
-/* ================= ANIMATION ================= */
-
-.page{
-  min-height:100vh;
-  transform:translateX(100%);
-  transition:transform .35s ease;
-}
-.page.active{ transform:translateX(0); }
-.page.exit{ transform:translateX(100%); }
 
 /* ================= HEADER ================= */
 
 header{
-  position:relative;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
   height:70px;
-}
-
-#backBtn{
-  position:absolute;
-  left:15px;
-  top:50%;
-  transform:translateY(-50%);
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:white;
+  background:var(--header-bg);
+  z-index:1000;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+}
+
+.header-left{
+  position:absolute;
+  left:12px;
+}
+
+.header-left img{
+  height:40px;
+}
+
+header h1{
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* ================= BELL ================= */
+
+#bellBox{
+  position:absolute;
+  right:12px;
+  font-size:22px;
   cursor:pointer;
 }
 
-#backBtn img{ width:22px; }
-
-header h1{
+#bellBadge{
   position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  margin:0;
-  font-size:18px;
+  top:-6px;
+  right:-6px;
+  background:red;
+  color:white;
+  width:16px;
+  height:16px;
+  font-size:10px;
+  border-radius:50%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= CONTENT ================= */
+
+.page-content{
+  margin-top:70px;
+}
+
+/* ================= TITLES ================= */
+
+#welcome{
+  text-align:center;
+  font-size:36px;
+  font-weight:700;
+  margin:10px 0 20px;
+}
+
+/* ================= BANDEAU ================= */
+
+#alert-wrapper{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#alert-box{
+  width:100%;
+  height:27px;
+  background:#E88B00;
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  box-sizing:border-box;
+  color:white;
+  font-size:14px;
+  font-weight:500;
+  transform:translateY(-100%);
+  opacity:0;
+  transition:transform .4s ease, opacity .4s ease;
+}
+
+#alert-box.show{
+  transform:translateY(0);
+  opacity:1;
+}
+
+/* ================= SECTIONS ================= */
+
+.section-title{
+  background:var(--section-bg);
+  color:var(--section-text);
+  display:inline-block;
+  padding:6px 14px;
+  margin:20px 15px 10px;
+  border-radius:6px;
+  font-size:14px;
+  letter-spacing:0.5px;
+}
+
+/* ================= GRID ================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  padding:0 15px;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+  background:var(--card-bg);
+  border-radius:22px;
+  padding:22px;
+  text-align:center;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:transform .15s ease;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+}
+
+.card img{
+  width:55px;
+  margin-bottom:12px;
+}
+
+.card div{
+  font-size:16px;
   font-weight:700;
 }
 
-/* ================= PLAN ================= */
+/* ================= LIST BUTTON ================= */
 
-#mapWrapper{
-  position:relative;
-  padding:10px;
-}
-
-#map{
-  width:100%;
-  border-radius:20px;
-  transition:box-shadow .3s ease;
-}
-
-/* ================= BOUTONS ================= */
-
-.plan-btn{
-  position:absolute;
-  width:48px;
-  height:48px;
-  background:#1e2c88;
-  border-radius:14px;
+.list-btn{
+  background:var(--card-bg);
+  margin:12px 15px;
+  padding:18px;
+  border-radius:22px;
   display:flex;
   align-items:center;
-  justify-content:center;
+  gap:12px;
+  box-shadow:var(--shadow);
+  font-weight:700;
   cursor:pointer;
+  transition:transform .15s ease;
 }
 
-.plan-btn img{
+.list-btn:hover{
+  transform:translateY(-2px);
+}
+
+.list-btn img{
   width:26px;
-  height:26px;
-  object-fit:contain;
-}
-
-/* positions */
-#btn-carriere{top:20%;left:25%;}
-#btn-beudot{top:20%;left:55%;}
-#btn-manege{top:35%;left:38%;}
-#btn-grande{top:38%;left:69%;}
-#btn-maison{top:55%;left:60%;}
-
-/* ================= LEGENDE ================= */
-
-.legend{
-  padding:20px;
-  font-size:15px;
-}
-
-.legend-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-.legend-item img{ width:22px; }
-
-/* ================= PANEL ================= */
-
-#panel{
-  position:fixed;
-  left:0;
-  bottom:0;
-  width:100%;
-  height:50%;
-  background:#ffffff;
-  border-radius:20px 20px 0 0;
-  transform:translateY(100%);
-  transition:0.3s;
-  padding:20px;
-  box-sizing:border-box;
-}
-
-#panel.active{ transform:translateY(0); }
-
-.label{ font-size:12px; color:#888; }
-.value{ font-size:14px; font-weight:500; }
-
-#reserveBox{
-  display:none;
-  margin-top:20px;
-  background:#E88B00;
-  color:white;
-  padding:12px;
-  border-radius:12px;
-  text-align:center;
-  font-weight:600;
-  cursor:pointer;
-}
-
-/* ================= DARK MODE ================= */
-
-@media (prefers-color-scheme: dark){
-
-  body{
-    background:#0f1115;
-    color:#ffffff;
-  }
-
-  header h1{ color:#ffffff; }
-
-  #backBtn{
-    background:#1c1f26;
-    box-shadow:0 12px 30px rgba(0,0,0,0.6);
-  }
-
-  #backBtn img{
-    filter:brightness(0) invert(1);
-  }
-
-  #panel{
-    background:#1c1f26;
-    box-shadow:0 25px 60px rgba(0,0,0,0.75);
-  }
-
-  .label{ color:#9aa0a6; }
-  .value{ color:#e5e5e5; }
-  .legend{ color:#ddd; }
-
-  /* === IMAGE DARK PROPRE === */
-
-  #map{
-    box-shadow:
-      0 25px 60px rgba(0,0,0,0.85),
-      0 0 0 1px rgba(255,255,255,0.04);
-  }
-
-  #mapWrapper::after{
-    content:"";
-    position:absolute;
-    inset:10px;
-    border-radius:20px;
-    background:rgba(0,0,0,0.16);
-    pointer-events:none;
-  }
-
-  #reserveBox{
-    background:#c87400;
-    box-shadow:0 12px 30px rgba(0,0,0,0.6);
-  }
-
 }
 
 </style>
@@ -211,170 +236,236 @@ header h1{
 
 <body>
 
-<div class="page" id="page">
-
 <header>
-  <div id="backBtn" onclick="goBack()">
-    <img src="image/back.svg">
+  <div class="header-left">
+    <img src="image/logo.png">
   </div>
-  <h1>PLAN INTERACTIF</h1>
+
+  <h1>ECURIE DAMIEN SIRI</h1>
+
+  <div id="bellBox" onclick="go('notifications.html')">
+    🔔
+    <span id="bellBadge"></span>
+  </div>
 </header>
 
-<div id="mapWrapper">
-  <img id="map" src="image/plan.png">
+<div class="page-content">
 
-  <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
-  <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
-  <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
-  <div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
-  <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
+<div id="welcome">BIENVENUE</div>
+
+<div id="alert-wrapper">
+  <div id="alert-box"></div>
 </div>
 
-<div class="legend">
-  <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
-  <div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
-  <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
-  <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
+<div class="section-title">ESPACES</div>
+
+<div class="grid">
+  <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
+  <div class="card" onclick="go('paddocks.html')"><img src="image/paddock.svg"><div>PADDOCK</div></div>
 </div>
 
-<div id="panel">
-  <div id="panelHeader">
-    <div id="panelTitle">---</div>
-    <div id="closePanel">✕</div>
-  </div>
+<div class="list-btn" onclick="go('plan.html')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
 
-  <div class="row">
-    <div class="label">Statut</div>
-    <div class="value" id="statut">---</div>
-  </div>
+<div class="section-title">PRATIQUE</div>
 
-  <div class="row">
-    <div class="label">Horaires</div>
-    <div class="value" id="horaire">---</div>
-  </div>
-
-  <div class="row" id="optionsRow">
-    <div class="label">Activités possibles</div>
-    <div>
-      <span class="optionText" id="liberte"></span>
-      <span class="optionText" id="longe"></span>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="label">Infos</div>
-    <div class="value scrollable" id="info"></div>
-  </div>
-
-  <div id="reserveBox" onclick="goReserve()">Réserver</div>
+<div class="grid">
+  <div class="card" onclick="go('horaires.html')"><img src="image/time.svg"><div>HORAIRES</div></div>
+  <div class="card" onclick="go('meteo.html')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
+  <div class="card" onclick="openExternal('https://ce-grand-rang.cavasoft.fr')"><img src="image/cavasoft.svg"><div>COURS</div></div>
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/book-online?category=194a368e-8a4f-4212-a33e-ae1656e4de8a')"><img src="image/service.svg"><div>SERVICES</div></div>
+  <div class="card" onclick="go('concours.html')"><img src="image/concours.svg"><div>CONCOURS</div></div>
+  <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/category/soins')"><img src="image/soins.svg"><div>SOINS</div></div>
 </div>
+
+<div class="section-title">AUTRES</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/category/laverie')"><img src="image/laverie.svg"> LAVERIE</div>
+<div class="list-btn" onclick="openExternal('tarifs.pdf')"><img src="image/tarif.svg"> TARIFS</div>
+
+<div class="section-title">COMPTE</div>
+
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/profile/my/profile')"><img src="image/compte.svg"> MON COMPTE</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/my-bookings')"><img src="image/reservation.svg"> MES RÉSERVATIONS</div>
+<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/cart-page')"><img src="image/panier.svg"> MON PANIER</div>
 
 </div>
 
 <script>
+function go(url){ window.location.href=url; }
+function openExternal(url){ window.open(url,"_blank"); }
+</script>
 
-window.addEventListener("DOMContentLoaded",()=>{
-  requestAnimationFrame(()=>{
-    document.getElementById("page").classList.add("active");
-  });
-});
+<script>
+
+/* ===== BANDEAU + STATUT ===== */
 
 const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
-const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
+const HORAIRES_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/horaires";
+const ESPACE="accueil";
 
-const ICONS={
-  "ouvert":"image/ouvert.png",
-  "ferme":"image/ferme.png",
-  "prevision":"image/prevision.png",
-  "hors-service":"image/horsservice.png"
-};
-
-let DATA=[];
-
-function formatTitle(t){
-  const map={
-    "carriere":"Carrière",
-    "manege":"Manège",
-    "maison":"Maison",
-    "grande-voie":"Grande voie",
-    "beudot":"Beudot"
-  };
-  return map[t]||t;
+function getTodayName(){
+  return ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
 }
 
-function loadData(){
-fetch(SHEET_URL,{cache:"no-store"})
-.then(r=>r.json())
-.then(d=>{
-  DATA=d;
-  d.forEach(e=>{
-    const icon=ICONS[e.statut_auto?.toLowerCase()];
-    const el=document.getElementById("icon-"+e.espace);
-    if(el && icon) el.src=icon;
+function parseTime(str){
+  const parts=str.split(":");
+  return {h:parseInt(parts[0]), m:parseInt(parts[1])};
+}
+
+function isNowBetween(open, close){
+  const now=new Date();
+  const openTime=new Date();
+  openTime.setHours(open.h,open.m,0,0);
+  const closeTime=new Date();
+  closeTime.setHours(close.h,close.m,0,0);
+  return now>=openTime && now<=closeTime;
+}
+
+function loadAlertAndStatus(){
+
+  const box=document.getElementById("alert-box");
+  box.innerHTML="";
+  box.classList.remove("show");
+  box.style.display="none";
+
+  fetch(SHEET_URL,{cache:"no-store"})
+  .then(r=>r.json())
+  .then(data=>{
+    const row=data.find(e=>e.espace===ESPACE);
+
+    // PRIORITÉ ALERTE
+    if(row && row.alerte && row.alerte.trim()!==""){
+
+      box.style.display="flex";
+      box.style.background="#E88B00";
+
+      const icon=document.createElement("img");
+      icon.src="https://static.wixstatic.com/shapes/ff7f34_8db0b910e97b4e37af20514452d5c4f4.svg";
+      icon.style.width="16px";
+
+      const text=document.createElement("div");
+      text.textContent=row.alerte;
+
+      box.appendChild(icon);
+      box.appendChild(text);
+
+      setTimeout(()=>{ box.classList.add("show"); },50);
+      return;
+    }
+
+    // SINON STATUT HORAIRES
+    fetch(HORAIRES_URL,{cache:"no-store"})
+    .then(r=>r.json())
+    .then(data=>{
+
+      const today=getTodayName();
+      const row=data.find(r=>r.jour?.toLowerCase()===today);
+      if(!row||!row.ouvert||!row.ferme) return;
+
+      const open=parseTime(row.ouvert);
+      const close=parseTime(row.ferme);
+
+      box.style.display="flex";
+      box.classList.add("show");
+
+      if(isNowBetween(open,close)){
+        box.style.background="#1e7e34";
+        box.textContent=`Écuries ouvertes (${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)})`;
+      }else{
+        box.style.background="#c0392b";
+        const now=new Date();
+        const openTime=new Date();
+        openTime.setHours(open.h,open.m,0,0);
+
+        if(now<openTime){
+          box.textContent=`Écuries fermées (ouvre à ${row.ouvert.substring(0,5)})`;
+        }else{
+          box.textContent=`Écuries fermées`;
+        }
+      }
+
+      setTimeout(()=>{ box.classList.add("show"); },50);
+
+    });
   });
-});
 }
 
-loadData();
-setInterval(loadData,60000);
+loadAlertAndStatus();
+setInterval(loadAlertAndStatus,60000);
 
-function openSpace(espace){
-const e=DATA.find(x=>x.espace===espace);
-if(!e) return;
+</script>
 
-panelTitle.innerText=formatTitle(e.espace);
+<script>
 
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
-if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
+/* ===== CLOCHE (INTOUCHÉE) ===== */
 
-const special=e.horaire_special && String(e.horaire_special).trim()!=="";
-horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
+const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
 
-if(special){
-  horaire.style.color="#E88B00";
-  horaire.style.fontWeight="600";
-}else{
-  horaire.style.color="";
-  horaire.style.fontWeight="500";
+const STORAGE_KEY="alerts_lues";
+
+function getLues(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; }
+  catch(e){ return []; }
 }
 
-info.innerText=e.info||"Aucune info";
-
-let show=false;
-if(e.liberte){
-  liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
-  show=true;
-}
-if(e.longe){
-  longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
-  show=true;
-}
-optionsRow.style.display=show?"block":"none";
-
-if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
- (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
-  reserveBox.style.display="block";
-}else{
-  reserveBox.style.display="none";
+function parseDateFR(str){
+  if(!str) return null;
+  if(str.includes("-")){
+    const p=str.split("-");
+    return new Date(p[0],p[1]-1,p[2],0,0,0);
+  }
+  if(str.includes("/")){
+    const p=str.split("/");
+    return new Date(p[2],p[1]-1,p[0],0,0,0);
+  }
+  return null;
 }
 
-panel.classList.add("active");
+async function updateBell(){
+
+  const badge=document.getElementById("bellBadge");
+
+  try{
+    const res=await fetch(API_URL,{cache:"no-store"});
+    const data=await res.json();
+
+    const today=new Date();
+    today.setHours(0,0,0,0);
+
+    const lues=getLues().map(String);
+    let count=0;
+
+    data
+      .filter(n=>{
+        if(n.epingle==="oui") return true;
+        if(n.active!=="oui") return false;
+
+        if(!n.expire){
+          const d=parseDateFR(n.date);
+          if(!d) return true;
+          return d>=today;
+        }
+
+        const exp=parseDateFR(n.expire);
+        if(!exp) return true;
+        return exp>=today;
+      })
+      .forEach(n=>{
+        if(!lues.includes(String(n.id))){
+          count++;
+        }
+      });
+
+    badge.style.display = count>0 ? "flex" : "none";
+    badge.textContent = count;
+
+  }catch(e){
+    badge.style.display="none";
+  }
 }
 
-closePanel.onclick=()=>panel.classList.remove("active");
-
-function goBack(){
-  const page=document.getElementById("page");
-  page.classList.remove("active");
-  page.classList.add("exit");
-  setTimeout(()=>{ location.href="index.html"; },300);
-}
-
-function goReserve(){
-  window.open(RESERVE_URL,"_blank");
-}
+updateBell();
+setInterval(updateBell,60000);
 
 </script>
 
