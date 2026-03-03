@@ -7,7 +7,6 @@
 <title>Ecurie Damien Siri</title>
 
 <link rel="manifest" href="manifest.json">
-
 <link rel="apple-touch-icon" href="image/icon-192x192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -42,9 +41,7 @@
   }
 
   .header-left img{
-    filter:
-      brightness(0) invert(1)
-      drop-shadow(0 0 6px rgba(255,255,255,0.5));
+    filter:brightness(0) invert(1);
   }
 }
 
@@ -55,8 +52,11 @@ body{
   font-family:'Montserrat',sans-serif;
   background:var(--bg);
   color:var(--text);
-  overflow-y:auto;
   transition:background .3s ease,color .3s ease;
+}
+
+.page-content{
+  margin-top:70px;
 }
 
 /* ================= HEADER ================= */
@@ -87,7 +87,6 @@ header h1{
   margin:0;
   font-size:20px;
   font-weight:700;
-  color:var(--text);
 }
 
 /* ================= BELL ================= */
@@ -114,17 +113,13 @@ header h1{
   justify-content:center;
 }
 
-/* ================= CONTENT ================= */
-
-.page-content{
-  margin-top:70px;
-}
+/* ================= WELCOME ================= */
 
 #welcome{
   text-align:center;
   font-size:36px;
   font-weight:700;
-  margin:10px 0 10px;
+  margin:10px 0 6px;
 }
 
 /* ================= STATUS DISCRET ================= */
@@ -142,21 +137,20 @@ header h1{
   font-size:15px;
   font-weight:600;
   margin-top:4px;
-  display:flex;
   align-items:center;
   gap:8px;
 }
 
 .status-dot{
-  width:10px;
-  height:10px;
+  width:9px;
+  height:9px;
   border-radius:50%;
 }
 
 #alert-box small{
   font-size:12px;
-  font-weight:500;
   opacity:0.75;
+  margin-left:4px;
 }
 
 /* ================= SECTIONS ================= */
@@ -171,16 +165,12 @@ header h1{
   font-size:14px;
 }
 
-/* ================= GRID ================= */
-
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:15px;
   padding:0 15px;
 }
-
-/* ================= CARDS ================= */
 
 .card{
   background:var(--card-bg);
@@ -205,8 +195,6 @@ header h1{
   font-size:16px;
   font-weight:700;
 }
-
-/* ================= LIST BUTTON ================= */
 
 .list-btn{
   background:var(--card-bg);
@@ -251,7 +239,6 @@ header h1{
   <div id="alert-box"></div>
 </div>
 
-<!-- CONTENU IDENTIQUE -->
 <div class="section-title">ESPACES</div>
 <div class="grid">
   <div class="card" onclick="go('travail.html')"><img src="image/travail.svg"><div>TRAVAIL</div></div>
@@ -269,58 +256,74 @@ header h1{
 </div>
 
 <script>
+function go(url){ window.location.href=url; }
+</script>
 
-/* ===== STATUS OUVERTURE DISCRET ===== */
+<script>
+
+/* ===== STATUS OUVERTURE ===== */
 
 const SHEET_ID="1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI";
+const STATUTS_URL=`https://opensheet.elk.sh/${SHEET_ID}/statuts`;
 const HORAIRES_URL=`https://opensheet.elk.sh/${SHEET_ID}/horaires`;
 
 function getTodayName(){
   return ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
 }
 
-function timeToMinutes(t){
+function toMin(t){
   const p=t.split(":");
-  return parseInt(p[0])*60 + parseInt(p[1]);
+  return parseInt(p[0])*60+parseInt(p[1]);
 }
 
-function isOpenNow(open,close){
+function isOpen(open,close){
   const now=new Date();
-  const nowMin=now.getHours()*60 + now.getMinutes();
-  return nowMin>=timeToMinutes(open) && nowMin<=timeToMinutes(close);
+  const m=now.getHours()*60+now.getMinutes();
+  return m>=toMin(open)&&m<=toMin(close);
 }
 
-async function loadOpeningState(){
+async function loadOpening(){
 
   const box=document.getElementById("alert-box");
   box.innerHTML="";
   box.style.display="none";
 
   try{
-    const res=await fetch(HORAIRES_URL,{cache:"no-store"});
-    const horaires=await res.json();
+
+    const [sRes,hRes]=await Promise.all([
+      fetch(STATUTS_URL,{cache:"no-store"}),
+      fetch(HORAIRES_URL,{cache:"no-store"})
+    ]);
+
+    const statuts=await sRes.json();
+    const horaires=await hRes.json();
+
+    const accueil=statuts.find(e=>e.espace==="accueil");
+
+    if(accueil && accueil.alerte && accueil.alerte.trim()!==""){
+      return; // bandeau spécial prioritaire
+    }
 
     const today=getTodayName();
-    const todayRow=horaires.find(h=>h.jour?.toLowerCase()===today);
+    const row=horaires.find(h=>h.jour?.toLowerCase()===today);
+    if(!row) return;
 
-    if(!todayRow) return;
-
-    const ouvert=isOpenNow(todayRow.ouverture,todayRow.fermeture);
+    const open=isOpen(row.ouverture,row.fermeture);
 
     box.style.display="flex";
 
     const dot=document.createElement("div");
     dot.className="status-dot";
-    dot.style.background=ouvert?"#1DB954":"#e53935";
+    dot.style.background=open?"#1DB954":"#e53935";
 
     const main=document.createElement("span");
-    main.textContent=ouvert?"Écuries ouvertes":"Écuries fermées";
-    main.style.color=ouvert?"#1DB954":"#e53935";
+    main.textContent=open?"Écuries ouvertes":"Écuries fermées";
+    main.style.color=open?"#1DB954":"#e53935";
 
     const sub=document.createElement("small");
-    sub.textContent=ouvert?
-      `(jusqu'à ${todayRow.fermeture})`:
-      `(ouvre à ${todayRow.ouverture})`;
+    sub.textContent=open?
+      `(jusqu'à ${row.fermeture})`:
+      `(ouvre à ${row.ouverture})`;
 
     box.appendChild(dot);
     box.appendChild(main);
@@ -331,8 +334,71 @@ async function loadOpeningState(){
   }
 }
 
-loadOpeningState();
-setInterval(loadOpeningState,60000);
+loadOpening();
+setInterval(loadOpening,60000);
+
+</script>
+
+<script>
+
+/* ===== CLOCHE (INTACTE) ===== */
+
+const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
+
+const STORAGE_KEY="alerts_lues";
+
+function getLues(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}
+  catch(e){return [];}
+}
+
+function parseDateFR(str){
+  if(!str)return null;
+  if(str.includes("-")){
+    const p=str.split("-");
+    return new Date(p[0],p[1]-1,p[2],0,0,0);
+  }
+  if(str.includes("/")){
+    const p=str.split("/");
+    return new Date(p[2],p[1]-1,p[0],0,0,0);
+  }
+  return null;
+}
+
+async function updateBell(){
+  const badge=document.getElementById("bellBadge");
+  try{
+    const res=await fetch(API_URL,{cache:"no-store"});
+    const data=await res.json();
+    const today=new Date();today.setHours(0,0,0,0);
+    const lues=getLues().map(String);
+    let count=0;
+
+    data.filter(n=>{
+      if(n.epingle==="oui")return true;
+      if(n.active!=="oui")return false;
+      if(!n.expire){
+        const d=parseDateFR(n.date);
+        if(!d)return true;
+        return d>=today;
+      }
+      const exp=parseDateFR(n.expire);
+      if(!exp)return true;
+      return exp>=today;
+    }).forEach(n=>{
+      if(!lues.includes(String(n.id)))count++;
+    });
+
+    badge.style.display=count>0?"flex":"none";
+    badge.textContent=count;
+
+  }catch(e){
+    badge.style.display="none";
+  }
+}
+
+updateBell();
+setInterval(updateBell,60000);
 
 </script>
 
