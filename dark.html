@@ -125,7 +125,7 @@ header h1{
   margin:10px 0 10px;
 }
 
-/* ================= BANDEAU MODIFIÉ ================= */
+/* ================= BANDEAU ================= */
 
 #alert-wrapper{
   width:100%;
@@ -138,12 +138,15 @@ header h1{
   display:none;
   font-size:15px;
   font-weight:600;
+  text-align:right;
 }
 
 #alert-box small{
-  font-size:9px;
-  opacity:0.7;
+  display:block;       /* passe à la ligne */
+  font-size:9px;       /* très discret */
+  opacity:0.6;
   font-weight:500;
+  margin-top:2px;
 }
 
 /* ================= SECTIONS ================= */
@@ -275,7 +278,7 @@ function openExternal(url){ window.open(url,"_blank"); }
 
 <script>
 
-/* ===== BANDEAU + STATUT (MODIFIÉ VISUELLEMENT UNIQUEMENT) ===== */
+/* ===== BANDEAU + STATUT (LOGIQUE INTACTE) ===== */
 
 const SHEET_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/statuts";
 const HORAIRES_URL="https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/horaires";
@@ -310,7 +313,6 @@ function loadAlertAndStatus(){
   .then(data=>{
     const row=data.find(e=>e.espace===ESPACE);
 
-    // PRIORITÉ ALERTE
     if(row && row.alerte && row.alerte.trim()!==""){
       box.style.display="block";
       box.style.color="#E88B00";
@@ -333,10 +335,10 @@ function loadAlertAndStatus(){
 
       if(isNowBetween(open,close)){
         box.style.color="#1e7e34";
-        box.innerHTML=`Écuries ouvertes <small>(${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)})</small>`;
+        box.innerHTML=`Écuries ouvertes<small>(${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)})</small>`;
       }else{
         box.style.color="#c0392b";
-        box.innerHTML=`Écuries fermées <small>(${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)})</small>`;
+        box.innerHTML=`Écuries fermées<small>(${row.ouvert.substring(0,5)} – ${row.ferme.substring(0,5)})</small>`;
       }
 
     });
@@ -348,10 +350,9 @@ setInterval(loadAlertAndStatus,60000);
 
 </script>
 
-<!-- CLOCHE STRICTEMENT INCHANGÉE -->
 <script>
 
-/* ===== CLOCHE ===== */
+/* ===== CLOCHE STRICTEMENT INCHANGÉE ===== */
 
 const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
 
