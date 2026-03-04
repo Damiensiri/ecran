@@ -39,6 +39,10 @@ border-radius:6px;
 cursor:pointer;
 }
 
+.topbar button:hover{
+background:#2a2f38;
+}
+
 .wrapper{
 overflow-x:auto;
 padding:10px;
@@ -109,10 +113,17 @@ font-weight:600;
 <h1>Planning Écurie</h1>
 
 <div class="topbar">
+
 <button onclick="changeWeek(-1)">←</button>
+
 <div id="weekLabel"></div>
+
 <button onclick="changeWeek(1)">→</button>
+
 <button id="viewBtn" onclick="toggleView()">Vue jour</button>
+
+<button onclick="goEcran()">FERMER</button>
+
 </div>
 
 <div class="wrapper">
@@ -121,7 +132,33 @@ font-weight:600;
 
 <script>
 
-/* SHEET */
+/* ===== VEILLE 1 MINUTE ===== */
+
+let inactivityTimer;
+
+function resetTimer(){
+
+clearTimeout(inactivityTimer);
+
+inactivityTimer=setTimeout(()=>{
+location.href="ecran.html";
+},60000);
+
+}
+
+["click","touchstart","mousemove","keydown"].forEach(evt=>{
+document.addEventListener(evt,resetTimer,true);
+});
+
+resetTimer();
+
+/* bouton fermer */
+
+function goEcran(){
+location.href="ecran.html";
+}
+
+/* CONFIG SHEET */
 
 const SHEET_ID="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
 
@@ -171,9 +208,7 @@ return {icon:"",class:""};
 /* clé validation */
 
 function validationKey(cheval,jour,tache){
-
 return `${currentWeek}_${cheval}_${jour}_${tache}`.toLowerCase();
-
 }
 
 /* format tâches */
