@@ -249,6 +249,26 @@ function updateClock(){
 updateClock();
 setInterval(updateClock,1000);
 
+/* ===== DOUBLE TAP → PLANNING ===== */
+
+let lastTap = 0;
+
+document.addEventListener("touchend", function(){
+  const now = new Date().getTime();
+  if(now - lastTap < 300){
+    window.location.href = "planning.html";
+  }
+  lastTap = now;
+});
+
+document.addEventListener("click", function(){
+  const now = new Date().getTime();
+  if(now - lastTap < 300){
+    window.location.href = "planning.html";
+  }
+  lastTap = now;
+});
+
 </script>
 </body>
 </html>
