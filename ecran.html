@@ -14,86 +14,63 @@ body{
   margin:0;
   font-family:'Montserrat',sans-serif;
   background:#000;
-  color:white;
 }
 
 /* ===== HEADER ===== */
 
 header{
-  min-height:70px;
+  height:70px;
   background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
-  padding:10px;
 }
 
 header img{
   position:absolute;
   left:15px;
-  height:clamp(30px,4vw,50px);
+  height:40px;
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
+  color:white;
   margin:0;
-  font-size:clamp(18px,2.2vw,32px);
+  font-size:22px;
   font-weight:700;
-  text-align:center;
 }
 
 #clock{
   position:absolute;
   right:18px;
-  font-size:clamp(16px,2vw,28px);
+  color:white;
+  font-size:20px;
   font-weight:700;
 }
 
 /* ===== SECTIONS ===== */
 
 .section-title{
-  margin:clamp(15px,2vw,30px) clamp(15px,3vw,40px) 10px;
-  font-size:clamp(14px,1.6vw,22px);
+  color:white;
+  margin:20px 15px 10px;
+  font-size:16px;
   font-weight:700;
 }
 
-/* ===== GRID ===== */
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:clamp(12px,2vw,25px);
-  padding:0 clamp(15px,3vw,40px);
-}
-
-/* tablette */
-
-@media(min-width:700px){
-.grid{
-  grid-template-columns:1fr 1fr;
-}
-}
-
-/* écran large */
-
-@media(min-width:1200px){
-.grid{
-  grid-template-columns:1fr 1fr 1fr;
-}
-}
-
-/* ===== CARDS ===== */
+/* ===== GLASS CARDS (PLUS VISIBLES) ===== */
 
 .card{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border:1px solid rgba(255,255,255,0.18);
-  padding:clamp(14px,2vw,22px);
+  margin:0 15px 18px;
+  padding:16px;
   border-radius:18px;
   box-shadow:0 8px 26px rgba(0,0,0,0.7);
+  color:white;
 }
 
 .card-top{
@@ -105,20 +82,21 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 
 .title-wrap img{
-  width:clamp(22px,2vw,32px);
+  width:26px;
 }
 
 .card-title{
-  font-size:clamp(18px,2vw,28px);
+  font-size:22px;
   font-weight:700;
+  color:white;
 }
 
 .card-top img.statut{
-  width:clamp(22px,2vw,32px);
+  width:26px;
 }
 
 /* ===== LIGNE ===== */
@@ -126,14 +104,14 @@ header h1{
 .card-middle{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
   margin-top:8px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
 }
 
 .badge{
   font-weight:700;
-  font-size:clamp(12px,1.2vw,16px);
+  font-size:14px;
 }
 
 .badge.oui{ color:#4caf50; }
@@ -141,14 +119,14 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:clamp(13px,1.2vw,18px);
+  font-size:14px;
   font-weight:600;
   color:#f5f5f5;
 }
 
 .info{
   margin-top:10px;
-  font-size:clamp(13px,1.3vw,18px);
+  font-size:14px;
   font-weight:500;
   color:#ffb347;
   white-space:pre-line;
@@ -167,18 +145,14 @@ header h1{
 
 <div class="section-title">ESPACES TRAVAIL</div>
 
-<div class="grid">
-  <div class="card" id="carriere"></div>
-  <div class="card" id="manege"></div>
-</div>
+<div class="card" id="carriere"></div>
+<div class="card" id="manege"></div>
 
 <div class="section-title">PADDOCKS</div>
 
-<div class="grid">
-  <div class="card" id="maison"></div>
-  <div class="card" id="grande-voie"></div>
-  <div class="card" id="beudot"></div>
-</div>
+<div class="card" id="maison"></div>
+<div class="card" id="grande-voie"></div>
+<div class="card" id="beudot"></div>
 
 <script>
 
@@ -209,11 +183,12 @@ function badgeYN(v){
 function buildCard(e){
 
   const isTravail = (e.espace==="carriere" || e.espace==="manege");
+  const icon = isTravail ? "image/travail.svg" : "image/paddock.svg";
 
   return `
     <div class="card-top">
       <div class="title-wrap">
-        <img src="image/travail.svg">
+        <img src="${icon}">
         <div class="card-title">${TITRES[e.espace]}</div>
       </div>
       <img class="statut" src="${ICONS_STATUT[e.statut_auto]}">
@@ -245,6 +220,8 @@ function buildCard(e){
   `;
 }
 
+/* ===== LOAD DATA ===== */
+
 function loadData(){
 fetch(SHEET_URL,{cache:"no-store"})
 .then(r=>r.json())
@@ -260,6 +237,8 @@ fetch(SHEET_URL,{cache:"no-store"})
 loadData();
 setInterval(loadData,REFRESH);
 
+/* ===== CLOCK ===== */
+
 function updateClock(){
   const d=new Date();
   const h=String(d.getHours()).padStart(2,"0");
@@ -271,3 +250,5 @@ updateClock();
 setInterval(updateClock,1000);
 
 </script>
+</body>
+</html>
