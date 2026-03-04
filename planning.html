@@ -76,7 +76,7 @@ padding:8px;
 width:140px;
 }
 
-/* colonne cheval fixe */
+/* colonne cheval */
 
 .horse{
 position:sticky;
@@ -85,6 +85,12 @@ background:#181b21;
 font-weight:700;
 z-index:3;
 box-shadow:8px 0 12px rgba(0,0,0,0.6);
+}
+
+/* largeur réduite vue jour */
+
+.day-view .horse{
+width:120px;
 }
 
 /* colonne jour */
@@ -134,7 +140,7 @@ text-decoration:line-through;
 
 <button onclick="changeWeek(1)">→</button>
 
-<button onclick="toggleView()">Vue jour</button>
+<button id="viewBtn" onclick="toggleView()">Vue jour</button>
 
 </div>
 
@@ -231,6 +237,8 @@ ${iconData.icon}${text}
 
 function buildPlanning(){
 
+document.body.classList.remove("day-view");
+
 let html="<tr>";
 
 html+="<th class='horse'>Cheval</th>";
@@ -274,6 +282,8 @@ addTaskEvents();
 /* vue jour */
 
 function buildDayView(){
+
+document.body.classList.add("day-view");
 
 const day=days[todayColumn];
 
@@ -330,12 +340,20 @@ loadPlanning();
 
 function toggleView(){
 
+const btn=document.getElementById("viewBtn");
+
 if(viewMode==="week"){
+
 viewMode="day";
+btn.innerText="Vue semaine";
 buildDayView();
+
 }else{
+
 viewMode="week";
+btn.innerText="Vue jour";
 buildPlanning();
+
 }
 
 }
