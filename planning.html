@@ -132,15 +132,25 @@ font-weight:600;
 
 <script>
 
-/* ===== VEILLE 1 MINUTE ===== */
+/* ===== CONFIG ===== */
+
+const SHEET_PLANNING="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
+const SHEET_VALIDATIONS="1YfrSDkB9E_SNA1ojqMuoUXBJt9vd_z40Kej3oyOXV7A";
+
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdsG-ErANYpSvtqj3QsHNuXj5tjSiK-IZB-nP__aSMz6iHV8w/formResponse";
+
+const ENTRY_WEEK="entry.915711839";
+const ENTRY_HORSE="entry.1929695140";
+const ENTRY_DAY="entry.301329581";
+const ENTRY_TASK="entry.450632275";
+
+/* ===== VEILLE ===== */
 
 let inactivityTimer;
 
 function resetTimer(){
 clearTimeout(inactivityTimer);
-inactivityTimer=setTimeout(()=>{
-location.href="ecran.html";
-},60000);
+inactivityTimer=setTimeout(()=>{location.href="ecran.html";},60000);
 }
 
 ["click","touchstart","mousemove","keydown"].forEach(evt=>{
@@ -149,32 +159,15 @@ document.addEventListener(evt,resetTimer,true);
 
 resetTimer();
 
-/* bouton fermer */
-
 function goEcran(){
 location.href="ecran.html";
 }
 
-/* CONFIG SHEET */
-
-const SHEET_ID="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
-
-/* GOOGLE FORM */
-
-const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdsG-ErANYpSvtqj3QsHNuXj5tjSiK-IZB-nP__aSMz6iHV8w/formResponse";
-
-/* champs form */
-
-const ENTRY_WEEK="entry.915711839";
-const ENTRY_HORSE="entry.1929695140";
-const ENTRY_DAY="entry.301329581";
-const ENTRY_TASK="entry.450632275";
-
-/* jours */
+/* ===== JOURS ===== */
 
 const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
-/* semaine */
+/* ===== SEMAINE ===== */
 
 function getWeekNumber(){
 const d=new Date();
@@ -187,16 +180,11 @@ return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
 let currentWeek=getWeekNumber();
 
 let planningData=[];
+let validations=[];
 
 let viewMode="week";
 
-/* jour actuel */
-
-const todayIndex=new Date().getDay();
-const dayMap=[6,0,1,2,3,4,5];
-const todayColumn=dayMap[todayIndex];
-
-/* icones */
+/* ===== ICÔNES ===== */
 
 function taskIcon(text){
 
@@ -213,13 +201,13 @@ return {icon:"",class:""};
 
 }
 
-/* clé validation */
+/* ===== VALIDATION KEY ===== */
 
 function validationKey(cheval,jour,tache){
 return `${currentWeek}_${cheval}_${jour}_${tache}`.toLowerCase();
 }
 
-/* envoi google form */
+/* ===== GOOGLE FORM ===== */
 
 function sendToForm(cheval,jour,tache){
 
@@ -230,15 +218,22 @@ data.append(ENTRY_HORSE,cheval);
 data.append(ENTRY_DAY,jour);
 data.append(ENTRY_TASK,tache);
 
-fetch(FORM_URL,{
-method:"POST",
-mode:"no-cors",
-body:data
-});
+fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
 
 }
 
-/* format tâches */
+/* ===== FORMAT TÂCHES ===== */
+
+function isValidated(cheval,jour,tache){
+
+return validations.some(v=>
+String(v.Semaine)==String(currentWeek)
+&& v.Cheval.toLowerCase()==cheval.toLowerCase()
+&& v.Jour.toLowerCase()==jour.toLowerCase()
+&& v["Tâche"].toLowerCase()==tache.toLowerCase()
+);
+
+}
 
 function formatTasks(tasks,cheval,jour){
 
@@ -252,9 +247,7 @@ const text=t.trim();
 
 const iconData=taskIcon(text);
 
-const key=validationKey(cheval,jour,text);
-
-const done=localStorage.getItem(key);
+let done=isValidated(cheval,jour,text);
 
 return `<div class="task ${iconData.class} ${done?"done":""}" data-cheval="${cheval}" data-jour="${jour}" data-task="${text}">
 ${done?"✔ ":""}${iconData.icon}${text}
@@ -264,7 +257,7 @@ ${done?"✔ ":""}${iconData.icon}${text}
 
 }
 
-/* tableau semaine */
+/* ===== TABLEAU ===== */
 
 function buildPlanning(){
 
@@ -272,9 +265,8 @@ let html="<tr>";
 
 html+="<th class='horse'>Cheval</th>";
 
-days.forEach((d,i)=>{
-let cls=i===todayColumn?"today":"";
-html+=`<th class="${cls}">${d.toUpperCase()}</th>`;
+days.forEach(day=>{
+html+=`<th>${day.toUpperCase()}</th>`;
 });
 
 html+="</tr>";
@@ -285,14 +277,8 @@ html+="<tr>";
 
 html+=`<td class="horse">${row.cheval}</td>`;
 
-days.forEach((day,i)=>{
-
-let cls=i===todayColumn?"today":"";
-
-html+=`<td class="${cls}">
-${formatTasks(row[day],row.cheval,day)}
-</td>`;
-
+days.forEach(day=>{
+html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
 });
 
 html+="</tr>";
@@ -305,17 +291,17 @@ addTaskEvents();
 
 }
 
-/* vue jour */
+/* ===== VUE JOUR ===== */
 
 function buildDayView(){
 
-const day=days[todayColumn];
+const today=new Date();
+const index=[6,0,1,2,3,4,5][today.getDay()];
+const day=days[index];
 
 let html="<tr>";
-
 html+="<th class='horse'>Cheval</th>";
 html+=`<th>${day.toUpperCase()}</th>`;
-
 html+="</tr>";
 
 planningData.forEach(row=>{
@@ -335,7 +321,7 @@ addTaskEvents();
 
 }
 
-/* validation */
+/* ===== CLICK TASK ===== */
 
 function addTaskEvents(){
 
@@ -347,26 +333,15 @@ const cheval=el.dataset.cheval;
 const jour=el.dataset.jour;
 const task=el.dataset.task;
 
-const key=validationKey(cheval,jour,task);
+if(!el.classList.contains("done")){
 
-el.classList.toggle("done");
-
-if(el.classList.contains("done")){
-
-if(!localStorage.getItem(key)){
 sendToForm(cheval,jour,task);
-}
 
-localStorage.setItem(key,"1");
+el.classList.add("done");
 
 if(!el.innerHTML.startsWith("✔")){
 el.innerHTML="✔ "+el.innerHTML;
 }
-
-}else{
-
-localStorage.removeItem(key);
-el.innerHTML=el.innerHTML.replace("✔ ","");
 
 }
 
@@ -376,14 +351,14 @@ el.innerHTML=el.innerHTML.replace("✔ ","");
 
 }
 
-/* navigation semaine */
+/* ===== NAV SEMAINE ===== */
 
 function changeWeek(delta){
 currentWeek+=delta;
 loadPlanning();
 }
 
-/* toggle vue */
+/* ===== TOGGLE VIEW ===== */
 
 function toggleView(){
 
@@ -401,7 +376,7 @@ buildPlanning();
 
 }
 
-/* load sheet */
+/* ===== LOAD DATA ===== */
 
 async function loadPlanning(){
 
@@ -409,11 +384,14 @@ let week=String(currentWeek).padStart(2,"0");
 
 document.getElementById("weekLabel").innerText="Semaine "+week;
 
-const url=`https://opensheet.elk.sh/${SHEET_ID}/semaine_${week}`;
+const planningURL=`https://opensheet.elk.sh/${SHEET_PLANNING}/semaine_${week}`;
+const validationURL=`https://opensheet.elk.sh/${SHEET_VALIDATIONS}/1`;
 
-const res=await fetch(url);
+const res1=await fetch(planningURL);
+planningData=await res1.json();
 
-planningData=await res.json();
+const res2=await fetch(validationURL);
+validations=await res2.json();
 
 if(viewMode==="week"){
 buildPlanning();
