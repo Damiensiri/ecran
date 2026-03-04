@@ -6,55 +6,55 @@
 
 <title>Planning Écurie</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
 body{
 margin:0;
-font-family:'Montserrat',sans-serif;
 background:#0f1115;
+font-family:'Montserrat',sans-serif;
 color:white;
 }
 
 h1{
 text-align:center;
-margin:15px 0;
+margin:25px 0;
+font-size:32px;
 }
 
-/* scroll horizontal */
+/* CONTAINER SCROLL */
 
 .wrapper{
 overflow-x:auto;
+overflow-y:hidden;
+overflow:hidden;
 padding:10px;
 scroll-behavior:smooth;
 }
 
-/* tableau */
+/* TABLE */
 
 table{
 border-collapse:collapse;
 width:100%;
 min-width:900px;
+position:relative;
+}
+
+th,td{
+border:1px solid #333;
+padding:14px;
+text-align:center;
+min-width:140px;
 }
 
 th{
-background:#1c1f26;
-color:white;
-padding:12px;
-font-size:14px;
-border:1px solid #333;
+background:#181b21;
+font-weight:600;
 }
 
-td{
-background:#1c1f26;
-border:1px solid #333;
-vertical-align:top;
-padding:8px;
-width:140px;
-}
-
-/* colonne cheval fixe */
+/* COLONNE CHEVAL FIXE */
 
 .horse{
 position:sticky;
@@ -62,64 +62,66 @@ left:0;
 background:#181b21;
 font-weight:700;
 z-index:3;
-
-/* ombre pour voir le scroll */
-box-shadow:8px 0 12px rgba(0,0,0,0.6);
+border-right:2px solid #333;
 }
 
-/* colonne du jour */
+th.horse{
+z-index:4;
+}
+
+/* JOUR ACTUEL */
 
 .today{
-background:#2a2f38 !important;
+background:#2a2f3a;
 }
 
-/* tâches */
+/* CELLULE */
+
+.cell{
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* TACHES */
 
 .task{
-padding:4px 6px;
-margin:4px 0;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
+padding:8px 14px;
+border-radius:12px;
+font-size:14px;
+font-weight:600;
 }
 
-/* couleurs */
+/* COULEURS */
 
 .travail{
-background:#fff3b0;
-color:#000;
+background:#e9dfa6;
+color:black;
 }
 
 .paddock{
-background:#b7e4c7;
-color:#000;
+background:#a8d5ba;
+color:black;
 }
 
 .repos{
-background:#cdb4db;
-color:#000;
-}
-
-.proprio{
-background:#cdb4db;
-color:#000;
+background:#c7b1d6;
+color:black;
 }
 
 .longe{
-background:#bde0fe;
-color:#000;
+background:#b8d8f0;
+color:black;
 }
 
 .concours{
 background:#ffb703;
-color:#000;
+color:black;
 }
 
-/* validation tâche */
-
-.task.done{
-opacity:0.4;
-text-decoration:line-through;
+.proprio{
+background:#c7b1d6;
+color:black;
 }
 
 </style>
@@ -130,179 +132,73 @@ text-decoration:line-through;
 <h1>Planning Écurie</h1>
 
 <div class="wrapper">
-<table id="planning"></table>
+
+<table>
+
+<thead>
+<tr>
+<th class="horse">Cheval</th>
+<th>LUNDI</th>
+<th>MARDI</th>
+<th class="today">MERCREDI</th>
+<th>JEUDI</th>
+<th>VENDREDI</th>
+<th>SAMEDI</th>
+<th>DIMANCHE</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td class="horse">Java</td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td><div class="cell"><div class="task proprio">👤 Propriétaire</div></div></td>
+<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
+<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+</tr>
+
+<tr>
+<td class="horse">Oslo</td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td><div class="cell"><div class="task longe">🪢 Longe</div></div></td>
+<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+</tr>
+
+<tr>
+<td class="horse">Iris</td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task proprio">👤 Propriétaire</div></div></td>
+<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+</tr>
+
+<tr>
+<td class="horse">Salsa</td>
+<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td class="today"><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
+<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+</tr>
+
+</tbody>
+
+</table>
+
 </div>
-
-<script>
-
-/* ===== DONNÉES MAQUETTE ===== */
-
-const planningData = [
-
-{
-cheval:"Java",
-lundi:"Travail / Maison 08:00-09:00 / Paddock",
-mardi:"Repos",
-mercredi:"Travail",
-jeudi:"Paddock",
-vendredi:"Propriétaire",
-samedi:"Concours",
-dimanche:"Repos"
-},
-
-{
-cheval:"Oslo",
-lundi:"Longe",
-mardi:"Paddock",
-mercredi:"Travail",
-jeudi:"Travail",
-vendredi:"Repos",
-samedi:"Concours",
-dimanche:"Paddock"
-},
-
-{
-cheval:"Iris",
-lundi:"Repos",
-mardi:"Travail",
-mercredi:"Paddock",
-jeudi:"Travail",
-vendredi:"Travail",
-samedi:"Propriétaire",
-dimanche:"Repos"
-},
-
-{
-cheval:"Salsa",
-lundi:"Travail",
-mardi:"Travail",
-mercredi:"Paddock",
-jeudi:"Repos",
-vendredi:"Paddock",
-samedi:"Concours",
-dimanche:"Repos"
-}
-
-];
-
-/* jours */
-
-const days=[
-"lundi",
-"mardi",
-"mercredi",
-"jeudi",
-"vendredi",
-"samedi",
-"dimanche"
-];
-
-/* ===== COLONNE JOUR ACTUEL ===== */
-
-const todayIndex = new Date().getDay();
-const dayMap=[6,0,1,2,3,4,5];
-const todayColumn = dayMap[todayIndex];
-
-/* ===== ICONES ===== */
-
-function taskIcon(text){
-
-const t=text.toLowerCase();
-
-if(t.includes("travail")) return {icon:"🐎 ",class:"travail"};
-if(t.includes("paddock")) return {icon:"🌿 ",class:"paddock"};
-if(t.includes("repos")) return {icon:"😴 ",class:"repos"};
-if(t.includes("concours")) return {icon:"🏆 ",class:"concours"};
-if(t.includes("propriétaire")) return {icon:"👤 ",class:"proprio"};
-if(t.includes("longe")) return {icon:"🪢 ",class:"longe"};
-
-return {icon:"",class:""};
-
-}
-
-/* ===== CONSTRUCTION TABLEAU ===== */
-
-function buildPlanning(){
-
-let html="<tr>";
-
-html+="<th class='horse'>Cheval</th>";
-
-days.forEach((d,i)=>{
-
-let cls=i===todayColumn?"today":"";
-
-html+=`<th class="${cls}">${d.toUpperCase()}</th>`;
-
-});
-
-html+="</tr>";
-
-planningData.forEach(row=>{
-
-html+="<tr>";
-
-html+=`<td class="horse">${row.cheval}</td>`;
-
-days.forEach((day,i)=>{
-
-let cls=i===todayColumn?"today":"";
-
-html+=`<td class="${cls}">
-${formatTasks(row[day])}
-</td>`;
-
-});
-
-html+="</tr>";
-
-});
-
-document.getElementById("planning").innerHTML=html;
-
-addTaskEvents();
-
-}
-
-/* ===== FORMAT TACHES ===== */
-
-function formatTasks(tasks){
-
-if(!tasks) return "";
-
-const list=tasks.split("/");
-
-return list.map(t=>{
-
-const text=t.trim();
-
-const iconData=taskIcon(text);
-
-return `<div class="task ${iconData.class}">
-${iconData.icon}${text}
-</div>`;
-
-}).join("");
-
-}
-
-/* ===== VALIDATION TACHE ===== */
-
-function addTaskEvents(){
-
-document.querySelectorAll(".task").forEach(el=>{
-
-el.onclick=()=>{
-el.classList.toggle("done");
-};
-
-});
-
-}
-
-buildPlanning();
-
-</script>
 
 </body>
 </html>
