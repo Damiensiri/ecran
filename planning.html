@@ -23,14 +23,14 @@ margin:25px 0;
 font-size:32px;
 }
 
-/* CONTAINER SCROLL */
+/* SCROLL */
 
 .wrapper{
 overflow-x:auto;
 overflow-y:hidden;
-overflow:hidden;
 padding:10px;
 scroll-behavior:smooth;
+-webkit-overflow-scrolling:touch;
 }
 
 /* TABLE */
@@ -39,7 +39,6 @@ table{
 border-collapse:collapse;
 width:100%;
 min-width:900px;
-position:relative;
 }
 
 th,td{
@@ -95,7 +94,7 @@ font-weight:600;
 /* COULEURS */
 
 .travail{
-background:#e9dfa6;
+background:#f0e6a6;
 color:black;
 }
 
@@ -140,11 +139,11 @@ color:black;
 <th class="horse">Cheval</th>
 <th>LUNDI</th>
 <th>MARDI</th>
-<th class="today">MERCREDI</th>
-<th>JEUDI</th>
-<th>VENDREDI</th>
-<th>SAMEDI</th>
-<th>DIMANCHE</th>
+<th id="d3">MERCREDI</th>
+<th id="d4">JEUDI</th>
+<th id="d5">VENDREDI</th>
+<th id="d6">SAMEDI</th>
+<th id="d0">DIMANCHE</th>
 </tr>
 </thead>
 
@@ -152,46 +151,46 @@ color:black;
 
 <tr>
 <td class="horse">Java</td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
-<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td><div class="cell"><div class="task proprio">👤 Propriétaire</div></div></td>
-<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
-<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task repos">Repos</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task proprio">Propriétaire</div></td>
+<td><div class="task concours">🏆 Concours</div></td>
+<td><div class="task repos">Repos</div></td>
 </tr>
 
 <tr>
 <td class="horse">Oslo</td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td><div class="cell"><div class="task longe">🪢 Longe</div></div></td>
-<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
-<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task longe">🪢 Longe</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task repos">Repos</div></td>
+<td><div class="task concours">🏆 Concours</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
 </tr>
 
 <tr>
 <td class="horse">Iris</td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td class="today"><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task proprio">👤 Propriétaire</div></div></td>
-<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task proprio">Propriétaire</div></td>
+<td><div class="task repos">Repos</div></td>
 </tr>
 
 <tr>
 <td class="horse">Salsa</td>
-<td><div class="cell"><div class="task travail">🐎 Travail</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td class="today"><div class="cell"><div class="task repos">😴 Repos</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td><div class="cell"><div class="task paddock">🌿 Paddock</div></div></td>
-<td><div class="cell"><div class="task concours">🏆 Concours</div></div></td>
-<td><div class="cell"><div class="task repos">😴 Repos</div></div></td>
+<td><div class="task travail">🐎 Travail</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task repos">Repos</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task paddock">🌿 Paddock</div></td>
+<td><div class="task concours">🏆 Concours</div></td>
+<td><div class="task repos">Repos</div></td>
 </tr>
 
 </tbody>
@@ -199,6 +198,22 @@ color:black;
 </table>
 
 </div>
+
+<script>
+
+/* JOUR ACTUEL AUTOMATIQUE */
+
+const today = new Date().getDay();
+
+const headers = document.querySelectorAll("th");
+
+headers.forEach(h=>{
+if(h.id==="d"+today){
+h.classList.add("today");
+}
+});
+
+</script>
 
 </body>
 </html>
