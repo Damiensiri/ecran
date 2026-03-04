@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Planning Écurie</title>
+<title>Planning Chevaux</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 
@@ -13,7 +13,8 @@
 body{
 margin:0;
 font-family:'Montserrat',sans-serif;
-background:#f4f4f4;
+background:#0f1115;
+color:white;
 }
 
 h1{
@@ -33,35 +34,60 @@ min-width:900px;
 }
 
 th{
-background:#181E3B;
+background:#1c1f26;
 color:white;
 padding:10px;
 font-size:14px;
 }
 
 td{
-background:white;
-border:1px solid #ddd;
+background:#1c1f26;
+border:1px solid #333;
 vertical-align:top;
 padding:8px;
-width:120px;
+width:140px;
 }
+
+/* cheval colonne fixe */
 
 .horse{
+position:sticky;
+left:0;
+background:#181b21;
 font-weight:700;
-background:#fafafa;
+z-index:2;
 }
+
+/* colonne du jour */
+
+.today{
+background:#2a2f38 !important;
+}
+
+/* tâches */
 
 .task{
-padding:3px 4px;
-margin:2px 0;
-border-radius:4px;
+padding:4px 6px;
+margin:3px 0;
+border-radius:6px;
 cursor:pointer;
+font-size:13px;
 }
 
+/* couleurs */
+
+.travail{ background:#fff3b0; color:#000; }
+.paddock{ background:#b7e4c7; color:#000; }
+.repos{ background:#cdb4db; color:#000; }
+.proprio{ background:#cdb4db; color:#000; }
+.longe{ background:#bde0fe; color:#000; }
+.concours{ background:#ffb703; color:#000; }
+
+/* tâche validée */
+
 .task.done{
+opacity:0.4;
 text-decoration:line-through;
-opacity:0.5;
 }
 
 </style>
@@ -69,7 +95,7 @@ opacity:0.5;
 
 <body>
 
-<h1>Planning Chevaux</h1>
+<h1>Planning Écurie</h1>
 
 <div class="wrapper">
 <table id="planning"></table>
@@ -137,32 +163,41 @@ const days=[
 "dimanche"
 ];
 
+/* ===== JOUR ACTUEL ===== */
+
+const todayIndex = new Date().getDay(); 
+const dayMap=[6,0,1,2,3,4,5];
+const todayColumn = dayMap[todayIndex];
+
 /* ===== ICONES ===== */
 
 function taskIcon(text){
 
 const t=text.toLowerCase();
 
-if(t.includes("travail")) return "🐎 "+text;
-if(t.includes("paddock")) return "🌿 "+text;
-if(t.includes("repos")) return "😴 "+text;
-if(t.includes("concours")) return "🏆 "+text;
-if(t.includes("propriétaire")) return "👤 "+text;
-if(t.includes("longe")) return "🪢 "+text;
+if(t.includes("travail")) return {icon:"🐎 ",class:"travail"};
+if(t.includes("paddock")) return {icon:"🌿 ",class:"paddock"};
+if(t.includes("repos")) return {icon:"😴 ",class:"repos"};
+if(t.includes("concours")) return {icon:"🏆 ",class:"concours"};
+if(t.includes("propriétaire")) return {icon:"👤 ",class:"proprio"};
+if(t.includes("longe")) return {icon:"🪢 ",class:"longe"};
 
-return text;
+return {icon:"",class:""};
 
 }
 
-/* ===== CRÉATION TABLEAU ===== */
+/* ===== BUILD TABLE ===== */
 
 function buildPlanning(){
 
 let html="<tr>";
-html+="<th>Cheval</th>";
+html+="<th class='horse'>Cheval</th>";
 
-days.forEach(d=>{
-html+=`<th>${d.toUpperCase()}</th>`;
+days.forEach((d,i)=>{
+
+let cls=i===todayColumn?"today":"";
+html+=`<th class="${cls}">${d.toUpperCase()}</th>`;
+
 });
 
 html+="</tr>";
@@ -173,9 +208,11 @@ html+="<tr>";
 
 html+=`<td class="horse">${row.cheval}</td>`;
 
-days.forEach(day=>{
+days.forEach((day,i)=>{
 
-html+=`<td>${formatTasks(row[day])}</td>`;
+let cls=i===todayColumn?"today":"";
+
+html+=`<td class="${cls}">${formatTasks(row[day])}</td>`;
 
 });
 
@@ -189,7 +226,7 @@ addTaskEvents();
 
 }
 
-/* ===== FORMAT TACHES ===== */
+/* ===== FORMAT TASKS ===== */
 
 function formatTasks(tasks){
 
@@ -199,15 +236,19 @@ const list=tasks.split("/");
 
 return list.map(t=>{
 
-const text=taskIcon(t.trim());
+const text=t.trim();
 
-return `<div class="task">${text}</div>`;
+const iconData=taskIcon(text);
+
+return `<div class="task ${iconData.class}">
+${iconData.icon}${text}
+</div>`;
 
 }).join("");
 
 }
 
-/* ===== CLIC VALIDATION ===== */
+/* ===== VALIDATION ===== */
 
 function addTaskEvents(){
 
