@@ -14,63 +14,86 @@ body{
   margin:0;
   font-family:'Montserrat',sans-serif;
   background:#000;
+  color:white;
 }
 
 /* ===== HEADER ===== */
 
 header{
-  height:70px;
+  min-height:70px;
   background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
+  padding:10px;
 }
 
 header img{
   position:absolute;
   left:15px;
-  height:40px;
+  height:clamp(30px,4vw,50px);
   filter:brightness(0) invert(1)
          drop-shadow(0 0 6px rgba(255,255,255,0.6));
 }
 
 header h1{
-  color:white;
   margin:0;
-  font-size:22px;
+  font-size:clamp(18px,2.2vw,32px);
   font-weight:700;
+  text-align:center;
 }
 
 #clock{
   position:absolute;
   right:18px;
-  color:white;
-  font-size:20px;
+  font-size:clamp(16px,2vw,28px);
   font-weight:700;
 }
 
 /* ===== SECTIONS ===== */
 
 .section-title{
-  color:white;
-  margin:20px 15px 10px;
-  font-size:16px;
+  margin:clamp(15px,2vw,30px) clamp(15px,3vw,40px) 10px;
+  font-size:clamp(14px,1.6vw,22px);
   font-weight:700;
 }
 
-/* ===== GLASS CARDS (PLUS VISIBLES) ===== */
+/* ===== GRID ===== */
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(12px,2vw,25px);
+  padding:0 clamp(15px,3vw,40px);
+}
+
+/* tablette */
+
+@media(min-width:700px){
+.grid{
+  grid-template-columns:1fr 1fr;
+}
+}
+
+/* écran large */
+
+@media(min-width:1200px){
+.grid{
+  grid-template-columns:1fr 1fr 1fr;
+}
+}
+
+/* ===== CARDS ===== */
 
 .card{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border:1px solid rgba(255,255,255,0.18);
-  margin:0 15px 18px;
-  padding:16px;
+  padding:clamp(14px,2vw,22px);
   border-radius:18px;
   box-shadow:0 8px 26px rgba(0,0,0,0.7);
-  color:white;
 }
 
 .card-top{
@@ -82,21 +105,20 @@ header h1{
 .title-wrap{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
 }
 
 .title-wrap img{
-  width:26px;
+  width:clamp(22px,2vw,32px);
 }
 
 .card-title{
-  font-size:22px;
+  font-size:clamp(18px,2vw,28px);
   font-weight:700;
-  color:white;
 }
 
 .card-top img.statut{
-  width:26px;
+  width:clamp(22px,2vw,32px);
 }
 
 /* ===== LIGNE ===== */
@@ -104,14 +126,14 @@ header h1{
 .card-middle{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
   margin-top:8px;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
 }
 
 .badge{
   font-weight:700;
-  font-size:14px;
+  font-size:clamp(12px,1.2vw,16px);
 }
 
 .badge.oui{ color:#4caf50; }
@@ -119,14 +141,14 @@ header h1{
 
 .horaire{
   margin-left:auto;
-  font-size:14px;
+  font-size:clamp(13px,1.2vw,18px);
   font-weight:600;
   color:#f5f5f5;
 }
 
 .info{
   margin-top:10px;
-  font-size:14px;
+  font-size:clamp(13px,1.3vw,18px);
   font-weight:500;
   color:#ffb347;
   white-space:pre-line;
@@ -145,14 +167,18 @@ header h1{
 
 <div class="section-title">ESPACES TRAVAIL</div>
 
-<div class="card" id="carriere"></div>
-<div class="card" id="manege"></div>
+<div class="grid">
+  <div class="card" id="carriere"></div>
+  <div class="card" id="manege"></div>
+</div>
 
 <div class="section-title">PADDOCKS</div>
 
-<div class="card" id="maison"></div>
-<div class="card" id="grande-voie"></div>
-<div class="card" id="beudot"></div>
+<div class="grid">
+  <div class="card" id="maison"></div>
+  <div class="card" id="grande-voie"></div>
+  <div class="card" id="beudot"></div>
+</div>
 
 <script>
 
@@ -219,8 +245,6 @@ function buildCard(e){
   `;
 }
 
-/* ===== LOAD DATA ===== */
-
 function loadData(){
 fetch(SHEET_URL,{cache:"no-store"})
 .then(r=>r.json())
@@ -236,8 +260,6 @@ fetch(SHEET_URL,{cache:"no-store"})
 loadData();
 setInterval(loadData,REFRESH);
 
-/* ===== CLOCK ===== */
-
 function updateClock(){
   const d=new Date();
   const h=String(d.getHours()).padStart(2,"0");
@@ -249,6 +271,3 @@ updateClock();
 setInterval(updateClock,1000);
 
 </script>
-
-</body>
-</html>
