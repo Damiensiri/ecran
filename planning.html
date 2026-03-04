@@ -22,8 +22,6 @@ text-align:center;
 margin:10px 0;
 }
 
-/* barre semaine */
-
 .topbar{
 display:flex;
 justify-content:center;
@@ -41,18 +39,10 @@ border-radius:6px;
 cursor:pointer;
 }
 
-.topbar button:hover{
-background:#2a2f38;
-}
-
-/* scroll horizontal */
-
 .wrapper{
 overflow-x:auto;
 padding:10px;
 }
-
-/* tableau */
 
 table{
 border-collapse:collapse;
@@ -62,9 +52,7 @@ min-width:900px;
 
 th{
 background:#1c1f26;
-color:white;
 padding:12px;
-font-size:14px;
 border:1px solid #333;
 }
 
@@ -76,8 +64,6 @@ padding:8px;
 width:140px;
 }
 
-/* colonne cheval */
-
 .horse{
 position:sticky;
 left:0;
@@ -85,20 +71,14 @@ background:#181b21;
 font-weight:700;
 z-index:3;
 box-shadow:8px 0 12px rgba(0,0,0,0.6);
-
-/* largeur automatique selon le texte */
 white-space:nowrap;
 width:1%;
 padding-right:20px;
 }
 
-/* colonne jour */
-
 .today{
 background:#2a2f38 !important;
 }
-
-/* tâches */
 
 .task{
 padding:4px 6px;
@@ -108,16 +88,12 @@ cursor:pointer;
 font-size:13px;
 }
 
-/* couleurs */
-
-.travail{ background:#fff3b0;color:#000; }
-.paddock{ background:#b7e4c7;color:#000; }
-.repos{ background:#cdb4db;color:#000; }
-.proprio{ background:#cdb4db;color:#000; }
-.longe{ background:#bde0fe;color:#000; }
-.concours{ background:#ffb703;color:#000; }
-
-/* validation */
+.travail{ background:#fff3b0;color:#000;}
+.paddock{ background:#b7e4c7;color:#000;}
+.repos{ background:#cdb4db;color:#000;}
+.proprio{ background:#cdb4db;color:#000;}
+.longe{ background:#bde0fe;color:#000;}
+.concours{ background:#ffb703;color:#000;}
 
 .task.done{
 background:#4caf50 !important;
@@ -133,15 +109,10 @@ font-weight:600;
 <h1>Planning Écurie</h1>
 
 <div class="topbar">
-
 <button onclick="changeWeek(-1)">←</button>
-
 <div id="weekLabel"></div>
-
 <button onclick="changeWeek(1)">→</button>
-
 <button id="viewBtn" onclick="toggleView()">Vue jour</button>
-
 </div>
 
 <div class="wrapper">
@@ -150,36 +121,22 @@ font-weight:600;
 
 <script>
 
-/* CONFIG SHEET */
+/* SHEET */
 
 const SHEET_ID="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
 
 /* jours */
 
-const days=[
-"lundi",
-"mardi",
-"mercredi",
-"jeudi",
-"vendredi",
-"samedi",
-"dimanche"
-];
+const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
-/* semaine actuelle */
+/* semaine */
 
 function getWeekNumber(){
-
 const d=new Date();
-
 d.setHours(0,0,0,0);
-
 d.setDate(d.getDate()+3-(d.getDay()+6)%7);
-
 const week1=new Date(d.getFullYear(),0,4);
-
 return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
-
 }
 
 let currentWeek=getWeekNumber();
@@ -211,9 +168,17 @@ return {icon:"",class:""};
 
 }
 
+/* clé validation */
+
+function validationKey(cheval,jour,tache){
+
+return `${currentWeek}_${cheval}_${jour}_${tache}`.toLowerCase();
+
+}
+
 /* format tâches */
 
-function formatTasks(tasks){
+function formatTasks(tasks,cheval,jour){
 
 if(!tasks) return "";
 
@@ -225,8 +190,12 @@ const text=t.trim();
 
 const iconData=taskIcon(text);
 
-return `<div class="task ${iconData.class}">
-${iconData.icon}${text}
+const key=validationKey(cheval,jour,text);
+
+const done=localStorage.getItem(key);
+
+return `<div class="task ${iconData.class} ${done?"done":""}" data-cheval="${cheval}" data-jour="${jour}" data-task="${text}">
+${done?"✔ ":""}${iconData.icon}${text}
 </div>`;
 
 }).join("");
@@ -262,7 +231,7 @@ days.forEach((day,i)=>{
 let cls=i===todayColumn?"today":"";
 
 html+=`<td class="${cls}">
-${formatTasks(row[day])}
+${formatTasks(row[day],row.cheval,day)}
 </td>`;
 
 });
@@ -296,7 +265,7 @@ html+="<tr>";
 
 html+=`<td class="horse">${row.cheval}</td>`;
 
-html+=`<td>${formatTasks(row[day])}</td>`;
+html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
 
 html+="</tr>";
 
@@ -308,7 +277,7 @@ addTaskEvents();
 
 }
 
-/* validation tâche */
+/* validation */
 
 function addTaskEvents(){
 
@@ -316,15 +285,25 @@ document.querySelectorAll(".task").forEach(el=>{
 
 el.onclick=()=>{
 
+const cheval=el.dataset.cheval;
+const jour=el.dataset.jour;
+const task=el.dataset.task;
+
+const key=validationKey(cheval,jour,task);
+
 el.classList.toggle("done");
 
 if(el.classList.contains("done")){
+
+localStorage.setItem(key,"1");
 
 if(!el.innerHTML.startsWith("✔")){
 el.innerHTML="✔ "+el.innerHTML;
 }
 
 }else{
+
+localStorage.removeItem(key);
 
 el.innerHTML=el.innerHTML.replace("✔ ","");
 
@@ -374,11 +353,9 @@ async function loadPlanning(){
 
 let week=String(currentWeek).padStart(2,"0");
 
-document.getElementById("weekLabel").innerText=
-"Semaine "+week;
+document.getElementById("weekLabel").innerText="Semaine "+week;
 
-const url=
-`https://opensheet.elk.sh/${SHEET_ID}/semaine_${week}`;
+const url=`https://opensheet.elk.sh/${SHEET_ID}/semaine_${week}`;
 
 const res=await fetch(url);
 
