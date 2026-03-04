@@ -29,31 +29,43 @@ margin:0;
 font-size:26px;
 }
 
-#weekLabel{
+/* LIGNE SEMAINE */
+
+.weekline{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
 margin-top:4px;
+}
+
+.weeknav{
+background:#1c1f26;
+color:white;
+border:none;
+padding:4px 8px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.weeknav:hover{
+background:#2a2f38;
+}
+
+#weekLabel{
 font-size:14px;
-opacity:0.9;
 font-weight:600;
+opacity:0.9;
 }
 
 /* BARRE HAUT */
 
 .topbar{
-display:grid;
-grid-template-columns:auto 1fr auto;
+display:flex;
+justify-content:space-between;
 align-items:center;
-margin:10px 0;
 padding:0 10px;
-}
-
-.topbar-left{
-display:flex;
-gap:8px;
-}
-
-.topbar-right{
-display:flex;
-justify-content:flex-end;
+margin-top:6px;
 }
 
 .topbar button{
@@ -74,7 +86,7 @@ background:#2a2f38;
 .wrapper{
 overflow:auto;
 padding:10px;
-max-height:calc(100vh - 150px);
+max-height:calc(100vh - 160px);
 }
 
 /* TABLE */
@@ -85,7 +97,7 @@ width:100%;
 min-width:900px;
 }
 
-/* JOURS GELÉS */
+/* HEADER JOURS GELÉ */
 
 th{
 background:#1c1f26;
@@ -161,23 +173,22 @@ font-weight:600;
 <body>
 
 <div class="titleblock">
+
 <h1>Planning Écurie</h1>
+
+<div class="weekline">
+<button class="weeknav" onclick="changeWeek(-1)">←</button>
 <div id="weekLabel"></div>
+<button class="weeknav" onclick="changeWeek(1)">→</button>
+</div>
+
 </div>
 
 <div class="topbar">
 
-<div class="topbar-left">
 <button id="viewBtn" onclick="toggleView()">Vue jour</button>
-<button onclick="changeWeek(-1)">←</button>
-<button onclick="changeWeek(1)">→</button>
-</div>
 
-<div></div>
-
-<div class="topbar-right">
 <button onclick="goEcran()">FERMER</button>
-</div>
 
 </div>
 
@@ -201,13 +212,15 @@ const ENTRY_TASK="entry.450632275";
 
 const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
-/* VEILLE */
+/* VEILLE 1 MIN */
 
 let inactivityTimer;
 
 function resetTimer(){
 clearTimeout(inactivityTimer);
-inactivityTimer=setTimeout(()=>{location.href="ecran.html"},60000);
+inactivityTimer=setTimeout(()=>{
+location.href="ecran.html";
+},60000);
 }
 
 ["click","touchstart","mousemove","keydown"].forEach(evt=>{
@@ -272,7 +285,7 @@ String(v.Semaine)==String(currentWeek)
 
 }
 
-/* GOOGLE FORM */
+/* ENVOI FORM */
 
 function sendToForm(cheval,jour,tache){
 
