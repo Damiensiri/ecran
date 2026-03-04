@@ -68,6 +68,8 @@ padding:8px;
 width:140px;
 }
 
+/* colonne cheval fixe */
+
 .horse{
 position:sticky;
 left:0;
@@ -80,9 +82,19 @@ width:1%;
 padding-right:20px;
 }
 
+/* aujourd'hui */
+
 .today{
 background:#2a2f38 !important;
 }
+
+/* jours passés */
+
+.past{
+opacity:0.35;
+}
+
+/* tâches */
 
 .task{
 padding:4px 6px;
@@ -132,7 +144,7 @@ font-weight:600;
 
 <script>
 
-/* ===== CONFIG ===== */
+/* CONFIG */
 
 const SHEET_PLANNING="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
 const SHEET_VALIDATIONS="1YfrSDkB9E_SNA1ojqMuoUXBJt9vd_z40Kej3oyOXV7A";
@@ -144,13 +156,15 @@ const ENTRY_HORSE="entry.1929695140";
 const ENTRY_DAY="entry.301329581";
 const ENTRY_TASK="entry.450632275";
 
-/* ===== VEILLE ===== */
+const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+
+/* veille */
 
 let inactivityTimer;
 
 function resetTimer(){
 clearTimeout(inactivityTimer);
-inactivityTimer=setTimeout(()=>{location.href="ecran.html";},60000);
+inactivityTimer=setTimeout(()=>{location.href="ecran.html"},60000);
 }
 
 ["click","touchstart","mousemove","keydown"].forEach(evt=>{
@@ -163,11 +177,7 @@ function goEcran(){
 location.href="ecran.html";
 }
 
-/* ===== JOURS ===== */
-
-const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
-
-/* ===== SEMAINE ===== */
+/* semaine */
 
 function getWeekNumber(){
 const d=new Date();
@@ -184,7 +194,13 @@ let validations=[];
 
 let viewMode="week";
 
-/* ===== ICÔNES ===== */
+/* jour actuel */
+
+const todayIndex=new Date().getDay();
+const dayMap=[6,0,1,2,3,4,5];
+const todayColumn=dayMap[todayIndex];
+
+/* icônes */
 
 function taskIcon(text){
 
@@ -201,28 +217,7 @@ return {icon:"",class:""};
 
 }
 
-/* ===== VALIDATION KEY ===== */
-
-function validationKey(cheval,jour,tache){
-return `${currentWeek}_${cheval}_${jour}_${tache}`.toLowerCase();
-}
-
-/* ===== GOOGLE FORM ===== */
-
-function sendToForm(cheval,jour,tache){
-
-const data=new FormData();
-
-data.append(ENTRY_WEEK,currentWeek);
-data.append(ENTRY_HORSE,cheval);
-data.append(ENTRY_DAY,jour);
-data.append(ENTRY_TASK,tache);
-
-fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
-
-}
-
-/* ===== FORMAT TÂCHES ===== */
+/* vérifier validation */
 
 function isValidated(cheval,jour,tache){
 
@@ -234,6 +229,27 @@ String(v.Semaine)==String(currentWeek)
 );
 
 }
+
+/* envoyer validation */
+
+function sendToForm(cheval,jour,tache){
+
+const data=new FormData();
+
+data.append(ENTRY_WEEK,currentWeek);
+data.append(ENTRY_HORSE,cheval);
+data.append(ENTRY_DAY,jour);
+data.append(ENTRY_TASK,tache);
+
+fetch(FORM_URL,{
+method:"POST",
+mode:"no-cors",
+body:data
+});
+
+}
+
+/* format tâches */
 
 function formatTasks(tasks,cheval,jour){
 
@@ -257,7 +273,7 @@ ${done?"✔ ":""}${iconData.icon}${text}
 
 }
 
-/* ===== TABLEAU ===== */
+/* tableau semaine */
 
 function buildPlanning(){
 
@@ -265,8 +281,15 @@ let html="<tr>";
 
 html+="<th class='horse'>Cheval</th>";
 
-days.forEach(day=>{
-html+=`<th>${day.toUpperCase()}</th>`;
+days.forEach((day,i)=>{
+
+let cls="";
+
+if(i < todayColumn) cls="past";
+if(i === todayColumn) cls="today";
+
+html+=`<th class="${cls}">${day.toUpperCase()}</th>`;
+
 });
 
 html+="</tr>";
@@ -277,8 +300,17 @@ html+="<tr>";
 
 html+=`<td class="horse">${row.cheval}</td>`;
 
-days.forEach(day=>{
-html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
+days.forEach((day,i)=>{
+
+let cls="";
+
+if(i < todayColumn) cls="past";
+if(i === todayColumn) cls="today";
+
+html+=`<td class="${cls}">
+${formatTasks(row[day],row.cheval,day)}
+</td>`;
+
 });
 
 html+="</tr>";
@@ -291,17 +323,17 @@ addTaskEvents();
 
 }
 
-/* ===== VUE JOUR ===== */
+/* vue jour */
 
 function buildDayView(){
 
-const today=new Date();
-const index=[6,0,1,2,3,4,5][today.getDay()];
-const day=days[index];
+const day=days[todayColumn];
 
 let html="<tr>";
+
 html+="<th class='horse'>Cheval</th>";
 html+=`<th>${day.toUpperCase()}</th>`;
+
 html+="</tr>";
 
 planningData.forEach(row=>{
@@ -321,7 +353,7 @@ addTaskEvents();
 
 }
 
-/* ===== CLICK TASK ===== */
+/* clic tâche */
 
 function addTaskEvents(){
 
@@ -351,14 +383,14 @@ el.innerHTML="✔ "+el.innerHTML;
 
 }
 
-/* ===== NAV SEMAINE ===== */
+/* navigation semaine */
 
 function changeWeek(delta){
 currentWeek+=delta;
 loadPlanning();
 }
 
-/* ===== TOGGLE VIEW ===== */
+/* vue */
 
 function toggleView(){
 
@@ -376,7 +408,7 @@ buildPlanning();
 
 }
 
-/* ===== LOAD DATA ===== */
+/* chargement */
 
 async function loadPlanning(){
 
