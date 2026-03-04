@@ -85,12 +85,11 @@ background:#181b21;
 font-weight:700;
 z-index:3;
 box-shadow:8px 0 12px rgba(0,0,0,0.6);
-}
 
-/* largeur réduite vue jour */
-
-.day-view .horse{
-width:120px;
+/* largeur automatique selon le texte */
+white-space:nowrap;
+width:1%;
+padding-right:20px;
 }
 
 /* colonne jour */
@@ -121,8 +120,9 @@ font-size:13px;
 /* validation */
 
 .task.done{
-opacity:0.4;
-text-decoration:line-through;
+background:#4caf50 !important;
+color:white !important;
+font-weight:600;
 }
 
 </style>
@@ -237,8 +237,6 @@ ${iconData.icon}${text}
 
 function buildPlanning(){
 
-document.body.classList.remove("day-view");
-
 let html="<tr>";
 
 html+="<th class='horse'>Cheval</th>";
@@ -283,8 +281,6 @@ addTaskEvents();
 
 function buildDayView(){
 
-document.body.classList.add("day-view");
-
 const day=days[todayColumn];
 
 let html="<tr>";
@@ -319,7 +315,21 @@ function addTaskEvents(){
 document.querySelectorAll(".task").forEach(el=>{
 
 el.onclick=()=>{
+
 el.classList.toggle("done");
+
+if(el.classList.contains("done")){
+
+if(!el.innerHTML.startsWith("✔")){
+el.innerHTML="✔ "+el.innerHTML;
+}
+
+}else{
+
+el.innerHTML=el.innerHTML.replace("✔ ","");
+
+}
+
 };
 
 });
