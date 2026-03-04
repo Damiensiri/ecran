@@ -17,17 +17,37 @@ background:#0f1115;
 color:white;
 }
 
+/* TITRE */
+
 h1{
 text-align:center;
 margin:10px 0;
 }
 
+/* BARRE HAUT */
+
 .topbar{
-display:flex;
-justify-content:center;
+display:grid;
+grid-template-columns:auto 1fr auto;
 align-items:center;
-gap:12px;
 margin-bottom:10px;
+padding:0 10px;
+}
+
+.topbar-left{
+display:flex;
+gap:8px;
+}
+
+.topbar-center{
+text-align:center;
+font-weight:700;
+letter-spacing:0.5px;
+}
+
+.topbar-right{
+display:flex;
+justify-content:flex-end;
 }
 
 .topbar button{
@@ -43,10 +63,15 @@ cursor:pointer;
 background:#2a2f38;
 }
 
+/* WRAPPER */
+
 .wrapper{
-overflow-x:auto;
+overflow:auto;
 padding:10px;
+max-height:calc(100vh - 110px);
 }
+
+/* TABLEAU */
 
 table{
 border-collapse:collapse;
@@ -54,11 +79,18 @@ width:100%;
 min-width:900px;
 }
 
+/* LIGNE DES JOURS GELÉE */
+
 th{
 background:#1c1f26;
 padding:12px;
 border:1px solid #333;
+position:sticky;
+top:0;
+z-index:4;
 }
+
+/* CELLULES */
 
 td{
 background:#1c1f26;
@@ -68,33 +100,33 @@ padding:8px;
 width:140px;
 }
 
-/* colonne cheval fixe */
+/* COLONNE CHEVAL FIXE */
 
 .horse{
 position:sticky;
 left:0;
 background:#181b21;
 font-weight:700;
-z-index:3;
+z-index:5;
 box-shadow:8px 0 12px rgba(0,0,0,0.6);
 white-space:nowrap;
 width:1%;
 padding-right:20px;
 }
 
-/* aujourd'hui */
+/* AUJOURD'HUI */
 
 .today{
 background:#2a2f38 !important;
 }
 
-/* jours passés */
+/* PASSÉ */
 
 .past{
 opacity:0.35;
 }
 
-/* tâches */
+/* TÂCHES */
 
 .task{
 padding:4px 6px;
@@ -126,15 +158,17 @@ font-weight:600;
 
 <div class="topbar">
 
-<button onclick="changeWeek(-1)">←</button>
-
-<div id="weekLabel"></div>
-
-<button onclick="changeWeek(1)">→</button>
-
+<div class="topbar-left">
 <button id="viewBtn" onclick="toggleView()">Vue jour</button>
+<button onclick="changeWeek(-1)">←</button>
+<button onclick="changeWeek(1)">→</button>
+</div>
 
+<div id="weekLabel" class="topbar-center"></div>
+
+<div class="topbar-right">
 <button onclick="goEcran()">FERMER</button>
+</div>
 
 </div>
 
@@ -158,7 +192,7 @@ const ENTRY_TASK="entry.450632275";
 
 const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 
-/* veille */
+/* VEILLE */
 
 let inactivityTimer;
 
@@ -177,7 +211,7 @@ function goEcran(){
 location.href="ecran.html";
 }
 
-/* semaine */
+/* SEMAINE */
 
 function getWeekNumber(){
 const d=new Date();
@@ -188,19 +222,17 @@ return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
 }
 
 let currentWeek=getWeekNumber();
-
 let planningData=[];
 let validations=[];
-
 let viewMode="week";
 
-/* jour actuel */
+/* JOUR ACTUEL */
 
 const todayIndex=new Date().getDay();
 const dayMap=[6,0,1,2,3,4,5];
 const todayColumn=dayMap[todayIndex];
 
-/* icônes */
+/* ICÔNES */
 
 function taskIcon(text){
 
@@ -217,7 +249,7 @@ return {icon:"",class:""};
 
 }
 
-/* vérifier validation */
+/* VALIDATION */
 
 function isValidated(cheval,jour,tache){
 
@@ -230,7 +262,7 @@ String(v.Semaine)==String(currentWeek)
 
 }
 
-/* envoyer validation */
+/* GOOGLE FORM */
 
 function sendToForm(cheval,jour,tache){
 
@@ -241,15 +273,11 @@ data.append(ENTRY_HORSE,cheval);
 data.append(ENTRY_DAY,jour);
 data.append(ENTRY_TASK,tache);
 
-fetch(FORM_URL,{
-method:"POST",
-mode:"no-cors",
-body:data
-});
+fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
 
 }
 
-/* format tâches */
+/* FORMAT TÂCHES */
 
 function formatTasks(tasks,cheval,jour){
 
@@ -260,9 +288,7 @@ const list=tasks.split("/");
 return list.map(t=>{
 
 const text=t.trim();
-
 const iconData=taskIcon(text);
-
 let done=isValidated(cheval,jour,text);
 
 return `<div class="task ${iconData.class} ${done?"done":""}" data-cheval="${cheval}" data-jour="${jour}" data-task="${text}">
@@ -273,7 +299,7 @@ ${done?"✔ ":""}${iconData.icon}${text}
 
 }
 
-/* tableau semaine */
+/* TABLEAU SEMAINE */
 
 function buildPlanning(){
 
@@ -284,7 +310,6 @@ html+="<th class='horse'>Cheval</th>";
 days.forEach((day,i)=>{
 
 let cls="";
-
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
 
@@ -303,7 +328,6 @@ html+=`<td class="horse">${row.cheval}</td>`;
 days.forEach((day,i)=>{
 
 let cls="";
-
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
 
@@ -318,12 +342,11 @@ html+="</tr>";
 });
 
 document.getElementById("planning").innerHTML=html;
-
 addTaskEvents();
 
 }
 
-/* vue jour */
+/* VUE JOUR */
 
 function buildDayView(){
 
@@ -333,27 +356,23 @@ let html="<tr>";
 
 html+="<th class='horse'>Cheval</th>";
 html+=`<th>${day.toUpperCase()}</th>`;
-
 html+="</tr>";
 
 planningData.forEach(row=>{
 
 html+="<tr>";
-
 html+=`<td class="horse">${row.cheval}</td>`;
 html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
-
 html+="</tr>";
 
 });
 
 document.getElementById("planning").innerHTML=html;
-
 addTaskEvents();
 
 }
 
-/* clic tâche */
+/* CLIC TÂCHE */
 
 function addTaskEvents(){
 
@@ -383,14 +402,14 @@ el.innerHTML="✔ "+el.innerHTML;
 
 }
 
-/* navigation semaine */
+/* NAV SEMAINE */
 
 function changeWeek(delta){
 currentWeek+=delta;
 loadPlanning();
 }
 
-/* vue */
+/* VUE */
 
 function toggleView(){
 
@@ -408,13 +427,45 @@ buildPlanning();
 
 }
 
-/* chargement */
+/* DATES SEMAINE */
+
+function getWeekDates(year,week){
+
+const simple=new Date(year,0,1+(week-1)*7);
+const dow=simple.getDay();
+
+let ISOweekStart=new Date(simple);
+
+if(dow<=4)
+ISOweekStart.setDate(simple.getDate()-simple.getDay()+1);
+else
+ISOweekStart.setDate(simple.getDate()+8-simple.getDay());
+
+const start=new Date(ISOweekStart);
+const end=new Date(start);
+end.setDate(start.getDate()+6);
+
+return {start,end};
+
+}
+
+function formatDate(d){
+return d.getDate()+"/"+(d.getMonth()+1)+"/"+String(d.getFullYear()).slice(2);
+}
+
+/* LOAD */
 
 async function loadPlanning(){
 
 let week=String(currentWeek).padStart(2,"0");
+let year=new Date().getFullYear();
 
-document.getElementById("weekLabel").innerText="Semaine "+week;
+const dates=getWeekDates(year,currentWeek);
+const start=formatDate(dates.start);
+const end=formatDate(dates.end);
+
+document.getElementById("weekLabel").innerText=
+"Semaine "+week+" • "+year+" • "+start+" → "+end;
 
 const planningURL=`https://opensheet.elk.sh/${SHEET_PLANNING}/semaine_${week}`;
 const validationURL=`https://opensheet.elk.sh/${SHEET_VALIDATIONS}/1`;
