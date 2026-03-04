@@ -19,9 +19,21 @@ color:white;
 
 /* TITRE */
 
-h1{
+.titleblock{
 text-align:center;
-margin:10px 0;
+margin-top:10px;
+}
+
+h1{
+margin:0;
+font-size:26px;
+}
+
+#weekLabel{
+margin-top:4px;
+font-size:14px;
+opacity:0.9;
+font-weight:600;
 }
 
 /* BARRE HAUT */
@@ -30,19 +42,13 @@ margin:10px 0;
 display:grid;
 grid-template-columns:auto 1fr auto;
 align-items:center;
-margin-bottom:10px;
+margin:10px 0;
 padding:0 10px;
 }
 
 .topbar-left{
 display:flex;
 gap:8px;
-}
-
-.topbar-center{
-text-align:center;
-font-weight:700;
-letter-spacing:0.5px;
 }
 
 .topbar-right{
@@ -68,10 +74,10 @@ background:#2a2f38;
 .wrapper{
 overflow:auto;
 padding:10px;
-max-height:calc(100vh - 110px);
+max-height:calc(100vh - 150px);
 }
 
-/* TABLEAU */
+/* TABLE */
 
 table{
 border-collapse:collapse;
@@ -79,7 +85,7 @@ width:100%;
 min-width:900px;
 }
 
-/* LIGNE DES JOURS GELÉE */
+/* JOURS GELÉS */
 
 th{
 background:#1c1f26;
@@ -126,7 +132,7 @@ background:#2a2f38 !important;
 opacity:0.35;
 }
 
-/* TÂCHES */
+/* TACHES */
 
 .task{
 padding:4px 6px;
@@ -154,7 +160,10 @@ font-weight:600;
 
 <body>
 
+<div class="titleblock">
 <h1>Planning Écurie</h1>
+<div id="weekLabel"></div>
+</div>
 
 <div class="topbar">
 
@@ -164,7 +173,7 @@ font-weight:600;
 <button onclick="changeWeek(1)">→</button>
 </div>
 
-<div id="weekLabel" class="topbar-center"></div>
+<div></div>
 
 <div class="topbar-right">
 <button onclick="goEcran()">FERMER</button>
@@ -222,6 +231,7 @@ return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
 }
 
 let currentWeek=getWeekNumber();
+
 let planningData=[];
 let validations=[];
 let viewMode="week";
@@ -232,7 +242,7 @@ const todayIndex=new Date().getDay();
 const dayMap=[6,0,1,2,3,4,5];
 const todayColumn=dayMap[todayIndex];
 
-/* ICÔNES */
+/* ICONES */
 
 function taskIcon(text){
 
@@ -277,7 +287,7 @@ fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
 
 }
 
-/* FORMAT TÂCHES */
+/* FORMAT TACHES */
 
 function formatTasks(tasks,cheval,jour){
 
@@ -299,7 +309,7 @@ ${done?"✔ ":""}${iconData.icon}${text}
 
 }
 
-/* TABLEAU SEMAINE */
+/* TABLEAU */
 
 function buildPlanning(){
 
@@ -310,6 +320,7 @@ html+="<th class='horse'>Cheval</th>";
 days.forEach((day,i)=>{
 
 let cls="";
+
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
 
@@ -328,6 +339,7 @@ html+=`<td class="horse">${row.cheval}</td>`;
 days.forEach((day,i)=>{
 
 let cls="";
+
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
 
@@ -342,6 +354,7 @@ html+="</tr>";
 });
 
 document.getElementById("planning").innerHTML=html;
+
 addTaskEvents();
 
 }
@@ -368,11 +381,12 @@ html+="</tr>";
 });
 
 document.getElementById("planning").innerHTML=html;
+
 addTaskEvents();
 
 }
 
-/* CLIC TÂCHE */
+/* CLIC TACHE */
 
 function addTaskEvents(){
 
@@ -485,6 +499,12 @@ buildDayView();
 }
 
 loadPlanning();
+
+/* REFRESH FULLY */
+
+setInterval(()=>{
+location.reload();
+},180000);
 
 </script>
 
