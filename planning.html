@@ -137,13 +137,10 @@ font-weight:600;
 let inactivityTimer;
 
 function resetTimer(){
-
 clearTimeout(inactivityTimer);
-
 inactivityTimer=setTimeout(()=>{
 location.href="ecran.html";
 },60000);
-
 }
 
 ["click","touchstart","mousemove","keydown"].forEach(evt=>{
@@ -161,6 +158,17 @@ location.href="ecran.html";
 /* CONFIG SHEET */
 
 const SHEET_ID="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
+
+/* GOOGLE FORM */
+
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdsG-ErANYpSvtqj3QsHNuXj5tjSiK-IZB-nP__aSMz6iHV8w/formResponse";
+
+/* champs form */
+
+const ENTRY_WEEK="entry.915711839";
+const ENTRY_HORSE="entry.1929695140";
+const ENTRY_DAY="entry.301329581";
+const ENTRY_TASK="entry.450632275";
 
 /* jours */
 
@@ -211,6 +219,25 @@ function validationKey(cheval,jour,tache){
 return `${currentWeek}_${cheval}_${jour}_${tache}`.toLowerCase();
 }
 
+/* envoi google form */
+
+function sendToForm(cheval,jour,tache){
+
+const data=new FormData();
+
+data.append(ENTRY_WEEK,currentWeek);
+data.append(ENTRY_HORSE,cheval);
+data.append(ENTRY_DAY,jour);
+data.append(ENTRY_TASK,tache);
+
+fetch(FORM_URL,{
+method:"POST",
+mode:"no-cors",
+body:data
+});
+
+}
+
 /* format tâches */
 
 function formatTasks(tasks,cheval,jour){
@@ -246,11 +273,8 @@ let html="<tr>";
 html+="<th class='horse'>Cheval</th>";
 
 days.forEach((d,i)=>{
-
 let cls=i===todayColumn?"today":"";
-
 html+=`<th class="${cls}">${d.toUpperCase()}</th>`;
-
 });
 
 html+="</tr>";
@@ -299,7 +323,6 @@ planningData.forEach(row=>{
 html+="<tr>";
 
 html+=`<td class="horse">${row.cheval}</td>`;
-
 html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
 
 html+="</tr>";
@@ -330,6 +353,10 @@ el.classList.toggle("done");
 
 if(el.classList.contains("done")){
 
+if(!localStorage.getItem(key)){
+sendToForm(cheval,jour,task);
+}
+
 localStorage.setItem(key,"1");
 
 if(!el.innerHTML.startsWith("✔")){
@@ -339,7 +366,6 @@ el.innerHTML="✔ "+el.innerHTML;
 }else{
 
 localStorage.removeItem(key);
-
 el.innerHTML=el.innerHTML.replace("✔ ","");
 
 }
@@ -353,11 +379,8 @@ el.innerHTML=el.innerHTML.replace("✔ ","");
 /* navigation semaine */
 
 function changeWeek(delta){
-
 currentWeek+=delta;
-
 loadPlanning();
-
 }
 
 /* toggle vue */
@@ -367,17 +390,13 @@ function toggleView(){
 const btn=document.getElementById("viewBtn");
 
 if(viewMode==="week"){
-
 viewMode="day";
 btn.innerText="Vue semaine";
 buildDayView();
-
 }else{
-
 viewMode="week";
 btn.innerText="Vue jour";
 buildPlanning();
-
 }
 
 }
