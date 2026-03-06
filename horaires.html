@@ -195,13 +195,9 @@ function formatTime(val){
 
 }
 
-/* ===== LOAD ===== */
+/* ===== RENDER ===== */
 
-function loadHoraires(){
-
-fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
-.then(r=>r.json())
-.then(data=>{
+function renderHoraires(data){
 
   const list=document.getElementById("list");
   list.innerHTML="";
@@ -223,8 +219,38 @@ fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 
   });
 
-});
 }
+
+/* ===== LOAD ===== */
+
+function loadHoraires(){
+
+fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+
+  localStorage.setItem("horaires",JSON.stringify(data));
+
+  renderHoraires(data);
+
+});
+
+}
+
+/* ===== CACHE INSTANT ===== */
+
+const cache=localStorage.getItem("horaires");
+
+if(cache){
+try{
+renderHoraires(JSON.parse(cache));
+}catch(e){}
+}
+
+/* ===== REFRESH ===== */
+
+loadHoraires();
+setInterval(loadHoraires,REFRESH);
 
 /* ===== NAV ===== */
 
@@ -234,9 +260,6 @@ function goBack(){
     location.href="index.html";
   },350);
 }
-
-loadHoraires();
-setInterval(loadHoraires,REFRESH);
 
 </script>
 
