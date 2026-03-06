@@ -46,7 +46,6 @@ body{
   font-family:'Montserrat',sans-serif;
   background:var(--bg);
   color:var(--text);
-  transition:background .3s ease,color .3s ease;
 }
 
 /* ================= PAGE ================= */
@@ -85,7 +84,6 @@ header{
 
 #backBtn img{
   width:22px;
-  height:22px;
 }
 
 header h1{
@@ -96,7 +94,6 @@ header h1{
   margin:0;
   font-size:18px;
   font-weight:700;
-  color:var(--text);
 }
 
 /* ================= CARDS ================= */
@@ -176,7 +173,6 @@ header h1{
 .legend{
   margin:25px 20px;
   font-size:15px;
-  color:var(--text);
 }
 
 .legend-item{
@@ -268,7 +264,7 @@ window.addEventListener("DOMContentLoaded",()=>{
   });
 });
 
-const const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 const REFRESH=60000;
 
 const ICONS_STATUT={
@@ -284,7 +280,7 @@ const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-
 
 function loadData(){
 
-fetch(SHEET_URL+"?t="+Date.now(),{cache:"no-store"})
+fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
 
