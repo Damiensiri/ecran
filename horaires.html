@@ -170,8 +170,8 @@ header h1{
 
 /* ===== CONFIG ===== */
 
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
-const REFRESH = 60000;
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
+const REFRESH=60000;
 
 /* ===== FORMAT JOUR ===== */
 
@@ -179,11 +179,27 @@ function capitalize(txt){
   return txt.charAt(0).toUpperCase() + txt.slice(1);
 }
 
+/* ===== FORMAT HEURE ===== */
+
+function formatTime(val){
+
+  if(!val) return "--:--";
+
+  let d=new Date(val);
+
+  if(!isNaN(d)){
+    return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  }
+
+  return String(val).substring(0,5);
+
+}
+
 /* ===== LOAD ===== */
 
 function loadHoraires(){
 
-fetch(SHEET_URL + "&t=" + Date.now(),{cache:"no-store"})
+fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
 
@@ -200,7 +216,7 @@ fetch(SHEET_URL + "&t=" + Date.now(),{cache:"no-store"})
     card.innerHTML=`
       <img src="image/time.svg">
       <div class="day">${capitalize(row.jour)} :</div>
-      <div class="time">${row.ouvert.substring(0,5)} - ${row.ferme.substring(0,5)}</div>
+      <div class="time">${formatTime(row.ouvert)} - ${formatTime(row.ferme)}</div>
     `;
 
     list.appendChild(card);
