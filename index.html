@@ -299,125 +299,90 @@ header h1{
 <script>
 function go(url){ window.location.href=url; }
 function openExternal(url){ window.open(url,"_blank"); }
-
-function updateThemeColor(){
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-    meta.setAttribute("content","#0f1115");
-  } else {
-    meta.setAttribute("content","#f4f4f4");
-  }
-}
-updateThemeColor();
-window.matchMedia('(prefers-color-scheme: dark)')
-  .addEventListener('change', updateThemeColor);
 </script>
 
-<!-- ===== ALERT + HORAIRES CONNECTÉS À LA NOUVELLE API ===== -->
+<!-- ===== CACHE + API ===== -->
 
 <script>
 
-const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
+const STATUTS_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 const HORAIRES_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
 
-const ESPACE="accueil";
+function fetchStatuts(){
 
-function getTodayName(){
-  return ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
-}
-
-function parseTime(str){
-  if(!str) return null;
-  if(str.includes("T")){
-    const d=new Date(str);
-    return {h:d.getHours(),m:d.getMinutes()};
-  }
-  const p=str.split(":");
-  return {h:parseInt(p[0]),m:parseInt(p[1])};
-}
-
-function formatTime(val){
-  if(!val) return "--:--";
-  if(val.includes("T")){
-    const d=new Date(val);
-    return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
-  }
-  return val.substring(0,5);
-}
-
-function isNowBetween(open,close){
-  const now=new Date();
-  const o=new Date(); o.setHours(open.h,open.m,0,0);
-  const c=new Date(); c.setHours(close.h,close.m,0,0);
-  return now>=o && now<=c;
-}
-
-function loadAll(){
-
-  const alertBox=document.getElementById("alert-box");
-  const status=document.getElementById("opening-status");
-
-  alertBox.innerHTML="";
-  alertBox.classList.remove("show");
-  alertBox.style.display="none";
-  status.style.display="none";
-
-  fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
-  .then(r=>r.json())
-  .then(data=>{
-
-    const row=data.find(e=>e.espace===ESPACE);
-
-    if(row && row.alerte && row.alerte.trim()!==""){
-
-      alertBox.style.display="flex";
-
-      const icon=document.createElement("img");
-      icon.src="https://static.wixstatic.com/shapes/ff7f34_8db0b910e97b4e37af20514452d5c4f4.svg";
-      icon.style.width="16px";
-
-      const text=document.createElement("div");
-      text.textContent=row.alerte;
-
-      alertBox.appendChild(icon);
-      alertBox.appendChild(text);
-
-      setTimeout(()=>{ alertBox.classList.add("show"); },50);
-      return;
-    }
-
-    fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
-    .then(r=>r.json())
-    .then(data=>{
-
-      const today=getTodayName();
-      const row=data.find(r=>r.jour?.toLowerCase()===today);
-      if(!row||!row.ouvert||!row.ferme) return;
-
-      const open=parseTime(row.ouvert);
-      const close=parseTime(row.ferme);
-
-      status.style.display="block";
-
-      const openTxt=formatTime(row.ouvert);
-      const closeTxt=formatTime(row.ferme);
-
-      if(isNowBetween(open,close)){
-        status.style.color="#2e7d32";
-        status.textContent=`Écuries ouvertes ${openTxt} – ${closeTxt}`;
-      }else{
-        status.style.color="#c0392b";
-        status.textContent=`Écuries fermées ${openTxt} – ${closeTxt}`;
-      }
-
-    });
-
-  });
+fetch(STATUTS_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+localStorage.setItem("statuts",JSON.stringify(data));
+updateUI(data);
+});
 
 }
 
-loadAll();
-setInterval(loadAll,60000);
+function fetchHoraires(){
+
+fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+localStorage.setItem("horaires",JSON.stringify(data));
+});
+
+}
+
+function updateUI(data){
+
+const alertBox=document.getElementById("alert-box");
+const status=document.getElementById("opening-status");
+
+const row=data.find(e=>e.espace==="accueil");
+
+if(row && row.alerte && row.alerte.trim()!==""){
+
+alertBox.style.display="flex";
+alertBox.innerHTML=`<img src="https://static.wixstatic.com/shapes/ff7f34_8db0b910e97b4e37af20514452d5c4f4.svg" width="16"> ${row.alerte}`;
+setTimeout(()=>alertBox.classList.add("show"),50);
+return;
+
+}
+
+const horaires=JSON.parse(localStorage.getItem("horaires")||"[]");
+
+const today=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
+
+const h=horaires.find(r=>r.jour?.toLowerCase()===today);
+
+if(!h)return;
+
+status.style.display="block";
+
+const open=h.ouvert.substring(0,5);
+const close=h.ferme.substring(0,5);
+
+const now=new Date();
+const o=new Date();o.setHours(open.split(":")[0],open.split(":")[1]);
+const c=new Date();c.setHours(close.split(":")[0],close.split(":")[1]);
+
+if(now>=o && now<=c){
+status.style.color="#2e7d32";
+status.textContent=`Écuries ouvertes ${open} – ${close}`;
+}else{
+status.style.color="#c0392b";
+status.textContent=`Écuries fermées ${open} – ${close}`;
+}
+
+}
+
+fetchStatuts();
+fetchHoraires();
+
+setInterval(fetchStatuts,10000);
+setInterval(fetchHoraires,60000);
+
+/* preload pages */
+
+["paddocks.html","travail.html","plan.html","horaires.html"].forEach(p=>{
+fetch(p,{cache:"force-cache"}).catch(()=>{});
+});
 
 </script>
 
