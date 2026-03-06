@@ -35,9 +35,7 @@
   }
 
   #backBtn img{
-    filter:
-      brightness(0) invert(1)
-      drop-shadow(0 0 6px rgba(255,255,255,0.5));
+    filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(255,255,255,0.5));
   }
 }
 
@@ -88,7 +86,6 @@ header{
 #backBtn img{
   width:22px;
   height:22px;
-  transition:filter .3s ease;
 }
 
 header h1{
@@ -168,11 +165,6 @@ header h1{
   gap:8px;
   cursor:pointer;
   box-shadow:var(--shadow);
-  transition:background .3s ease, transform .15s ease;
-}
-
-#reserveBox:hover{
-  transform:translateY(-2px);
 }
 
 #reserveBox img{
@@ -270,18 +262,13 @@ header h1{
 
 <script>
 
-if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
-}
-
 window.addEventListener("DOMContentLoaded",()=>{
   requestAnimationFrame(()=>{
     document.getElementById("page").classList.add("active");
   });
 });
 
-const SHEET_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrTzYqn2ccSJFP7tZaGGEKm16kTHOF-8JqsMoxkyXzzp0n8i1HL-6Q2cgWCI6TngwJkpRUeG5gMCa6sRuEUpoxoQW_wfX6msOkO7g1ddHbeqVjgow6W3IEXZsr7YqRFFiLdYyBtou7-dG9x8dn0CEEZXNJ1_3C9SSORrNW5yoioAFCXpbNZ5r1nPb_MOBOdsB3_osn2TKhFOxI-wCIvucs6KGML8hdbFn2oeu3YpLzFXzmDRYvB30zZhvDqizOXZnpk7DVaGIKj8dHDuXZ9DpFW5w3bC9uePfaqSM3UDf_8o7NjDDOk&lib=MQct1McyAvPNR3Hcicp3cJIesX2pvkKrD";
-
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec";
 const REFRESH=60000;
 
 const ICONS_STATUT={
@@ -297,56 +284,57 @@ const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-
 
 function loadData(){
 
-fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
+fetch(SHEET_URL+"?t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
 
-  let afficherBouton=false;
+let afficherBouton=false;
 
-  ESPACES.forEach(espace=>{
+ESPACES.forEach(espace=>{
 
-    const row=data.find(e=>e.espace===espace);
-    if(!row) return;
+const row=data.find(e=>e.espace===espace);
+if(!row) return;
 
-    document.getElementById(espace+"-statut").src =
-      ICONS_STATUT[row.statut_auto] || "";
+document.getElementById(espace+"-statut").src =
+ICONS_STATUT[row.statut_auto] || "";
 
-    const horaire=row.horaire_special || row.horaire_affiche || "";
-    const el=document.getElementById(espace+"-horaire");
-    el.innerText=horaire;
+const horaire=row.horaire_special || row.horaire_affiche || "";
+const el=document.getElementById(espace+"-horaire");
 
-    if(row.horaire_special){
-      el.style.color="#E88B00";
-      el.style.fontWeight="600";
-    }else{
-      el.style.color="var(--text)";
-      el.style.fontWeight="400";
-    }
+el.innerText=horaire;
 
-    document.getElementById(espace+"-info").innerText=row.info || "";
+if(row.horaire_special){
+el.style.color="#E88B00";
+el.style.fontWeight="600";
+}else{
+el.style.color="var(--text)";
+el.style.fontWeight="400";
+}
 
-    if(row.statut_auto==="ouvert" || row.statut_auto==="prevision"){
-      afficherBouton=true;
-    }
+document.getElementById(espace+"-info").innerText=row.info || "";
 
-  });
+if(row.statut_auto==="ouvert" || row.statut_auto==="prevision"){
+afficherBouton=true;
+}
 
-  document.getElementById("reserveBox").style.display =
-    afficherBouton ? "flex" : "none";
+});
+
+document.getElementById("reserveBox").style.display =
+afficherBouton ? "flex" : "none";
 
 });
 
 }
 
 function goBack(){
-  const page=document.getElementById("page");
-  page.classList.remove("active");
-  page.classList.add("exit");
-  setTimeout(()=>{ window.location.href="index.html"; },300);
+const page=document.getElementById("page");
+page.classList.remove("active");
+page.classList.add("exit");
+setTimeout(()=>{ window.location.href="index.html"; },300);
 }
 
 function goReserve(){
-  window.open(RESERVE_URL,"_blank");
+window.open(RESERVE_URL,"_blank");
 }
 
 loadData();
