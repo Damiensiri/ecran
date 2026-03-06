@@ -247,17 +247,10 @@ const ICONS={
 
 let lastData="";
 
-async function load(){
-
-try{
-
-const r=await fetch(API+"&t="+Date.now(),{cache:"no-store"});
-const data=await r.json();
+function render(data){
 
 const signature=JSON.stringify(data);
-
 if(signature===lastData) return;
-
 lastData=signature;
 
 let bouton=false;
@@ -293,6 +286,19 @@ bouton=true;
 
 document.getElementById("reserveBox").style.display=bouton?"flex":"none";
 
+}
+
+async function load(){
+
+try{
+
+const r=await fetch(API+"&t="+Date.now(),{cache:"no-store"});
+const data=await r.json();
+
+localStorage.setItem("statuts",JSON.stringify(data));
+
+render(data);
+
 }catch(e){
 console.log("API error",e);
 }
@@ -311,9 +317,22 @@ window.open("https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-4
 }
 
 window.onload=()=>{
+
 document.getElementById("page").classList.add("active");
+
+/* affichage instantané depuis cache */
+
+const cache=localStorage.getItem("statuts");
+if(cache){
+try{
+render(JSON.parse(cache));
+}catch(e){}
+}
+
 load();
+
 setInterval(load,10000);
+
 };
 
 </script>
