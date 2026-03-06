@@ -1,11 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paddocks</title>
+
+<meta name="theme-color" content="#f4f4f4">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= VARIABLES ================= */
+
+:root{
+  --bg:#f4f4f4;
+  --header-bg:#f4f4f4;
+  --text:#181E3B;
+  --card-bg:#ffffff;
+  --shadow:0 6px 18px rgba(0,0,0,0.08);
+  --info:#E88B00;
+  --reserve-bg:#E88B00;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1115;
+    --header-bg:#0f1115;
+    --text:#ffffff;
+    --card-bg:#1c1f26;
+    --shadow:0 10px 30px rgba(0,0,0,0.6);
+    --info:#E88B00; /* reste orange même en dark */
+    --reserve-bg:#c87400;
+  }
+
+  #backBtn img{
+    filter:
+      brightness(0) invert(1)
+      drop-shadow(0 0 6px rgba(255,255,255,0.5));
+  }
+}
+
+/* ================= BASE ================= */
+
+body{
+  margin:0;
+  font-family:'Montserrat',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:background .3s ease,color .3s ease;
+}
+
+/* ================= PAGE ================= */
+
+.page{
+  min-height:100vh;
+  transform:translateX(100%);
+  transition:transform .35s ease;
+}
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
+
+/* ================= HEADER ================= */
+
+header{
+  position:relative;
+  height:70px;
+  background:var(--header-bg);
+}
+
+#backBtn{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:var(--card-bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+
+#backBtn img{
+  width:22px;
+  height:22px;
+  transition:filter .3s ease;
+}
+
+header h1{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* ================= CARDS ================= */
+
+.card{
+  background:var(--card-bg);
+  margin:0 15px 20px;
+  padding:18px;
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.left-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.left-title img{
+  width:26px;
+}
+
+.card-title{
+  font-size:20px;
+  font-weight:700;
+}
+
+.card-top img.statut{
+  width:26px;
+}
+
+.card-middle{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:10px;
+  font-size:14px;
+}
+
+.card-info{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--info);
+  white-space:pre-line;
+}
+
+/* ================= BOUTON RESERVER ================= */
+
+#reserveBox{
+  margin:30px 15px;
+  background:var(--reserve-bg);
+  color:white;
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+  font-weight:600;
+  font-size:16px;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:background .3s ease, transform .15s ease;
+}
+
+#reserveBox:hover{
+  transform:translateY(-2px);
+}
+
+#reserveBox img{
+  width:20px;
+}
+
+/* ================= LEGENDE ================= */
+
+.legend{
+  margin:25px 20px;
+  font-size:15px;
+  color:var(--text);
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.legend-item img{
+  width:22px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page" id="page">
+
+<header>
+  <div id="backBtn" onclick="goBack()">
+    <img src="image/back.svg">
+  </div>
+  <h1>PADDOCKS</h1>
+</header>
+
+<div class="card">
+  <div class="card-top">
+    <div class="left-title">
+      <img src="image/paddock.svg">
+      <div class="card-title">Maison</div>
+    </div>
+    <img id="maison-statut" class="statut">
+  </div>
+  <div class="card-middle">
+    <div id="maison-horaire"></div>
+  </div>
+  <div class="card-info" id="maison-info"></div>
+</div>
+
+<div class="card">
+  <div class="card-top">
+    <div class="left-title">
+      <img src="image/paddock.svg">
+      <div class="card-title">Grande voie</div>
+    </div>
+    <img id="grande-voie-statut" class="statut">
+  </div>
+  <div class="card-middle">
+    <div id="grande-voie-horaire"></div>
+  </div>
+  <div class="card-info" id="grande-voie-info"></div>
+</div>
+
+<div class="card">
+  <div class="card-top">
+    <div class="left-title">
+      <img src="image/paddock.svg">
+      <div class="card-title">Beudot</div>
+    </div>
+    <img id="beudot-statut" class="statut">
+  </div>
+  <div class="card-middle">
+    <div id="beudot-horaire"></div>
+  </div>
+  <div class="card-info" id="beudot-info"></div>
+</div>
+
+<div id="reserveBox" onclick="goReserve()">
+  <img src="https://static.wixstatic.com/shapes/ff7f34_9b4da08e0dd544ec9a450433caf8c376.svg">
+  Réserver
+</div>
+
+<div class="legend">
+  <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
+  <div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
+  <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
+  <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
+</div>
+
+</div>
+
 <script>
 
 if(window.matchMedia('(prefers-color-scheme: dark)').matches){
   document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
 }
 
-const SHEET_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrTzYqn2ccSJFP7tZaGGEKm16kTHOF-8JqsMoxkyXzzp0n8i1HL-6Q2cgWCI6TngwJkpRUeG5gMCa6sRuEUpoxoQW_wfX6msOkO7g1ddHbeqVjgow6W3IEXZsr7YqRFFiLdYyBtou7-dG9x8dn0CEEZXNJ1_3C9SSORrNW5yoioAFCXpbNZ5r1nPb_MOBOdsB3_osn2TKhFOxI-wCIvucs6KGML8hdbFn2oeu3YpLzFXzmDRYvB30zZhvDqizOXZnpk7DVaGIKj8dHDuXZ9DpFW5w3bC9uePfaqSM3UDf_8o7NjDDOk&lib=MQct1McyAvPNR3Hcicp3cJIesX2pvkKrD";
+window.addEventListener("DOMContentLoaded",()=>{
+  requestAnimationFrame(()=>{
+    document.getElementById("page").classList.add("active");
+  });
+});
 
+const SHEET_URL="const SHEET_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrTzYqn2ccSJFP7tZaGGEKm16kTHOF-8JqsMoxkyXzzp0n8i1HL-6Q2cgWCI6TngwJkpRUeG5gMCa6sRuEUpoxoQW_wfX6msOkO7g1ddHbeqVjgow6W3IEXZsr7YqRFFiLdYyBtou7-dG9x8dn0CEEZXNJ1_3C9SSORrNW5yoioAFCXpbNZ5r1nPb_MOBOdsB3_osn2TKhFOxI-wCIvucs6KGML8hdbFn2oeu3YpLzFXzmDRYvB30zZhvDqizOXZnpk7DVaGIKj8dHDuXZ9DpFW5w3bC9uePfaqSM3UDf_8o7NjDDOk&lib=MQct1McyAvPNR3Hcicp3cJIesX2pvkKrD";
 const REFRESH=60000;
 
 const ICONS_STATUT={
@@ -15,84 +290,68 @@ const ICONS_STATUT={
   "hors-service":"image/horsservice.png"
 };
 
-window.addEventListener("DOMContentLoaded",()=>{
-  requestAnimationFrame(()=>{
-    document.getElementById("page").classList.add("active");
+const ESPACES=["maison","grande-voie","beudot"];
+const RESERVE_URL="https://www.ce-dugrandrang.com/book-online?category=ebb4678d-9213-49a4-9c62-168e3bdce954";
+
+function loadData(){
+
+fetch(SHEET_URL,{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+
+  let afficherBouton=false;
+
+  ESPACES.forEach(espace=>{
+
+    const row=data.find(e=>e.espace===espace);
+    if(!row) return;
+
+    document.getElementById(espace+"-statut").src =
+      ICONS_STATUT[row.statut_auto] || "";
+
+    const horaire=row.horaire_special || row.horaire_affiche || "";
+    const el=document.getElementById(espace+"-horaire");
+    el.innerText=horaire;
+
+    // 🟠 toujours orange si horaire spécial
+    if(row.horaire_special){
+      el.style.color="#E88B00";
+      el.style.fontWeight="600";
+    }else{
+      el.style.color="var(--text)";
+      el.style.fontWeight="400";
+    }
+
+    document.getElementById(espace+"-info").innerText=row.info || "";
+
+    if(row.statut_auto==="ouvert" || row.statut_auto==="prevision"){
+      afficherBouton=true;
+    }
+
   });
+
+  document.getElementById("reserveBox").style.display =
+    afficherBouton ? "flex" : "none";
+
 });
-
-function updateDate(){
-  const j=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
-  const m=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
-  const d=new Date();
-  document.getElementById("date").innerText=
-    j[d.getDay()]+" "+d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();
-}
-
-function makeBadge(val){
-  if(val==="oui") return `<span class="badge oui">OUI</span>`;
-  if(val==="non") return `<span class="badge non">NON</span>`;
-  return "";
-}
-
-async function loadData(){
-
-  try{
-
-    const url = SHEET_BASE + "?t=" + Date.now();
-
-    const r = await fetch(url,{cache:"no-store"});
-
-    const data = await r.json();
-
-    ["carriere","manege"].forEach(espace=>{
-
-      const row=data.find(e=>e.espace===espace);
-
-      if(!row) return;
-
-      document.getElementById(espace+"-liberte").innerHTML = makeBadge(row.liberte);
-
-      document.getElementById(espace+"-longe").innerHTML = makeBadge(row.longe);
-
-      document.getElementById(espace+"-statut").src = ICONS_STATUT[row.statut_auto];
-
-      const horaire=row.horaire_special || row.horaire_affiche || "";
-
-      const el=document.getElementById(espace+"-horaire");
-
-      el.innerText=horaire;
-
-      el.style.color=row.horaire_special ? "var(--info)" : "var(--text)";
-
-      document.getElementById(espace+"-info").innerText=row.info || "";
-
-    });
-
-  }catch(e){
-
-    console.log("Erreur chargement sheet",e);
-
-  }
 
 }
 
 function goBack(){
-
   const page=document.getElementById("page");
-
   page.classList.remove("active");
-
   page.classList.add("exit");
-
-  setTimeout(()=>{ location.href="index.html"; },300);
-
+  setTimeout(()=>{ window.location.href="index.html"; },300);
 }
 
-updateDate();
+function goReserve(){
+  window.open(RESERVE_URL,"_blank");
+}
 
 loadData();
-
 setInterval(loadData,REFRESH);
 
 </script>
+
+</body>
+</html>
