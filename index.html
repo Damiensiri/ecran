@@ -332,16 +332,10 @@ return;
 
 const exceptions=JSON.parse(localStorage.getItem("exceptions")||"[]");
 
-const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
+const now=new Date();
+const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 
-let ex=null;
-
-exceptions.forEach(e=>{
-if(!e.date) return;
-const d=new Date(e.date);
-const day=d.toLocaleDateString("fr-FR",{weekday:"long"}).toLowerCase();
-if(day===todayName){ ex=e; }
-});
+const ex=exceptions.find(e=>e.date===today);
 
 if(ex){
 status.style.display="block";
@@ -351,6 +345,8 @@ return;
 }
 
 const horaires=JSON.parse(localStorage.getItem("horaires")||"[]");
+
+const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
 
 const h=horaires.find(r=>r.jour?.toLowerCase()===todayName);
 
@@ -364,11 +360,11 @@ status.style.display="block";
 const [oh,om]=open.split(":");
 const [ch,cm]=close.split(":");
 
-const now=new Date();
+const nowTime=new Date();
 const o=new Date();o.setHours(oh,om,0,0);
 const c=new Date();c.setHours(ch,cm,0,0);
 
-if(now>=o && now<=c){
+if(nowTime>=o && nowTime<=c){
 status.style.color="#2e7d32";
 status.textContent=`Écuries ouvertes ${open} – ${close}`;
 }else{
@@ -397,7 +393,7 @@ fetch(p,{cache:"force-cache"}).catch(()=>{});
 
 <!-- CLOCHE STRICTEMENT INCHANGÉE -->
 <script>
-/* TON SCRIPT CLOCHE ORIGINAL ICI (INCHANGÉ) */
+/* COLLE ICI TON SCRIPT CLOCHE EXACT D'ORIGINE */
 </script>
 
 </body>
