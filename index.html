@@ -224,10 +224,6 @@ header h1{
   cursor:pointer;
 }
 
-.list-btn img{
-  width:26px;
-}
-
 </style>
 </head>
 
@@ -287,48 +283,44 @@ function openExternal(url){ window.open(url,"_blank"); }
 
 const STATUTS_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 const HORAIRES_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
+const EXCEPTIONS_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=exceptions";
 
 /* ================= TIME FIX ================= */
 
 function formatTime(val){
-
 if(!val) return "--:--";
-
 if(val.includes("T")){
 const d=new Date(val);
 return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
 }
-
 return val.substring(0,5);
-
 }
 
 /* ================= FETCH ================= */
 
-function fetchStatuts(){
+function fetchHoraires(){
+return fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+localStorage.setItem("horaires",JSON.stringify(data));
+});
+}
 
+function fetchExceptions(){
+return fetch(EXCEPTIONS_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+localStorage.setItem("exceptions",JSON.stringify(data));
+});
+}
+
+function fetchStatuts(){
 fetch(STATUTS_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
-
 localStorage.setItem("statuts",JSON.stringify(data));
-
 updateUI(data);
-
 });
-
-}
-
-function fetchHoraires(){
-
-fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
-.then(r=>r.json())
-.then(data=>{
-
-localStorage.setItem("horaires",JSON.stringify(data));
-
-});
-
 }
 
 /* ================= UI ================= */
@@ -352,11 +344,25 @@ return;
 
 }
 
+/* ===== EXCEPTION ===== */
+
+const exceptions=JSON.parse(localStorage.getItem("exceptions")||"[]");
+const today=new Date().toISOString().split("T")[0];
+const ex=exceptions.find(e=>e.date===today);
+
+if(ex){
+status.style.display="block";
+status.style.color="#c0392b";
+status.textContent=ex.message;
+return;
+}
+
+/* ===== HORAIRES ===== */
+
 const horaires=JSON.parse(localStorage.getItem("horaires")||"[]");
 
-const today=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
-
-const h=horaires.find(r=>r.jour?.toLowerCase()===today);
+const day=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
+const h=horaires.find(r=>r.jour?.toLowerCase()===day);
 
 if(!h) return;
 
@@ -384,11 +390,19 @@ status.textContent=`Écuries fermées ${open} – ${close}`;
 
 /* ================= START ================= */
 
+async function start(){
+await Promise.all([
+fetchHoraires(),
+fetchExceptions()
+]);
 fetchStatuts();
-fetchHoraires();
+}
+
+start();
 
 setInterval(fetchStatuts,10000);
 setInterval(fetchHoraires,60000);
+setInterval(fetchExceptions,60000);
 
 /* preload */
 
