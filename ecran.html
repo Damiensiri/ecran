@@ -156,12 +156,8 @@ header h1{
 
 <script>
 
-/* ===== API ===== */
-
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
-const REFRESH=10000;
-
-/* ===== ICONS ===== */
+const REFRESH=60000;
 
 const ICONS_STATUT={
   "ouvert":"image/ouvert.png",
@@ -227,24 +223,15 @@ function buildCard(e){
 /* ===== LOAD DATA ===== */
 
 function loadData(){
-
-fetch(SHEET_URL+"?t="+Date.now(),{cache:"no-store"})
+fetch(SHEET_URL,{cache:"no-store"})
 .then(r=>r.json())
-.then(res=>{
-
-const data = res.data || res;
-
-["carriere","manege","maison","grande-voie","beudot"].forEach(espace=>{
-  const row=data.find(e=>e.espace===espace);
-  if(!row) return;
-  document.getElementById(espace).innerHTML = buildCard(row);
+.then(data=>{
+  ["carriere","manege","maison","grande-voie","beudot"].forEach(espace=>{
+    const row=data.find(e=>e.espace===espace);
+    if(!row) return;
+    document.getElementById(espace).innerHTML = buildCard(row);
+  });
 });
-
-})
-.catch(err=>{
-console.error("API error",err);
-});
-
 }
 
 loadData();
@@ -283,6 +270,5 @@ document.addEventListener("click", function(){
 });
 
 </script>
-
 </body>
 </html>
