@@ -111,7 +111,7 @@ header h1{
   justify-content:center;
 }
 
-/* ================= SCROLL CONTAINER ================= */
+/* ================= SCROLL ================= */
 
 .page-content{
   position:fixed;
@@ -121,9 +121,6 @@ header h1{
   bottom:0;
   overflow-y:auto;
   padding-bottom:20px;
-
-  -ms-overflow-style:none;
-  scrollbar-width:none;
 }
 
 .page-content::-webkit-scrollbar{
@@ -137,11 +134,7 @@ header h1{
   font-size:44px;
   font-weight:700;
   margin:35px 0 16px;
-  padding-top:6px;
-  line-height:1.2;
 }
-
-/* ================= STATUT HORAIRES ================= */
 
 #opening-status{
   text-align:center;
@@ -151,7 +144,7 @@ header h1{
   font-weight:600;
 }
 
-/* ================= BANDEAU ================= */
+/* ================= ALERT ================= */
 
 #alert-wrapper{
   width:100%;
@@ -168,10 +161,8 @@ header h1{
   align-items:center;
   gap:8px;
   padding:0 12px;
-  box-sizing:border-box;
   color:white;
   font-size:14px;
-  font-weight:500;
   transform:translateY(-100%);
   opacity:0;
   transition:transform .4s ease, opacity .4s ease;
@@ -246,7 +237,9 @@ header h1{
   <div class="header-left">
     <img src="image/logo.png">
   </div>
+
   <h1>ECURIE DAMIEN SIRI</h1>
+
   <div id="bellBox" onclick="go('notifications.html')">
     🔔
     <span id="bellBadge"></span>
@@ -283,38 +276,45 @@ header h1{
   <div class="card" onclick="openExternal('https://www.ce-dugrandrang.com/category/soins')"><img src="image/soins.svg"><div>SOINS</div></div>
 </div>
 
-<div class="section-title">AUTRES</div>
-
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/category/laverie')"><img src="image/laverie.svg"> LAVERIE</div>
-<div class="list-btn" onclick="openExternal('tarifs.pdf')"><img src="image/tarif.svg"> TARIFS</div>
-
-<div class="section-title">COMPTE</div>
-
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/profile/my/profile')"><img src="image/compte.svg"> MON COMPTE</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/my-bookings')"><img src="image/reservation.svg"> MES RÉSERVATIONS</div>
-<div class="list-btn" onclick="openExternal('https://www.ce-dugrandrang.com/cart-page')"><img src="image/panier.svg"> MON PANIER</div>
-
 </div>
 
 <script>
+
 function go(url){ window.location.href=url; }
 function openExternal(url){ window.open(url,"_blank"); }
-</script>
 
-<!-- ===== CACHE + API ===== -->
-
-<script>
+/* ================= API ================= */
 
 const STATUTS_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 const HORAIRES_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
+
+/* ================= TIME FIX ================= */
+
+function formatTime(val){
+
+if(!val) return "--:--";
+
+if(val.includes("T")){
+const d=new Date(val);
+return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+}
+
+return val.substring(0,5);
+
+}
+
+/* ================= FETCH ================= */
 
 function fetchStatuts(){
 
 fetch(STATUTS_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
+
 localStorage.setItem("statuts",JSON.stringify(data));
+
 updateUI(data);
+
 });
 
 }
@@ -324,15 +324,22 @@ function fetchHoraires(){
 fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
+
 localStorage.setItem("horaires",JSON.stringify(data));
+
 });
 
 }
+
+/* ================= UI ================= */
 
 function updateUI(data){
 
 const alertBox=document.getElementById("alert-box");
 const status=document.getElementById("opening-status");
+
+alertBox.classList.remove("show");
+alertBox.style.display="none";
 
 const row=data.find(e=>e.espace==="accueil");
 
@@ -351,16 +358,19 @@ const today=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][
 
 const h=horaires.find(r=>r.jour?.toLowerCase()===today);
 
-if(!h)return;
+if(!h) return;
+
+const open=formatTime(h.ouvert);
+const close=formatTime(h.ferme);
 
 status.style.display="block";
 
-const open=h.ouvert.substring(0,5);
-const close=h.ferme.substring(0,5);
+const [oh,om]=open.split(":");
+const [ch,cm]=close.split(":");
 
 const now=new Date();
-const o=new Date();o.setHours(open.split(":")[0],open.split(":")[1]);
-const c=new Date();c.setHours(close.split(":")[0],close.split(":")[1]);
+const o=new Date();o.setHours(oh,om,0,0);
+const c=new Date();c.setHours(ch,cm,0,0);
 
 if(now>=o && now<=c){
 status.style.color="#2e7d32";
@@ -372,13 +382,15 @@ status.textContent=`Écuries fermées ${open} – ${close}`;
 
 }
 
+/* ================= START ================= */
+
 fetchStatuts();
 fetchHoraires();
 
 setInterval(fetchStatuts,10000);
 setInterval(fetchHoraires,60000);
 
-/* preload pages */
+/* preload */
 
 ["paddocks.html","travail.html","plan.html","horaires.html"].forEach(p=>{
 fetch(p,{cache:"force-cache"}).catch(()=>{});
@@ -386,76 +398,65 @@ fetch(p,{cache:"force-cache"}).catch(()=>{});
 
 </script>
 
-<!-- ===== CLOCHE (INTOUCHÉE) ===== -->
-
+<!-- CLOCHE STRICTEMENT INCHANGÉE -->
 <script>
 const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
 
 const STORAGE_KEY="alerts_lues";
 
 function getLues(){
-  try{
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  }catch(e){
-    return [];
-  }
+try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){return[];}
 }
 
 function parseDateFR(str){
-  if(!str) return null;
-  if(str.includes("-")){
-    const p=str.split("-");
-    return new Date(p[0],p[1]-1,p[2],0,0,0);
-  }
-  if(str.includes("/")){
-    const p=str.split("/");
-    return new Date(p[2],p[1]-1,p[0],0,0,0);
-  }
-  return null;
+if(!str)return null;
+if(str.includes("-")){const p=str.split("-");return new Date(p[0],p[1]-1,p[2]);}
+if(str.includes("/")){const p=str.split("/");return new Date(p[2],p[1]-1,p[0]);}
+return null;
 }
 
 async function updateBell(){
 
-  const badge=document.getElementById("bellBadge");
+const badge=document.getElementById("bellBadge");
 
-  try{
+try{
 
-    const res=await fetch(API_URL,{cache:"no-store"});
-    const data=await res.json();
+const res=await fetch(API_URL,{cache:"no-store"});
+const data=await res.json();
 
-    const today=new Date();
-    today.setHours(0,0,0,0);
+const today=new Date();
+today.setHours(0,0,0,0);
 
-    const lues=getLues().map(String);
-    let count=0;
+const lues=getLues().map(String);
+let count=0;
 
-    data
-      .filter(n=>{
-        if(n.epingle==="oui") return true;
-        if(n.active!=="oui") return false;
+data.filter(n=>{
+if(n.epingle==="oui")return true;
+if(n.active!=="oui")return false;
 
-        if(!n.expire){
-          const d=parseDateFR(n.date);
-          if(!d) return true;
-          return d>=today;
-        }
+if(!n.expire){
+const d=parseDateFR(n.date);
+if(!d)return true;
+return d>=today;
+}
 
-        const exp=parseDateFR(n.expire);
-        if(!exp) return true;
-        return exp>=today;
-      })
-      .forEach(n=>{
-        if(!lues.includes(String(n.id))){
-          count++;
-        }
-      });
+const exp=parseDateFR(n.expire);
+if(!exp)return true;
+return exp>=today;
 
-    badge.style.display = count>0 ? "flex" : "none";
-    badge.textContent = count;
+}).forEach(n=>{
+if(!lues.includes(String(n.id))){
+count++;
+}
+});
 
-  }catch(e){
-    badge.style.display="none";
-  }
+badge.style.display=count>0?"flex":"none";
+badge.textContent=count;
+
+}catch(e){
+badge.style.display="none";
+}
+
 }
 
 updateBell();
