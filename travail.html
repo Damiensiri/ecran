@@ -247,7 +247,7 @@ header h1{
 
 <script>
 
-const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts"
+const API_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts"
 
 const REFRESH=10000
 
@@ -278,6 +278,10 @@ j[d.getDay()]+" "+d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear()
 
 function makeBadge(val){
 
+if(!val) return ""
+
+val=val.toLowerCase().trim()
+
 if(val==="oui") return `<span class="badge oui">OUI</span>`
 if(val==="non") return `<span class="badge non">NON</span>`
 
@@ -287,7 +291,7 @@ return ""
 
 function loadData(){
 
-fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
+fetch(API_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
 
@@ -303,8 +307,10 @@ makeBadge(row.liberte)
 document.getElementById(espace+"-longe").innerHTML=
 makeBadge(row.longe)
 
+const statut=(row.statut_auto || "").toLowerCase().trim()
+
 document.getElementById(espace+"-statut").src=
-ICONS_STATUT[row.statut_auto] || ""
+ICONS_STATUT[statut] || ""
 
 const horaire=row.horaire_special || row.horaire_affiche || ""
 
@@ -341,17 +347,13 @@ page.classList.remove("active")
 page.classList.add("exit")
 
 setTimeout(()=>{
-
 location.href="index.html"
-
 },300)
 
 }
 
 updateDate()
-
 loadData()
-
 setInterval(loadData,REFRESH)
 
 </script>
