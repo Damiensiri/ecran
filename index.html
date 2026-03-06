@@ -7,7 +7,6 @@
 <title>Ecurie Damien Siri</title>
 
 <link rel="manifest" href="manifest.json">
-
 <link rel="apple-touch-icon" href="image/icon-192x192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -42,21 +41,20 @@
   }
 
   .header-left img{
-    filter:
-      brightness(0) invert(1)
-      drop-shadow(0 0 6px rgba(255,255,255,0.5));
+    filter:brightness(0) invert(1)
+           drop-shadow(0 0 6px rgba(255,255,255,0.5));
   }
 }
 
 /* ================= BASE ================= */
 
-body{
+html, body{
   margin:0;
+  height:100%;
   font-family:'Montserrat',sans-serif;
   background:var(--bg);
   color:var(--text);
-  overflow-y:auto;
-  transition:background .3s ease,color .3s ease;
+  overflow:hidden;
 }
 
 /* ================= HEADER ================= */
@@ -66,13 +64,12 @@ header{
   top:0;
   left:0;
   width:100%;
-  height:70px;
+  height:64px;
   background:var(--header-bg);
   z-index:1000;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:background .3s ease;
 }
 
 .header-left{
@@ -82,14 +79,12 @@ header{
 
 .header-left img{
   height:40px;
-  transition:filter .3s ease;
 }
 
 header h1{
   margin:0;
   font-size:20px;
   font-weight:700;
-  color:var(--text);
 }
 
 /* ================= BELL ================= */
@@ -116,20 +111,78 @@ header h1{
   justify-content:center;
 }
 
-/* ================= CONTENT ================= */
+/* ================= SCROLL CONTAINER ================= */
 
 .page-content{
-  margin-top:70px;
+  position:fixed;
+  top:20px;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow-y:auto;
+  padding-bottom:20px;
+
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+}
+
+.page-content::-webkit-scrollbar{
+  display:none;
 }
 
 /* ================= TITLES ================= */
 
 #welcome{
   text-align:center;
-  font-size:36px;
+  font-size:44px;
   font-weight:700;
-  margin:10px 0 20px;
+  margin:35px 0 16px;
+  padding-top:6px;
+  line-height:1.2;
 }
+
+/* ================= STATUT HORAIRES ================= */
+
+#opening-status{
+  text-align:center;
+  margin-bottom:16px;
+  display:none;
+  font-size:15px;
+  font-weight:600;
+}
+
+/* ================= BANDEAU ================= */
+
+#alert-wrapper{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#alert-box{
+  width:100%;
+  height:27px;
+  background:#E88B00;
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  box-sizing:border-box;
+  color:white;
+  font-size:14px;
+  font-weight:500;
+  transform:translateY(-100%);
+  opacity:0;
+  transition:transform .4s ease, opacity .4s ease;
+}
+
+#alert-box.show{
+  transform:translateY(0);
+  opacity:1;
+}
+
+/* ================= SECTIONS ================= */
 
 .section-title{
   background:var(--section-bg);
@@ -139,10 +192,7 @@ header h1{
   margin:20px 15px 10px;
   border-radius:6px;
   font-size:14px;
-  letter-spacing:0.5px;
 }
-
-/* ================= GRID ================= */
 
 .grid{
   display:grid;
@@ -151,8 +201,6 @@ header h1{
   padding:0 15px;
 }
 
-/* ================= CARDS ================= */
-
 .card{
   background:var(--card-bg);
   border-radius:22px;
@@ -160,11 +208,6 @@ header h1{
   text-align:center;
   box-shadow:var(--shadow);
   cursor:pointer;
-  transition:transform .15s ease;
-}
-
-.card:hover{
-  transform:translateY(-3px);
 }
 
 .card img{
@@ -177,8 +220,6 @@ header h1{
   font-weight:700;
 }
 
-/* ================= LIST BUTTON ================= */
-
 .list-btn{
   background:var(--card-bg);
   margin:12px 15px;
@@ -190,11 +231,6 @@ header h1{
   box-shadow:var(--shadow);
   font-weight:700;
   cursor:pointer;
-  transition:transform .15s ease;
-}
-
-.list-btn:hover{
-  transform:translateY(-2px);
 }
 
 .list-btn img{
@@ -210,9 +246,7 @@ header h1{
   <div class="header-left">
     <img src="image/logo.png">
   </div>
-
   <h1>ECURIE DAMIEN SIRI</h1>
-
   <div id="bellBox" onclick="go('notifications.html')">
     🔔
     <span id="bellBadge"></span>
@@ -222,6 +256,12 @@ header h1{
 <div class="page-content">
 
 <div id="welcome">BIENVENUE</div>
+
+<div id="opening-status"></div>
+
+<div id="alert-wrapper">
+  <div id="alert-box"></div>
+</div>
 
 <div class="section-title">ESPACES</div>
 
@@ -260,14 +300,130 @@ header h1{
 function go(url){ window.location.href=url; }
 function openExternal(url){ window.open(url,"_blank"); }
 
-if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
+function updateThemeColor(){
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+    meta.setAttribute("content","#0f1115");
+  } else {
+    meta.setAttribute("content","#f4f4f4");
+  }
 }
+updateThemeColor();
+window.matchMedia('(prefers-color-scheme: dark)')
+  .addEventListener('change', updateThemeColor);
 </script>
 
-<!-- ===== CLOCHE IDENTIQUE VERSION STABLE ===== -->
+<!-- ===== ALERT + HORAIRES CONNECTÉS À LA NOUVELLE API ===== -->
+
 <script>
 
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
+const HORAIRES_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
+
+const ESPACE="accueil";
+
+function getTodayName(){
+  return ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date().getDay()];
+}
+
+function parseTime(str){
+  if(!str) return null;
+  if(str.includes("T")){
+    const d=new Date(str);
+    return {h:d.getHours(),m:d.getMinutes()};
+  }
+  const p=str.split(":");
+  return {h:parseInt(p[0]),m:parseInt(p[1])};
+}
+
+function formatTime(val){
+  if(!val) return "--:--";
+  if(val.includes("T")){
+    const d=new Date(val);
+    return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  }
+  return val.substring(0,5);
+}
+
+function isNowBetween(open,close){
+  const now=new Date();
+  const o=new Date(); o.setHours(open.h,open.m,0,0);
+  const c=new Date(); c.setHours(close.h,close.m,0,0);
+  return now>=o && now<=c;
+}
+
+function loadAll(){
+
+  const alertBox=document.getElementById("alert-box");
+  const status=document.getElementById("opening-status");
+
+  alertBox.innerHTML="";
+  alertBox.classList.remove("show");
+  alertBox.style.display="none";
+  status.style.display="none";
+
+  fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
+  .then(r=>r.json())
+  .then(data=>{
+
+    const row=data.find(e=>e.espace===ESPACE);
+
+    if(row && row.alerte && row.alerte.trim()!==""){
+
+      alertBox.style.display="flex";
+
+      const icon=document.createElement("img");
+      icon.src="https://static.wixstatic.com/shapes/ff7f34_8db0b910e97b4e37af20514452d5c4f4.svg";
+      icon.style.width="16px";
+
+      const text=document.createElement("div");
+      text.textContent=row.alerte;
+
+      alertBox.appendChild(icon);
+      alertBox.appendChild(text);
+
+      setTimeout(()=>{ alertBox.classList.add("show"); },50);
+      return;
+    }
+
+    fetch(HORAIRES_URL+"&t="+Date.now(),{cache:"no-store"})
+    .then(r=>r.json())
+    .then(data=>{
+
+      const today=getTodayName();
+      const row=data.find(r=>r.jour?.toLowerCase()===today);
+      if(!row||!row.ouvert||!row.ferme) return;
+
+      const open=parseTime(row.ouvert);
+      const close=parseTime(row.ferme);
+
+      status.style.display="block";
+
+      const openTxt=formatTime(row.ouvert);
+      const closeTxt=formatTime(row.ferme);
+
+      if(isNowBetween(open,close)){
+        status.style.color="#2e7d32";
+        status.textContent=`Écuries ouvertes ${openTxt} – ${closeTxt}`;
+      }else{
+        status.style.color="#c0392b";
+        status.textContent=`Écuries fermées ${openTxt} – ${closeTxt}`;
+      }
+
+    });
+
+  });
+
+}
+
+loadAll();
+setInterval(loadAll,60000);
+
+</script>
+
+<!-- ===== CLOCHE (INTOUCHÉE) ===== -->
+
+<script>
 const API_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRY09nECq5kqJEPaFCkMRnR4qbM-Z9y5KOMgVdlakJAA_L1FlwHMDN84Nstw8qXhqpt9QHGCeU6Sr6aLk3y7hSeA-1vr_eBBQYFwVL111h-CJZc8JxRQKvcu3XE7Gg-OXbXE8Vkp1PlAMHAkhJduQw6bxUswIvR7b1rA8txQ2Rtyl25eNxQWvtBet3bytcH6RpMKvJdyZcSioOtKa5sYL4uRI4FOoFrfUzX5P_pjpK-cAN8Bdf6otVcK4myQl66GohjWiPVOyCuofXOq8M4lQkmsxucwQ&lib=MfQh9XKIUpdlMRcOJ4l9JImAGFOlNCMp3";
 
 const STORAGE_KEY="alerts_lues";
