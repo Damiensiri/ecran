@@ -170,7 +170,7 @@ header h1{
 
 /* ===== CONFIG ===== */
 
-const SHEET_URL = "https://opensheet.elk.sh/1-VbRioKfM6JHU-Oep0pa6H3S0VVuvYLyUMXTdSdRbzI/horaires";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
 const REFRESH = 60000;
 
 /* ===== FORMAT JOUR ===== */
@@ -183,7 +183,7 @@ function capitalize(txt){
 
 function loadHoraires(){
 
-fetch(SHEET_URL,{cache:"no-store"})
+fetch(SHEET_URL + "&t=" + Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(data=>{
 
