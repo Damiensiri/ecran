@@ -1,0 +1,98 @@
+<script>
+
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0f1115");
+}
+
+const SHEET_URL="https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrTzYqn2ccSJFP7tZaGGEKm16kTHOF-8JqsMoxkyXzzp0n8i1HL-6Q2cgWCI6TngwJkpRUeG5gMCa6sRuEUpoxoQW_wfX6msOkO7g1ddHbeqVjgow6W3IEXZsr7YqRFFiLdYyBtou7-dG9x8dn0CEEZXNJ1_3C9SSORrNW5yoioAFCXpbNZ5r1nPb_MOBOdsB3_osn2TKhFOxI-wCIvucs6KGML8hdbFn2oeu3YpLzFXzmDRYvB30zZhvDqizOXZnpk7DVaGIKj8dHDuXZ9DpFW5w3bC9uePfaqSM3UDf_8o7NjDDOk&lib=MQct1McyAvPNR3Hcicp3cJIesX2pvkKrD";
+
+const REFRESH=60000;
+
+const ICONS_STATUT={
+  "ouvert":"image/ouvert.png",
+  "ferme":"image/ferme.png",
+  "prevision":"image/prevision.png",
+  "hors-service":"image/horsservice.png"
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  requestAnimationFrame(()=>{
+    document.getElementById("page").classList.add("active");
+  });
+});
+
+function updateDate(){
+  const j=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+  const m=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  const d=new Date();
+  document.getElementById("date").innerText=
+    j[d.getDay()]+" "+d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();
+}
+
+function makeBadge(val){
+  if(val==="oui") return `<span class="badge oui">OUI</span>`;
+  if(val==="non") return `<span class="badge non">NON</span>`;
+  return "";
+}
+
+async function loadData(){
+
+  try{
+
+    const url = SHEET_BASE + "?t=" + Date.now();
+
+    const r = await fetch(url,{cache:"no-store"});
+
+    const data = await r.json();
+
+    ["carriere","manege"].forEach(espace=>{
+
+      const row=data.find(e=>e.espace===espace);
+
+      if(!row) return;
+
+      document.getElementById(espace+"-liberte").innerHTML = makeBadge(row.liberte);
+
+      document.getElementById(espace+"-longe").innerHTML = makeBadge(row.longe);
+
+      document.getElementById(espace+"-statut").src = ICONS_STATUT[row.statut_auto];
+
+      const horaire=row.horaire_special || row.horaire_affiche || "";
+
+      const el=document.getElementById(espace+"-horaire");
+
+      el.innerText=horaire;
+
+      el.style.color=row.horaire_special ? "var(--info)" : "var(--text)";
+
+      document.getElementById(espace+"-info").innerText=row.info || "";
+
+    });
+
+  }catch(e){
+
+    console.log("Erreur chargement sheet",e);
+
+  }
+
+}
+
+function goBack(){
+
+  const page=document.getElementById("page");
+
+  page.classList.remove("active");
+
+  page.classList.add("exit");
+
+  setTimeout(()=>{ location.href="index.html"; },300);
+
+}
+
+updateDate();
+
+loadData();
+
+setInterval(loadData,REFRESH);
+
+</script>
