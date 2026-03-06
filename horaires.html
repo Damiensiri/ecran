@@ -110,8 +110,6 @@ header h1{
   font-size:18px;
 }
 
-/* ===== MOBILE SAFE ===== */
-
 @media(max-width:480px){
   .day,.time{
     font-size:17px;
@@ -171,7 +169,11 @@ header h1{
 /* ===== CONFIG ===== */
 
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=horaires";
+const EXCEPTIONS_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=exceptions";
+
 const REFRESH=60000;
+
+let exceptions={};
 
 /* ===== FORMAT JOUR ===== */
 
@@ -195,6 +197,28 @@ function formatTime(val){
 
 }
 
+/* ===== CHARGER EXCEPTIONS ===== */
+
+function loadExceptions(){
+
+fetch(EXCEPTIONS_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(data=>{
+
+  exceptions={};
+
+  data.forEach(row=>{
+    if(row.date){
+      const d=new Date(row.date);
+      const jour=d.toLocaleDateString("fr-FR",{weekday:"long"}).toLowerCase();
+      exceptions[jour]=row.message;
+    }
+  });
+
+});
+
+}
+
 /* ===== RENDER ===== */
 
 function renderHoraires(data){
@@ -204,15 +228,23 @@ function renderHoraires(data){
 
   data.forEach(row=>{
 
-    if(!row.jour || !row.ouvert || !row.ferme) return;
+    if(!row.jour) return;
 
     const card=document.createElement("div");
     card.className="card";
 
+    let contenu;
+
+    if(exceptions[row.jour]){
+      contenu=exceptions[row.jour];
+    }else{
+      contenu=`${formatTime(row.ouvert)} - ${formatTime(row.ferme)}`;
+    }
+
     card.innerHTML=`
       <img src="image/time.svg">
       <div class="day">${capitalize(row.jour)} :</div>
-      <div class="time">${formatTime(row.ouvert)} - ${formatTime(row.ferme)}</div>
+      <div class="time">${contenu}</div>
     `;
 
     list.appendChild(card);
@@ -225,13 +257,25 @@ function renderHoraires(data){
 
 function loadHoraires(){
 
-fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
-.then(r=>r.json())
-.then(data=>{
+Promise.all([
+fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"}).then(r=>r.json()),
+fetch(EXCEPTIONS_URL+"&t="+Date.now(),{cache:"no-store"}).then(r=>r.json())
+])
+.then(([horaires,exc])=>{
 
-  localStorage.setItem("horaires",JSON.stringify(data));
+  exceptions={};
 
-  renderHoraires(data);
+  exc.forEach(row=>{
+    if(row.date){
+      const d=new Date(row.date);
+      const jour=d.toLocaleDateString("fr-FR",{weekday:"long"}).toLowerCase();
+      exceptions[jour]=row.message;
+    }
+  });
+
+  localStorage.setItem("horaires",JSON.stringify(horaires));
+
+  renderHoraires(horaires);
 
 });
 
