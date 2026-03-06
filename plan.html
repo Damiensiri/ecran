@@ -205,6 +205,59 @@ header h1{
   cursor:pointer;
 }
 
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+  body{
+    background:#0f1115;
+    color:#ffffff;
+  }
+
+  header h1{
+    color:#ffffff;
+  }
+
+  #backBtn{
+    background:#1c1f26;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+  #backBtn img{
+    filter:brightness(0) invert(1);
+  }
+
+  #panel{
+    background:#1c1f26;
+    box-shadow:0 25px 60px rgba(0,0,0,0.75);
+  }
+
+  .label{
+    color:#9aa0a6;
+  }
+
+  .value{
+    color:#e5e5e5;
+  }
+
+  .legend{
+    color:#ddd;
+  }
+
+  #map{
+    filter:brightness(0.92) contrast(0.95);
+    box-shadow:
+      0 30px 70px rgba(0,0,0,0.8),
+      0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  #reserveBox{
+    background:#c87400;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+
+}
+
 </style>
 </head>
 
@@ -292,9 +345,8 @@ const ICONS={
 
 let DATA=[];
 
-/* DOM sécurisé */
+/* références DOM (fix iOS / PWA) */
 
-const panel=document.getElementById("panel");
 const panelTitle=document.getElementById("panelTitle");
 const statut=document.getElementById("statut");
 const horaire=document.getElementById("horaire");
@@ -304,6 +356,7 @@ const longe=document.getElementById("longe");
 const optionsRow=document.getElementById("optionsRow");
 const reserveBox=document.getElementById("reserveBox");
 const closePanel=document.getElementById("closePanel");
+const panel=document.getElementById("panel");
 
 function formatTitle(t){
   const map={
@@ -316,39 +369,17 @@ function formatTitle(t){
   return map[t]||t;
 }
 
-function renderIcons(data){
-data.forEach(e=>{
-  const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
-  const el=document.getElementById("icon-"+e.espace);
-  if(el && icon) el.src=icon;
-});
-}
-
 function loadData(){
-
 fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(d=>{
-
   DATA=d;
-
-  localStorage.setItem("statuts",JSON.stringify(d));
-
-  renderIcons(d);
-
+  d.forEach(e=>{
+    const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
+    const el=document.getElementById("icon-"+e.espace);
+    if(el && icon) el.src=icon;
+  });
 });
-
-}
-
-/* cache instantané */
-
-const cache=localStorage.getItem("statuts");
-
-if(cache){
-try{
-DATA=JSON.parse(cache);
-renderIcons(DATA);
-}catch(e){}
 }
 
 loadData();
@@ -380,17 +411,14 @@ if(special){
 info.innerText=e.info||"Aucune info";
 
 let show=false;
-
 if(e.liberte){
   liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
   show=true;
 }
-
 if(e.longe){
   longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
   show=true;
 }
-
 optionsRow.style.display=show?"block":"none";
 
 if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
@@ -401,7 +429,6 @@ if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
 }
 
 panel.classList.add("active");
-
 }
 
 closePanel.onclick=()=>panel.classList.remove("active");
