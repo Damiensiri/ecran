@@ -143,6 +143,11 @@ color:#2ecc71;
 font-weight:600;
 }
 
+.reservedText{
+color:#e74c3c;
+font-weight:600;
+}
+
 .cancel{
 font-size:12px;
 background:#c0392b;
@@ -372,8 +377,6 @@ if(next>close)break;
 
 let time=current.toTimeString().slice(0,5);
 
-/* PATCH ADMIN CRENEAUX PASSES */
-
 if(!admin && selectedDate===now.toISOString().slice(0,10) && current<now){
 current=next;
 continue;
@@ -403,7 +406,20 @@ row.classList.add("selected");
 }else{
 
 row.className="row booked";
-row.innerHTML=`<div>${time}</div><div>${r.name}</div>`;
+
+let label="";
+
+if(admin){
+label=r.name;
+}
+else if(myReservations.includes(r.id)){
+label=r.name;
+}
+else{
+label='<span class="reservedText">réservé</span>';
+}
+
+row.innerHTML=`<div>${time}</div><div>${label}</div>`;
 
 if(myReservations.includes(r.id) || admin){
 
