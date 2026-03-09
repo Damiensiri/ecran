@@ -3,83 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Planning Paddocks</title>
+<title>Paddocks</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
+/* ================= BASE ================= */
+
 body{
 margin:0;
-font-family:'Montserrat',sans-serif;
 background:#f4f4f4;
+font-family:'Montserrat',sans-serif;
+color:#000;
+transition:background .3s ease,color .3s ease;
 }
 
-/* HEADER */
+/* ================= PAGE ANIM ================= */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
+
+/* ================= HEADER ================= */
 
 header{
+position:relative;
 height:70px;
+}
+
+#backBtn{
+position:absolute;
+left:15px;
+top:50%;
+transform:translateY(-50%);
+width:42px;
+height:42px;
+border-radius:50%;
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
-font-weight:700;
-font-size:20px;
-background:#fff;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+cursor:pointer;
 }
 
-/* SELECTORS */
+#backBtn img{
+width:22px;
+height:22px;
+}
+
+header h1{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+margin:0;
+font-size:18px;
+font-weight:700;
+}
+
+/* ================= CARD ================= */
+
+.card{
+background:white;
+margin:20px;
+padding:22px;
+border-radius:22px;
+box-shadow:0 5px 12px rgba(0,0,0,0.12);
+transition:background .3s ease, box-shadow .3s ease;
+}
+
+/* ================= SELECT ================= */
 
 .selectors{
-display:flex;
-gap:10px;
-padding:15px;
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+margin-bottom:20px;
 }
 
 select{
-flex:1;
-padding:10px;
-border-radius:8px;
+padding:12px;
+border-radius:10px;
 border:1px solid #ccc;
 font-size:14px;
+font-family:'Montserrat';
 }
 
-/* SLOTS */
-
-.slots{
-padding:15px;
-}
+/* ================= SLOT ================= */
 
 .slot{
-background:white;
-padding:14px;
-border-radius:12px;
-margin-bottom:10px;
+background:#f4f4f4;
+padding:12px;
+border-radius:10px;
+margin-bottom:8px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
 }
 
 .time{
 font-weight:700;
 }
 
-.free{
-color:#4caf50;
-}
-
-.booked{
-color:#f44336;
-}
+.free{ color:#4caf50; }
+.booked{ color:#f44336; }
 
 button{
 border:none;
-padding:8px 12px;
+padding:6px 10px;
 border-radius:8px;
 font-weight:600;
 cursor:pointer;
+font-family:'Montserrat';
 }
 
 .reserve{
@@ -92,12 +134,54 @@ background:#f44336;
 color:white;
 }
 
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+body{
+background:#0f1115;
+color:#ffffff;
+}
+
+header h1{
+color:#ffffff;
+}
+
+#backBtn{
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
+#backBtn img{
+filter:brightness(0) invert(1);
+}
+
+.card{
+background:#1c1f26;
+box-shadow:0 25px 60px rgba(0,0,0,0.75);
+}
+
+.slot{
+background:#252a33;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
-<header>PLANNING PADDOCKS</header>
+<div class="page" id="page">
+
+<header>
+<div id="backBtn" onclick="goBack()">
+<img src="image/back.svg">
+</div>
+<h1>PADDOCKS</h1>
+</header>
+
+<div class="card">
 
 <div class="selectors">
 
@@ -109,11 +193,30 @@ color:white;
 
 <select id="day"></select>
 
+<select id="duration">
+<option value="1h">1h</option>
+<option value="1h30">1h30</option>
+</select>
+
 </div>
 
-<div class="slots" id="slots"></div>
+<div id="slots"></div>
+
+</div>
+
+</div>
 
 <script>
+
+/* ===== PAGE ANIMATION ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== VARIABLES ===== */
 
 const slotsContainer=document.getElementById("slots");
 
@@ -125,7 +228,7 @@ const times=[
 
 let reservations=[];
 
-/* DAYS */
+/* ===== DAYS ===== */
 
 const daySelect=document.getElementById("day");
 
@@ -135,7 +238,6 @@ const d=new Date();
 d.setDate(d.getDate()+i);
 
 const label=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"short"});
-
 const value=d.toISOString().slice(0,10);
 
 const opt=document.createElement("option");
@@ -146,14 +248,45 @@ daySelect.appendChild(opt);
 
 }
 
-/* RENDER */
+/* ===== DURATION FILTER ===== */
+
+const paddockSelect=document.getElementById("paddock");
+const durationSelect=document.getElementById("duration");
+
+function updateDurations(){
+
+const paddock=paddockSelect.value;
+
+durationSelect.innerHTML="";
+
+if(paddock==="maison"){
+
+const opt=document.createElement("option");
+opt.value="1h";
+opt.textContent="1h";
+durationSelect.appendChild(opt);
+
+}else{
+
+["1h","1h30"].forEach(d=>{
+const opt=document.createElement("option");
+opt.value=d;
+opt.textContent=d;
+durationSelect.appendChild(opt);
+});
+
+}
+
+}
+
+/* ===== RENDER ===== */
 
 function render(){
 
 slotsContainer.innerHTML="";
 
-const paddock=document.getElementById("paddock").value;
-const day=document.getElementById("day").value;
+const paddock=paddockSelect.value;
+const day=daySelect.value;
 
 times.forEach(t=>{
 
@@ -178,7 +311,7 @@ const myId=localStorage.getItem("reservation_id");
 
 slot.innerHTML=`
 <div class="time">${t}</div>
-<div class="booked">${r.name}</div>
+<div class="booked">${r.name} (${r.duration})</div>
 `;
 
 if(myId===r.id){
@@ -199,13 +332,14 @@ slotsContainer.appendChild(slot);
 
 }
 
-/* RESERVE */
+/* ===== RESERVE ===== */
 
 function reserve(paddock,day,time){
 
 const name=prompt("Votre prénom");
-
 if(!name)return;
+
+const duration=durationSelect.value;
 
 const id=Math.random().toString(36).substring(2,8);
 
@@ -216,29 +350,43 @@ id,
 name,
 paddock,
 day,
-time
+time,
+duration
 });
 
 render();
 
 }
 
-/* CANCEL */
+/* ===== CANCEL ===== */
 
 function cancel(id){
 
 reservations=reservations.filter(r=>r.id!==id);
-
 render();
 
 }
 
-/* EVENTS */
+/* ===== EVENTS ===== */
 
-document.getElementById("paddock").onchange=render;
-document.getElementById("day").onchange=render;
-
+paddockSelect.onchange=()=>{
+updateDurations();
 render();
+};
+
+daySelect.onchange=render;
+
+updateDurations();
+render();
+
+/* ===== BACK ===== */
+
+function goBack(){
+const p=document.getElementById("page");
+p.classList.remove("active");
+p.classList.add("exit");
+setTimeout(()=>{ location.href="index.html"; },300);
+}
 
 </script>
 
