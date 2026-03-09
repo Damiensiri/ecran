@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Réservation paddock</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -386,7 +385,13 @@ container.appendChild(msg);
 
 function book(){
 
-const name=document.getElementById("name").value.trim();
+let name=document.getElementById("name").value.trim();
+let admin=false;
+
+if(name==="0359140"){
+name="Damien";
+admin=true;
+}
 
 if(!name){
 alert("Prénom obligatoire");
@@ -396,6 +401,15 @@ return;
 if(!selected){
 alert("Choisissez un créneau");
 return;
+}
+
+if(!admin){
+
+if(reservations.find(r=>r.date===selected.date && r.name===name)){
+alert("Vous avez déjà une réservation ce jour");
+return;
+}
+
 }
 
 if(reservations.find(r=>r.date===selected.date && r.time===selected.time && r.paddock===selected.paddock)){
