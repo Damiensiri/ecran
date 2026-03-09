@@ -1,379 +1,89 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+const API="https://script.google.com/macros/s/AKfycbwudqNrwrDPIz2OWGg1h3OjCxl95V_5oiz4lPGLm-nDMepv9MBF9K_zWwqnqA9CufND/exec";
 
-<title>Réservation paddock</title>
+let reservations=[];
+let horaires={};
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+let myReservations=JSON.parse(localStorage.getItem("my_reservations")||"[]");
 
-<style>
+async function loadData(){
 
-body{
-margin:0;
-background:#f4f4f4;
-font-family:'Montserrat',sans-serif;
-transition:.3s;
-}
+const r=await fetch(API+"?sheet=reservations");
+reservations=await r.json();
 
-.page{
-min-height:100vh;
-transform:translateX(100%);
-transition:.35s;
-}
+const h=await fetch(API+"?sheet=horaires");
+const horairesSheet=await h.json();
 
-.page.active{transform:translateX(0);}
-.page.exit{transform:translateX(100%);}
+horaires={};
 
-header{
-position:relative;
-height:70px;
-}
+horairesSheet.forEach(row=>{
 
-#backBtn{
-position:absolute;
-left:15px;
-top:50%;
-transform:translateY(-50%);
-width:42px;
-height:42px;
-border-radius:50%;
-background:white;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 3px 8px rgba(0,0,0,0.15);
-cursor:pointer;
-}
+const p=row.paddock;
 
-#backBtn img{width:22px}
+if(!horaires[p]) horaires[p]={};
 
-header h1{
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-margin:0;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
-display:flex;
-gap:8px;
-align-items:center;
-}
-
-#adminIcon{
-display:none;
-font-size:18px;
-}
-
-.card{
-background:white;
-margin:20px;
-padding:22px;
-border-radius:22px;
-box-shadow:0 5px 12px rgba(0,0,0,0.12);
-}
-
-label{
-font-weight:600;
-font-size:14px;
-}
-
-select,input{
-width:100%;
-padding:12px;
-margin-top:6px;
-margin-bottom:16px;
-border-radius:10px;
-border:none;
-background:#f4f4f4;
-}
-
-button{
-width:100%;
-padding:14px;
-border-radius:12px;
-border:none;
-background:#181E3B;
-color:white;
-font-weight:700;
-cursor:pointer;
-margin-top:20px;
-}
-
-.dayBtn{
-padding:10px;
-margin-bottom:8px;
-border-radius:10px;
-background:#f4f4f4;
-text-align:center;
-cursor:pointer;
-font-weight:600;
-}
-
-.dayBtn.active{
-background:#181E3B;
-color:white;
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-padding:10px;
-border-bottom:1px solid #eee;
-}
-
-.row.free{cursor:pointer}
-
-.row.free:hover{
-background:#f0f0f0;
-}
-
-.row.booked{color:#777}
-
-.row.selected{
-background:#c9d7ff;
-border-left:4px solid #181E3B;
-}
-
-.freeText{
-color:#2ecc71;
-font-weight:600;
-}
-
-.reservedText{
-color:#e74c3c;
-font-weight:600;
-}
-
-.cancel{
-font-size:12px;
-background:#c0392b;
-padding:4px 6px;
-border-radius:6px;
-color:white;
-cursor:pointer;
-}
-
-.fullMessage{
-text-align:center;
-padding:15px;
-font-weight:600;
-color:#999;
-}
-
-@media(prefers-color-scheme:dark){
-
-body{background:#0f1115;color:white}
-
-.card{background:#1c1f26}
-
-select,input{background:#252a33;color:white}
-
-.row.free:hover{background:#252a33}
-
-.dayBtn{background:#252a33}
-
-.row.selected{
-background:#2b3560;
-border-left:4px solid #5f7cff;
-}
-
-.row.selected .freeText{
-color:#00ff88;
-}
-
-.fullMessage{
-color:#aaa;
-}
-
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="page" id="page">
-
-<header>
-
-<div id="backBtn" onclick="goBack()">
-<img src="image/back.svg">
-</div>
-
-<h1 id="title">
-PADDOCK
-<span id="adminIcon">🔧</span>
-</h1>
-
-</header>
-
-<div class="card">
-
-<label>Durée</label>
-<select id="duration">
-<option value="60">1h</option>
-<option value="90">1h30</option>
-</select>
-
-<label>Paddock</label>
-<select id="paddock">
-<option value="maison">Maison</option>
-<option value="grande">Grande voie</option>
-<option value="beudot">Beudot</option>
-</select>
-
-<label>Jour</label>
-<div id="days"></div>
-
-<label>Prénom</label>
-<input id="name">
-
-<label>Email (optionnel)</label>
-<input id="email">
-
-<div id="planning"></div>
-
-<button onclick="book()">Réserver</button>
-
-</div>
-
-</div>
-
-<script>
-
-let admin=false;
-let tapCount=0;
-
-const ADMIN_CODE="0359140";
-
-const title=document.getElementById("title");
-const adminIcon=document.getElementById("adminIcon");
-
-title.addEventListener("click",()=>{
-
-tapCount++;
-
-if(tapCount===5){
-
-if(!admin){
-
-const code=prompt("Code admin");
-
-if(code===ADMIN_CODE){
-
-admin=true;
-adminIcon.style.display="inline";
-generate();
-
-}
-
-}else{
-
-admin=false;
-adminIcon.style.display="none";
-generate();
-
-}
-
-tapCount=0;
-
-}
-
-setTimeout(()=>{tapCount=0},1500);
+horaires[p][row.jour]={
+open:row.open,
+close:row.close,
+durations:row.durations.split(",").map(Number)
+};
 
 });
+
+generate();
+
+}
 
 window.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("page").classList.add("active");
 buildDays();
+loadData();
 });
-
-let reservations=JSON.parse(localStorage.getItem("paddock_reservations")||"[]");
-let myReservations=JSON.parse(localStorage.getItem("my_reservations")||"[]");
-
-let selectedDate=null;
-let selected=null;
-
-const horaires={
-maison:{open:"08:30",close:"19:00"},
-grande:{open:"08:30",close:"19:00"},
-beudot:{open:"08:30",close:"19:00"}
-};
-
-function buildDays(){
-
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
-
-const container=document.getElementById("days");
-container.innerHTML="";
-
-for(let i=0;i<3;i++){
-
-let d=new Date();
-d.setDate(d.getDate()+i);
-
-let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain";
-
-let btn=document.createElement("div");
-btn.className="dayBtn";
-
-btn.innerText=
-label+" - "+
-names[d.getDay()].charAt(0).toUpperCase()+
-names[d.getDay()].slice(1)+" "+
-d.getDate();
-
-btn.onclick=()=>{
-
-selectedDate=d.toISOString().slice(0,10);
-
-document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"));
-
-btn.classList.add("active");
-
-generate();
-
-};
-
-container.appendChild(btn);
-
-if(i===0){
-btn.classList.add("active");
-selectedDate=d.toISOString().slice(0,10);
-}
-
-}
-
-generate();
-
-}
 
 function generate(){
 
-const duration=parseInt(document.getElementById("duration").value);
 const paddock=document.getElementById("paddock").value;
+const duration=parseInt(document.getElementById("duration").value);
 
 const now=new Date();
+const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+
+const dayName=todayName[new Date(selectedDate).getDay()];
+
+if(!horaires[paddock] || !horaires[paddock][dayName]){
+
+document.getElementById("planning").innerHTML=
+'<div class="fullMessage">Paddock fermé</div>';
+
+return;
+
+}
+
+const config=horaires[paddock][dayName];
+
+if(!config.durations.includes(duration)){
+
+document.getElementById("planning").innerHTML=
+'<div class="fullMessage">Durée non disponible</div>';
+
+return;
+
+}
+
+let start=config.open.split(":");
+let end=config.close.split(":");
+
+let current=new Date(selectedDate+"T"+start[0]+":"+start[1]);
+let close=new Date(selectedDate+"T"+end[0]+":"+end[1]);
 
 const container=document.getElementById("planning");
 container.innerHTML="";
 
 let freeFound=false;
 
-let start=horaires[paddock].open.split(":");
-let end=horaires[paddock].close.split(":");
-
-let current=new Date(selectedDate+"T"+start[0]+":"+start[1]);
-let close=new Date(selectedDate+"T"+end[0]+":"+end[1]);
-
 while(true){
 
 let next=new Date(current.getTime()+duration*60000);
-if(next>close)break;
+if(next>close) break;
 
 let time=current.toTimeString().slice(0,5);
 
@@ -382,7 +92,11 @@ current=next;
 continue;
 }
 
-let r=reservations.find(r=>r.date===selectedDate && r.time===time && r.paddock===paddock);
+let r=reservations.find(r=>
+r.date===selectedDate &&
+r.time===time &&
+r.paddock===paddock
+);
 
 let row=document.createElement("div");
 
@@ -446,17 +160,13 @@ current=next;
 
 if(!freeFound){
 
-const msg=document.createElement("div");
-msg.className="fullMessage";
-msg.innerText="Complet aujourd’hui";
-
-container.appendChild(msg);
+container.innerHTML='<div class="fullMessage">Complet aujourd’hui</div>';
 
 }
 
 }
 
-function book(){
+async function book(){
 
 let name=document.getElementById("name").value.trim();
 
@@ -479,14 +189,20 @@ return;
 
 }
 
-if(reservations.find(r=>r.date===selected.date && r.time===selected.time && r.paddock===selected.paddock)){
+if(reservations.find(r=>
+r.date===selected.date &&
+r.time===selected.time &&
+r.paddock===selected.paddock
+)){
 alert("Créneau déjà réservé");
 return;
 }
 
 const id=Date.now().toString();
 
-reservations.push({
+await fetch(API,{
+method:"POST",
+body:JSON.stringify({
 id,
 name,
 email:document.getElementById("email").value,
@@ -494,52 +210,33 @@ paddock:selected.paddock,
 date:selected.date,
 time:selected.time,
 duration:selected.duration
+})
 });
 
 myReservations.push(id);
 
 localStorage.setItem("my_reservations",JSON.stringify(myReservations));
-localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
-generate();
+loadData();
 
 }
 
-function cancelReservation(id){
+async function cancelReservation(id){
 
-if(!confirm("Annuler cette réservation ?"))return;
+if(!confirm("Annuler cette réservation ?")) return;
 
-reservations=reservations.filter(r=>r.id!==id);
+await fetch(API+"?id="+id,{
+method:"DELETE"
+});
+
 myReservations=myReservations.filter(r=>r!==id);
 
 localStorage.setItem("my_reservations",JSON.stringify(myReservations));
-localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
-generate();
+loadData();
 
 }
 
 setInterval(()=>{
-generate();
+loadData();
 },10000);
-
-document.getElementById("duration").onchange=generate;
-document.getElementById("paddock").onchange=generate;
-
-function goBack(){
-
-const p=document.getElementById("page");
-
-p.classList.remove("active");
-p.classList.add("exit");
-
-setTimeout(()=>{
-location.href="index.html";
-},300);
-
-}
-
-</script>
-
-</body>
-</html>
