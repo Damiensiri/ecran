@@ -58,14 +58,14 @@ margin:0;
 font-size:18px;
 font-weight:700;
 cursor:pointer;
+display:flex;
+gap:8px;
+align-items:center;
 }
 
-.adminBadge{
-text-align:center;
-font-size:12px;
-color:#c0392b;
-margin-bottom:10px;
-font-weight:600;
+#adminIcon{
+display:none;
+font-size:18px;
 }
 
 .card{
@@ -196,17 +196,19 @@ color:#aaa;
 <div class="page" id="page">
 
 <header>
+
 <div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
-<h1 id="title">PADDOCK</h1>
+
+<h1 id="title">
+PADDOCK
+<span id="adminIcon">🔧</span>
+</h1>
+
 </header>
 
 <div class="card">
-
-<div id="adminBadge" class="adminBadge" style="display:none">
-🔧 MODE ADMIN
-</div>
 
 <label>Durée</label>
 <select id="duration">
@@ -240,20 +242,47 @@ color:#aaa;
 
 <script>
 
-let admin=false;
-let adminAccess=false;
+/* ADMIN */
 
+let admin=false;
 let tapCount=0;
 
-document.getElementById("title").onclick=()=>{
+const ADMIN_CODE="0359140";
+
+const title=document.getElementById("title");
+const adminIcon=document.getElementById("adminIcon");
+
+title.addEventListener("click",()=>{
 
 tapCount++;
 
-if(tapCount>=5){
+if(tapCount===5){
 
-adminAccess=true;
+if(!admin){
 
-alert("Mode admin disponible");
+const code=prompt("Code admin");
+
+if(code===ADMIN_CODE){
+
+admin=true;
+adminIcon.style.display="inline";
+
+alert("Mode admin activé");
+
+generate();
+
+}
+
+}else{
+
+admin=false;
+adminIcon.style.display="none";
+
+alert("Mode admin désactivé");
+
+generate();
+
+}
 
 tapCount=0;
 
@@ -261,7 +290,10 @@ tapCount=0;
 
 setTimeout(()=>{tapCount=0},1500);
 
-};
+});
+
+
+/* PAGE */
 
 window.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("page").classList.add("active");
@@ -278,6 +310,9 @@ maison:{open:"08:30",close:"19:00"},
 grande:{open:"08:30",close:"19:00"},
 beudot:{open:"08:30",close:"19:00"}
 };
+
+
+/* JOURS */
 
 function buildDays(){
 
@@ -326,6 +361,9 @@ selectedDate=d.toISOString().slice(0,10);
 generate();
 
 }
+
+
+/* CRENEAUX */
 
 function generate(){
 
@@ -420,19 +458,12 @@ container.appendChild(msg);
 
 }
 
+
+/* RESERVER */
+
 function book(){
 
 let name=document.getElementById("name").value.trim();
-
-if(adminAccess && name==="0359140"){
-
-admin=true;
-
-name="Damien";
-
-document.getElementById("adminBadge").style.display="block";
-
-}
 
 if(!name){
 alert("Prénom obligatoire");
@@ -477,6 +508,9 @@ generate();
 
 }
 
+
+/* ANNULER */
+
 function cancelReservation(id){
 
 if(!confirm("Annuler cette réservation ?"))return;
@@ -489,8 +523,14 @@ generate();
 
 }
 
+
+/* EVENTS */
+
 document.getElementById("duration").onchange=generate;
 document.getElementById("paddock").onchange=generate;
+
+
+/* RETOUR */
 
 function goBack(){
 
