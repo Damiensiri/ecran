@@ -3,34 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Réservation paddock</title>
+<title>Réservation paddocks</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-
-/* ===== BASE ===== */
 
 body{
 margin:0;
 background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 color:#000;
-transition:background .3s ease,color .3s ease;
+transition:.3s;
 }
-
-/* ===== PAGE ANIMATION ===== */
 
 .page{
 min-height:100vh;
 transform:translateX(100%);
-transition:0.35s;
+transition:.35s;
 }
 
-.page.active{ transform:translateX(0); }
-.page.exit{ transform:translateX(100%); }
-
-/* ===== HEADER ===== */
+.page.active{transform:translateX(0);}
+.page.exit{transform:translateX(100%);}
 
 header{
 position:relative;
@@ -53,10 +47,7 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{
-width:22px;
-height:22px;
-}
+#backBtn img{width:22px;}
 
 header h1{
 position:absolute;
@@ -68,18 +59,13 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ===== CARD ===== */
-
 .card{
 background:white;
 margin:20px;
 padding:22px;
 border-radius:22px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
-transition:background .3s ease, box-shadow .3s ease;
 }
-
-/* ===== FORM ===== */
 
 label{
 font-weight:600;
@@ -88,13 +74,12 @@ font-size:14px;
 
 select,input{
 width:100%;
+padding:12px;
 margin-top:6px;
 margin-bottom:16px;
-padding:12px;
 border-radius:10px;
 border:none;
 background:#f4f4f4;
-font-family:inherit;
 }
 
 button{
@@ -108,82 +93,53 @@ font-weight:700;
 cursor:pointer;
 }
 
-/* ===== SLOTS ===== */
-
-.slots{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
-margin-top:20px;
+.paddock{
+margin-top:25px;
 }
 
-.slot{
-background:#f4f4f4;
-padding:12px;
-border-radius:12px;
-text-align:center;
+.paddock-title{
+font-weight:700;
+margin-bottom:8px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+.row.free{
 cursor:pointer;
-font-weight:600;
 }
 
-.slot.booked{
-background:#ddd;
-cursor:default;
+.row.free:hover{
+background:#f0f0f0;
 }
 
-.booked-name{
-font-size:12px;
-margin-top:4px;
+.row.booked{
 color:#777;
 }
 
 .cancel{
-margin-top:6px;
-background:#c0392b;
-padding:6px;
-border-radius:6px;
 font-size:12px;
-}
-
-/* ===== DARK MODE ===== */
-
-@media (prefers-color-scheme: dark){
-
-body{
-background:#0f1115;
-color:#ffffff;
-}
-
-header h1{
-color:#ffffff;
-}
-
-#backBtn{
-background:#1c1f26;
-box-shadow:0 12px 30px rgba(0,0,0,0.6);
-}
-
-#backBtn img{
-filter:brightness(0) invert(1);
-}
-
-.card{
-background:#1c1f26;
-box-shadow:0 25px 60px rgba(0,0,0,0.75);
-}
-
-select,input{
-background:#252a33;
+background:#c0392b;
+padding:4px 8px;
+border-radius:6px;
 color:white;
+cursor:pointer;
 }
 
-.slot{
-background:#252a33;
-}
+@media(prefers-color-scheme:dark){
 
-.slot.booked{
-background:#333;
-}
+body{background:#0f1115;color:white}
+
+.card{background:#1c1f26}
+
+select,input{background:#252a33;color:white}
+
+.row.free:hover{background:#252a33}
 
 }
 
@@ -198,7 +154,7 @@ background:#333;
 <div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
-<h1>PADDOCK</h1>
+<h1>PADDOCKS</h1>
 </header>
 
 <div class="card">
@@ -207,13 +163,6 @@ background:#333;
 <select id="duration">
 <option value="60">1h</option>
 <option value="90">1h30</option>
-</select>
-
-<label>Paddock</label>
-<select id="paddock">
-<option value="maison">Maison</option>
-<option value="grande">Grande voie</option>
-<option value="beudot">Beudot</option>
 </select>
 
 <label>Jour</label>
@@ -227,7 +176,7 @@ background:#333;
 
 <button onclick="book()">Réserver</button>
 
-<div class="slots" id="slots"></div>
+<div id="planning"></div>
 
 </div>
 
@@ -235,17 +184,17 @@ background:#333;
 
 <script>
 
-/* ===== ANIMATION ===== */
-
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
 });
 
-/* ===== DATA ===== */
+let reservations=JSON.parse(localStorage.getItem("paddock_reservations")||"[]");
 
-let reservations = JSON.parse(localStorage.getItem("paddock_reservations") || "[]");
+let selected=null;
+
+const paddocks=["maison","grande","beudot"];
 
 const horaires={
 maison:{open:"08:30",close:"19:00"},
@@ -253,23 +202,27 @@ grande:{open:"08:30",close:"19:00"},
 beudot:{open:"08:30",close:"19:00"}
 };
 
-/* ===== GENERATE SLOTS ===== */
+function generate(){
 
-function generateSlots(){
-
-const paddock=document.getElementById("paddock").value;
-const duration=parseInt(document.getElementById("duration").value);
 const date=document.getElementById("date").value;
-
-const slots=document.getElementById("slots");
-slots.innerHTML="";
+const duration=parseInt(document.getElementById("duration").value);
 
 if(!date)return;
 
-const h=horaires[paddock];
+const now=new Date();
 
-let start=h.open.split(":");
-let end=h.close.split(":");
+const container=document.getElementById("planning");
+container.innerHTML="";
+
+paddocks.forEach(p=>{
+
+const block=document.createElement("div");
+block.className="paddock";
+
+block.innerHTML=`<div class="paddock-title">${p.toUpperCase()}</div>`;
+
+let start=horaires[p].open.split(":");
+let end=horaires[p].close.split(":");
 
 let current=new Date(date+"T"+start[0]+":"+start[1]);
 let close=new Date(date+"T"+end[0]+":"+end[1]);
@@ -281,59 +234,93 @@ if(next>close)break;
 
 let time=current.toTimeString().slice(0,5);
 
-let r=reservations.find(r=>r.date===date && r.time===time && r.paddock===paddock);
+if(date===now.toISOString().slice(0,10) && current<now){
+current=next;
+continue;
+}
 
-const slot=document.createElement("div");
-slot.className="slot";
+let r=reservations.find(r=>r.date===date && r.time===time && r.paddock===p);
+
+let row=document.createElement("div");
 
 if(!r){
 
-slot.innerHTML=time;
+row.className="row free";
+row.innerHTML=`<div>${time}</div><div>libre</div>`;
 
-slot.onclick=()=>{
-document.getElementById("selected").value=time;
+row.onclick=()=>{
+selected={time,paddock:p,date,duration};
+document.querySelectorAll(".row").forEach(r=>r.style.background="");
+row.style.background="#dfe6ff";
 };
 
 }else{
 
-slot.classList.add("booked");
+row.className="row booked";
+
+row.innerHTML=`<div>${time}</div><div>${r.name}</div>`;
 
 const myId=localStorage.getItem("reservation_id");
 
-slot.innerHTML=`${time}<div class="booked-name">${r.name}</div>`;
-
 if(myId===r.id){
 
-const btn=document.createElement("button");
+const btn=document.createElement("div");
 btn.className="cancel";
-btn.textContent="Annuler";
+btn.innerText="Annuler";
 
-btn.onclick=()=>cancelReservation(r.id);
+btn.onclick=(e)=>{
+e.stopPropagation();
+cancelReservation(r.id);
+};
 
-slot.appendChild(btn);
+row.appendChild(btn);
 
 }
 
 }
 
-slots.appendChild(slot);
+block.appendChild(row);
 
 current=next;
 
 }
 
-}
+container.appendChild(block);
 
-/* ===== BOOK ===== */
+});
+
+}
 
 function book(){
 
 const name=document.getElementById("name").value.trim();
 if(!name){alert("Prénom obligatoire");return;}
 
+if(!selected){alert("Choisissez un créneau");return;}
+
+if(reservations.find(r=>r.date===selected.date && r.time===selected.time && r.paddock===selected.paddock)){
+alert("Créneau déjà réservé");
+return;
 }
 
-/* ===== CANCEL ===== */
+const id=Date.now().toString();
+
+reservations.push({
+id,
+name,
+email:document.getElementById("email").value,
+paddock:selected.paddock,
+date:selected.date,
+time:selected.time,
+duration:selected.duration
+});
+
+localStorage.setItem("reservation_id",id);
+localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
+
+generate();
+
+}
 
 function cancelReservation(id){
 
@@ -342,20 +329,14 @@ if(!confirm("Annuler votre réservation ?"))return;
 reservations=reservations.filter(r=>r.id!==id);
 
 localStorage.removeItem("reservation_id");
-
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
-generateSlots();
+generate();
 
 }
 
-/* ===== EVENTS ===== */
-
-document.getElementById("paddock").onchange=generateSlots;
-document.getElementById("duration").onchange=generateSlots;
-document.getElementById("date").onchange=generateSlots;
-
-/* ===== BACK ===== */
+document.getElementById("date").onchange=generate;
+document.getElementById("duration").onchange=generate;
 
 function goBack(){
 const p=document.getElementById("page");
