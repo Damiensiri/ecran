@@ -57,15 +57,6 @@ transform:translate(-50%,-50%);
 margin:0;
 font-size:18px;
 font-weight:700;
-cursor:pointer;
-display:flex;
-gap:8px;
-align-items:center;
-}
-
-#adminIcon{
-display:none;
-font-size:18px;
 }
 
 .card{
@@ -149,27 +140,6 @@ font-weight:600;
 color:#999;
 }
 
-@media(prefers-color-scheme:dark){
-
-body{background:#0f1115;color:white}
-
-.card{background:#1c1f26}
-
-select,input{background:#252a33;color:white}
-
-.dayBtn{background:#252a33}
-
-.row.selected{
-background:#2b3560;
-border-left:4px solid #5f7cff;
-}
-
-.fullMessage{
-color:#aaa;
-}
-
-}
-
 </style>
 </head>
 
@@ -183,10 +153,7 @@ color:#aaa;
 <img src="image/back.svg">
 </div>
 
-<h1 id="title">
-PADDOCK
-<span id="adminIcon">🔧</span>
-</h1>
+<h1>PADDOCK</h1>
 
 </header>
 
@@ -228,25 +195,13 @@ const API="https://script.google.com/macros/s/AKfycbwudqNrwrDPIz2OWGg1h3OjCxl95V
 
 let reservations=[];
 let horaires={};
+
 let selectedDate=null;
 let selected=null;
 
 let myReservations=JSON.parse(localStorage.getItem("my_reservations")||"[]");
 
-/* CONVERSION HEURE GOOGLE SHEETS */
-
-function formatTime(val){
-
-if(!val) return "";
-
-const d=new Date(val);
-
-return String(d.getHours()).padStart(2,"0")+":"+
-String(d.getMinutes()).padStart(2,"0");
-
-}
-
-/* CHARGEMENT DONNÉES */
+let bookingLock=false;
 
 async function loadData(){
 
@@ -266,8 +221,8 @@ const jour=row.jour.trim().toLowerCase();
 if(!horaires[paddock]) horaires[paddock]={};
 
 horaires[paddock][jour]={
-open:formatTime(row.open),
-close:formatTime(row.close),
+open:row.open,
+close:row.close,
 durations:String(row.durations).split(",").map(Number)
 };
 
@@ -276,8 +231,6 @@ durations:String(row.durations).split(",").map(Number)
 generate();
 
 }
-
-/* CONSTRUCTION JOURS */
 
 function buildDays(){
 
@@ -329,7 +282,17 @@ String(d.getDate()).padStart(2,"0");
 
 }
 
-/* GENERATE CRENEAUX */
+function overlap(start,duration,res){
+
+const s1=start;
+const e1=start+duration;
+
+const s2=res.timeMinutes;
+const e2=s2+res.duration;
+
+return !(e1<=s2 || s1>=e2);
+
+}
 
 function generate(){
 
@@ -347,43 +310,50 @@ const container=document.getElementById("planning");
 container.innerHTML="";
 
 if(!horaires[paddock] || !horaires[paddock][jour]){
-
 container.innerHTML='<div class="fullMessage">Paddock fermé</div>';
 return;
-
 }
 
 const config=horaires[paddock][jour];
 
 if(!config.durations.includes(duration)){
-
 container.innerHTML='<div class="fullMessage">Durée non disponible</div>';
 return;
-
 }
 
 let start=config.open.split(":");
 let end=config.close.split(":");
 
-let current=new Date(selectedDate+"T"+start[0]+":"+start[1]);
-let close=new Date(selectedDate+"T"+end[0]+":"+end[1]);
+let startMinutes=parseInt(start[0])*60+parseInt(start[1]);
+let endMinutes=parseInt(end[0])*60+parseInt(end[1]);
 
-while(true){
+let step=30;
 
-let next=new Date(current.getTime()+duration*60000);
+for(let m=startMinutes; m<=endMinutes-duration; m+=step){
 
-if(next>close) break;
+let time=
+String(Math.floor(m/60)).padStart(2,"0")+":"+
+String(m%60).padStart(2,"0");
 
-let time=current.toTimeString().slice(0,5);
+let conflict=false;
 
-let r=reservations.find(r=>r.date===selectedDate && r.time===time && r.paddock===paddock);
+reservations.forEach(r=>{
+
+if(r.date===selectedDate && r.paddock===paddock){
+
+r.timeMinutes=parseInt(r.time.split(":")[0])*60+parseInt(r.time.split(":")[1]);
+
+if(overlap(m,duration,r)) conflict=true;
+
+}
+
+});
 
 let row=document.createElement("div");
 
-if(!r){
+if(!conflict){
 
 row.className="row free";
-
 row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`;
 
 row.onclick=()=>{
@@ -398,29 +368,32 @@ row.classList.add("selected");
 
 }else{
 
-let label=myReservations.includes(r.id)?r.name:'<span class="reservedText">réservé</span>';
-
-row.innerHTML=`<div>${time}</div><div>${label}</div>`;
+row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`;
 
 }
 
 container.appendChild(row);
 
-current=next;
-
 }
 
 }
-
-/* BOOK */
 
 async function book(){
+
+if(bookingLock) return;
 
 let name=document.getElementById("name").value.trim();
 
 if(!name){alert("Prénom obligatoire");return;}
 
 if(!selected){alert("Choisissez un créneau");return;}
+
+if(reservations.find(r=>r.date===selected.date && r.name===name)){
+alert("Vous avez déjà une réservation ce jour");
+return;
+}
+
+bookingLock=true;
 
 const id=Date.now().toString();
 
@@ -441,11 +414,11 @@ myReservations.push(id);
 
 localStorage.setItem("my_reservations",JSON.stringify(myReservations));
 
+bookingLock=false;
+
 loadData();
 
 }
-
-/* INIT */
 
 window.addEventListener("DOMContentLoaded",()=>{
 
