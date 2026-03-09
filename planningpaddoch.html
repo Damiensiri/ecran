@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Réservation paddocks</title>
+<title>Réservation paddock</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -91,15 +91,7 @@ background:#181E3B;
 color:white;
 font-weight:700;
 cursor:pointer;
-}
-
-.paddock{
-margin-top:25px;
-}
-
-.paddock-title{
-font-weight:700;
-margin-bottom:8px;
+margin-top:20px;
 }
 
 .row{
@@ -154,7 +146,7 @@ select,input{background:#252a33;color:white}
 <div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
-<h1>PADDOCKS</h1>
+<h1>PADDOCK</h1>
 </header>
 
 <div class="card">
@@ -163,6 +155,13 @@ select,input{background:#252a33;color:white}
 <select id="duration">
 <option value="60">1h</option>
 <option value="90">1h30</option>
+</select>
+
+<label>Paddock</label>
+<select id="paddock">
+<option value="maison">Maison</option>
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
 </select>
 
 <label>Jour</label>
@@ -174,9 +173,9 @@ select,input{background:#252a33;color:white}
 <label>Email (optionnel)</label>
 <input id="email">
 
-<button onclick="book()">Réserver</button>
-
 <div id="planning"></div>
+
+<button onclick="book()">Réserver</button>
 
 </div>
 
@@ -185,16 +184,20 @@ select,input{background:#252a33;color:white}
 <script>
 
 window.addEventListener("DOMContentLoaded",()=>{
-requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
-});
+
+/* jour = aujourd'hui */
+
+const today=new Date().toISOString().slice(0,10);
+document.getElementById("date").value=today;
+
+generate();
+
 });
 
 let reservations=JSON.parse(localStorage.getItem("paddock_reservations")||"[]");
 
 let selected=null;
-
-const paddocks=["maison","grande","beudot"];
 
 const horaires={
 maison:{open:"08:30",close:"19:00"},
@@ -206,6 +209,7 @@ function generate(){
 
 const date=document.getElementById("date").value;
 const duration=parseInt(document.getElementById("duration").value);
+const paddock=document.getElementById("paddock").value;
 
 if(!date)return;
 
@@ -214,15 +218,8 @@ const now=new Date();
 const container=document.getElementById("planning");
 container.innerHTML="";
 
-paddocks.forEach(p=>{
-
-const block=document.createElement("div");
-block.className="paddock";
-
-block.innerHTML=`<div class="paddock-title">${p.toUpperCase()}</div>`;
-
-let start=horaires[p].open.split(":");
-let end=horaires[p].close.split(":");
+let start=horaires[paddock].open.split(":");
+let end=horaires[paddock].close.split(":");
 
 let current=new Date(date+"T"+start[0]+":"+start[1]);
 let close=new Date(date+"T"+end[0]+":"+end[1]);
@@ -239,7 +236,7 @@ current=next;
 continue;
 }
 
-let r=reservations.find(r=>r.date===date && r.time===time && r.paddock===p);
+let r=reservations.find(r=>r.date===date && r.time===time && r.paddock===paddock);
 
 let row=document.createElement("div");
 
@@ -249,7 +246,7 @@ row.className="row free";
 row.innerHTML=`<div>${time}</div><div>libre</div>`;
 
 row.onclick=()=>{
-selected={time,paddock:p,date,duration};
+selected={time,paddock,date,duration};
 document.querySelectorAll(".row").forEach(r=>r.style.background="");
 row.style.background="#dfe6ff";
 };
@@ -257,7 +254,6 @@ row.style.background="#dfe6ff";
 }else{
 
 row.className="row booked";
-
 row.innerHTML=`<div>${time}</div><div>${r.name}</div>`;
 
 const myId=localStorage.getItem("reservation_id");
@@ -279,15 +275,11 @@ row.appendChild(btn);
 
 }
 
-block.appendChild(row);
+container.appendChild(row);
 
 current=next;
 
 }
-
-container.appendChild(block);
-
-});
 
 }
 
@@ -337,6 +329,7 @@ generate();
 
 document.getElementById("date").onchange=generate;
 document.getElementById("duration").onchange=generate;
+document.getElementById("paddock").onchange=generate;
 
 function goBack(){
 const p=document.getElementById("page");
