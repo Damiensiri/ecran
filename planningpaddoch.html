@@ -91,6 +91,7 @@ background:#181E3B;
 color:white;
 font-weight:700;
 cursor:pointer;
+margin-top:20px;
 }
 
 .dayBtn{
@@ -115,13 +116,26 @@ padding:10px;
 border-bottom:1px solid #eee;
 }
 
-.row.free{cursor:pointer}
+.row.free{
+cursor:pointer;
+}
 
 .row.free:hover{
 background:#f0f0f0;
 }
 
-.row.booked{color:#777}
+.row.booked{
+color:#777;
+}
+
+.row.selected{
+background:#dfe6ff;
+}
+
+.freeText{
+color:#2ecc71;
+font-weight:600;
+}
 
 .cancel{
 font-size:12px;
@@ -253,12 +267,13 @@ container.appendChild(btn);
 if(i===0){
 
 btn.classList.add("active");
-
 selectedDate=d.toISOString().slice(0,10);
 
 }
 
 }
+
+generate();
 
 }
 
@@ -270,7 +285,6 @@ const paddock=document.getElementById("paddock").value;
 const now=new Date();
 
 const container=document.getElementById("planning");
-
 container.innerHTML="";
 
 let start=horaires[paddock].open.split(":");
@@ -288,10 +302,8 @@ if(next>close)break;
 let time=current.toTimeString().slice(0,5);
 
 if(selectedDate===now.toISOString().slice(0,10) && current<now){
-
 current=next;
 continue;
-
 }
 
 let r=reservations.find(r=>r.date===selectedDate && r.time===time && r.paddock===paddock);
@@ -302,15 +314,15 @@ if(!r){
 
 row.className="row free";
 
-row.innerHTML=`<div>${time}</div><div>libre</div>`;
+row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`;
 
 row.onclick=()=>{
 
 selected={time,paddock,date:selectedDate,duration};
 
-document.querySelectorAll(".row").forEach(r=>r.style.background="");
+document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"));
 
-row.style.background="#dfe6ff";
+row.classList.add("selected");
 
 };
 
@@ -327,15 +339,11 @@ if(myId===r.id){
 const btn=document.createElement("div");
 
 btn.className="cancel";
-
 btn.innerText="Annuler";
 
 btn.onclick=(e)=>{
-
 e.stopPropagation();
-
 cancelReservation(r.id);
-
 };
 
 row.appendChild(btn);
@@ -357,51 +365,33 @@ function book(){
 const name=document.getElementById("name").value.trim();
 
 if(!name){
-
 alert("Prénom obligatoire");
-
 return;
-
 }
 
 if(!selected){
-
 alert("Choisissez un créneau");
-
 return;
-
 }
 
 if(reservations.find(r=>r.date===selected.date && r.time===selected.time && r.paddock===selected.paddock)){
-
 alert("Créneau déjà réservé");
-
 return;
-
 }
 
 const id=Date.now().toString();
 
 reservations.push({
-
 id,
-
 name,
-
 email:document.getElementById("email").value,
-
 paddock:selected.paddock,
-
 date:selected.date,
-
 time:selected.time,
-
 duration:selected.duration
-
 });
 
 localStorage.setItem("reservation_id",id);
-
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
 generate();
@@ -423,7 +413,6 @@ generate();
 }
 
 document.getElementById("duration").onchange=generate;
-
 document.getElementById("paddock").onchange=generate;
 
 function goBack(){
@@ -431,13 +420,10 @@ function goBack(){
 const p=document.getElementById("page");
 
 p.classList.remove("active");
-
 p.classList.add("exit");
 
 setTimeout(()=>{
-
 location.href="index.html";
-
 },300);
 
 }
