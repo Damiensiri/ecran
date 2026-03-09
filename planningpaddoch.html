@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Réservation paddock</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -226,6 +227,8 @@ color:#aaa;
 
 <script>
 
+let admin=false;
+
 window.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("page").classList.add("active");
 buildDays();
@@ -348,7 +351,7 @@ row.innerHTML=`<div>${time}</div><div>${r.name}</div>`;
 
 const myId=localStorage.getItem("reservation_id");
 
-if(myId===r.id){
+if(myId===r.id || admin){
 
 const btn=document.createElement("div");
 btn.className="cancel";
@@ -386,11 +389,10 @@ container.appendChild(msg);
 function book(){
 
 let name=document.getElementById("name").value.trim();
-let admin=false;
 
 if(name==="0359140"){
-name="Damien";
 admin=true;
+name="Damien";
 }
 
 if(!name){
@@ -438,11 +440,10 @@ generate();
 
 function cancelReservation(id){
 
-if(!confirm("Annuler votre réservation ?"))return;
+if(!confirm("Annuler cette réservation ?"))return;
 
 reservations=reservations.filter(r=>r.id!==id);
 
-localStorage.removeItem("reservation_id");
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
 generate();
