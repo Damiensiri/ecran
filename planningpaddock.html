@@ -394,7 +394,9 @@ const paddock=document.getElementById("paddock").value;
 const now=new Date();
 
 const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
-const dayName=todayName[new Date(selectedDate).getDay()];
+
+const d=new Date(selectedDate+"T12:00:00");
+const dayName=todayName[d.getDay()];
 
 const container=document.getElementById("planning");
 container.innerHTML="";
