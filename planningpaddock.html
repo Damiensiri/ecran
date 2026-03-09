@@ -297,12 +297,22 @@ setTimeout(()=>{tapCount=0},1500);
 let selectedDate=null;
 let selected=null;
 
+/* CORRECTION HEURE GOOGLE SHEETS */
+
 function formatTime(val){
+
+if(!val) return "";
+
+if(typeof val === "string" && val.includes(":") && val.length<=5){
+return val;
+}
 
 const d=new Date(val);
 
-return String(d.getHours()).padStart(2,"0")+":"+
-String(d.getMinutes()).padStart(2,"0");
+return d.toLocaleTimeString("fr-FR",{
+hour:"2-digit",
+minute:"2-digit"
+});
 
 }
 
@@ -394,7 +404,7 @@ const paddock=document.getElementById("paddock").value;
 
 const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 
-const d=new Date(selectedDate+"T12:00:00");
+const d=new Date(selectedDate+"T10:00:00");
 const dayName=todayName[d.getDay()].toLowerCase();
 
 const container=document.getElementById("planning");
@@ -487,10 +497,16 @@ container.innerHTML='<div class="fullMessage">Complet aujourd’hui</div>';
 setInterval(loadData,10000);
 
 function goBack(){
+
 const p=document.getElementById("page");
+
 p.classList.remove("active");
 p.classList.add("exit");
-setTimeout(()=>{location.href="index.html";},300);
+
+setTimeout(()=>{
+location.href="index.html";
+},300);
+
 }
 
 </script>
