@@ -9,8 +9,6 @@
 
 <style>
 
-/* ================= BASE ================= */
-
 body{
 margin:0;
 background:#f4f4f4;
@@ -19,7 +17,7 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-/* ================= PAGE ANIM ================= */
+/* PAGE */
 
 .page{
 min-height:100vh;
@@ -30,7 +28,7 @@ transition:0.35s;
 .page.active{ transform:translateX(0); }
 .page.exit{ transform:translateX(100%); }
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 header{
 position:relative;
@@ -68,7 +66,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ================= CARD ================= */
+/* CARD */
 
 .card{
 background:white;
@@ -79,11 +77,10 @@ box-shadow:0 5px 12px rgba(0,0,0,0.12);
 transition:background .3s ease, box-shadow .3s ease;
 }
 
-/* ================= SELECT ================= */
+/* SELECT */
 
 .selectors{
 display:grid;
-grid-template-columns:1fr;
 gap:12px;
 margin-bottom:20px;
 }
@@ -96,7 +93,7 @@ font-size:14px;
 font-family:'Montserrat';
 }
 
-/* ================= SLOT ================= */
+/* SLOT */
 
 .slot{
 background:#f4f4f4;
@@ -134,7 +131,7 @@ background:#f44336;
 color:white;
 }
 
-/* ================= DARK MODE ================= */
+/* DARK MODE */
 
 @media (prefers-color-scheme: dark){
 
@@ -187,15 +184,15 @@ background:#252a33;
 
 <select id="paddock">
 <option value="maison">Maison</option>
-<option value="grande-voie">Grande voie</option>
+<option value="grande">Grande voie</option>
 <option value="beudot">Beudot</option>
 </select>
 
 <select id="day"></select>
 
 <select id="duration">
-<option value="1h">1h</option>
-<option value="1h30">1h30</option>
+<option value="60">1h</option>
+<option value="90">1h30</option>
 </select>
 
 </div>
@@ -208,7 +205,7 @@ background:#252a33;
 
 <script>
 
-/* ===== PAGE ANIMATION ===== */
+/* PAGE ANIM */
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
@@ -216,19 +213,16 @@ document.getElementById("page").classList.add("active");
 });
 });
 
-/* ===== VARIABLES ===== */
+/* CONFIG */
+
+const OPEN="08:30";
+const CLOSE="19:00";
 
 const slotsContainer=document.getElementById("slots");
 
-const times=[
-"08:30","09:30","10:30","11:30",
-"12:30","13:30","14:30","15:30",
-"16:30","17:30","18:30"
-];
-
 let reservations=[];
 
-/* ===== DAYS ===== */
+/* DAYS */
 
 const daySelect=document.getElementById("day");
 
@@ -248,47 +242,91 @@ daySelect.appendChild(opt);
 
 }
 
-/* ===== DURATION FILTER ===== */
+/* TIME UTILS */
+
+function addMinutes(time,minutes){
+
+const [h,m]=time.split(":").map(Number);
+
+const d=new Date();
+d.setHours(h);
+d.setMinutes(m+minutes);
+
+return d;
+
+}
+
+function timeToStr(d){
+
+return String(d.getHours()).padStart(2,"0")+":"+
+String(d.getMinutes()).padStart(2,"0");
+
+}
+
+/* BUILD SLOTS */
+
+function buildSlots(){
+
+const duration=parseInt(durationSelect.value);
+
+const open=addMinutes(OPEN,0);
+const close=addMinutes(CLOSE,0);
+
+let t=new Date(open);
+
+const list=[];
+
+while(true){
+
+const end=new Date(t);
+end.setMinutes(end.getMinutes()+duration);
+
+if(end>close) break;
+
+list.push(timeToStr(t));
+
+t.setMinutes(t.getMinutes()+60);
+
+}
+
+return list;
+
+}
+
+/* DURATION FILTER */
 
 const paddockSelect=document.getElementById("paddock");
 const durationSelect=document.getElementById("duration");
 
 function updateDurations(){
 
-const paddock=paddockSelect.value;
+if(paddockSelect.value==="maison"){
 
-durationSelect.innerHTML="";
-
-if(paddock==="maison"){
-
-const opt=document.createElement("option");
-opt.value="1h";
-opt.textContent="1h";
-durationSelect.appendChild(opt);
+durationSelect.innerHTML=`<option value="60">1h</option>`;
 
 }else{
 
-["1h","1h30"].forEach(d=>{
-const opt=document.createElement("option");
-opt.value=d;
-opt.textContent=d;
-durationSelect.appendChild(opt);
-});
+durationSelect.innerHTML=`
+<option value="60">1h</option>
+<option value="90">1h30</option>
+`;
 
 }
 
 }
 
-/* ===== RENDER ===== */
+/* RENDER */
 
 function render(){
 
 slotsContainer.innerHTML="";
 
+const slots=buildSlots();
+
 const paddock=paddockSelect.value;
 const day=daySelect.value;
 
-times.forEach(t=>{
+slots.forEach(t=>{
 
 const slot=document.createElement("div");
 slot.className="slot";
@@ -311,7 +349,7 @@ const myId=localStorage.getItem("reservation_id");
 
 slot.innerHTML=`
 <div class="time">${t}</div>
-<div class="booked">${r.name} (${r.duration})</div>
+<div class="booked">${r.name}</div>
 `;
 
 if(myId===r.id){
@@ -320,6 +358,7 @@ const btn=document.createElement("button");
 btn.textContent="Annuler";
 btn.className="cancel";
 btn.onclick=()=>cancel(r.id);
+
 slot.appendChild(btn);
 
 }
@@ -332,16 +371,15 @@ slotsContainer.appendChild(slot);
 
 }
 
-/* ===== RESERVE ===== */
+/* RESERVE */
 
 function reserve(paddock,day,time){
 
 const name=prompt("Votre prénom");
-if(!name)return;
 
-const duration=durationSelect.value;
+if(!name) return;
 
-const id=Math.random().toString(36).substring(2,8);
+const id=Math.random().toString(36).substring(2,9);
 
 localStorage.setItem("reservation_id",id);
 
@@ -350,36 +388,38 @@ id,
 name,
 paddock,
 day,
-time,
-duration
+time
 });
 
 render();
 
 }
 
-/* ===== CANCEL ===== */
+/* CANCEL */
 
 function cancel(id){
 
 reservations=reservations.filter(r=>r.id!==id);
+
 render();
 
 }
 
-/* ===== EVENTS ===== */
+/* EVENTS */
 
 paddockSelect.onchange=()=>{
 updateDurations();
 render();
 };
 
+durationSelect.onchange=render;
+
 daySelect.onchange=render;
 
 updateDurations();
 render();
 
-/* ===== BACK ===== */
+/* BACK */
 
 function goBack(){
 const p=document.getElementById("page");
