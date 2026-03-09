@@ -9,6 +9,8 @@
 
 <style>
 
+/* BASE */
+
 body{
 margin:0;
 background:#f4f4f4;
@@ -53,7 +55,6 @@ cursor:pointer;
 
 #backBtn img{
 width:22px;
-height:22px;
 }
 
 header h1{
@@ -74,7 +75,6 @@ margin:20px;
 padding:22px;
 border-radius:22px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
-transition:background .3s ease, box-shadow .3s ease;
 }
 
 /* SELECT */
@@ -89,7 +89,6 @@ select{
 padding:12px;
 border-radius:10px;
 border:1px solid #ccc;
-font-size:14px;
 font-family:'Montserrat';
 }
 
@@ -105,12 +104,8 @@ justify-content:space-between;
 align-items:center;
 }
 
-.time{
-font-weight:700;
-}
-
-.free{ color:#4caf50; }
-.booked{ color:#f44336; }
+.free{color:#4caf50;}
+.booked{color:#f44336;}
 
 button{
 border:none;
@@ -121,15 +116,8 @@ cursor:pointer;
 font-family:'Montserrat';
 }
 
-.reserve{
-background:#4caf50;
-color:white;
-}
-
-.cancel{
-background:#f44336;
-color:white;
-}
+.reserve{background:#4caf50;color:white;}
+.cancel{background:#f44336;color:white;}
 
 /* DARK MODE */
 
@@ -137,11 +125,11 @@ color:white;
 
 body{
 background:#0f1115;
-color:#ffffff;
+color:white;
 }
 
 header h1{
-color:#ffffff;
+color:white;
 }
 
 #backBtn{
@@ -205,7 +193,7 @@ background:#252a33;
 
 <script>
 
-/* PAGE ANIM */
+/* PAGE ANIMATION */
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
@@ -218,13 +206,14 @@ document.getElementById("page").classList.add("active");
 const OPEN="08:30";
 const CLOSE="19:00";
 
-const slotsContainer=document.getElementById("slots");
-
 let reservations=[];
 
-/* DAYS */
-
+const paddockSelect=document.getElementById("paddock");
 const daySelect=document.getElementById("day");
+const durationSelect=document.getElementById("duration");
+const slotsContainer=document.getElementById("slots");
+
+/* DAYS */
 
 for(let i=0;i<3;i++){
 
@@ -242,76 +231,61 @@ daySelect.appendChild(opt);
 
 }
 
-/* TIME UTILS */
+/* TIME */
 
-function addMinutes(time,minutes){
+function addMinutes(time,min){
 
 const [h,m]=time.split(":").map(Number);
 
 const d=new Date();
 d.setHours(h);
-d.setMinutes(m+minutes);
+d.setMinutes(m+min);
 
 return d;
 
 }
 
-function timeToStr(d){
+function timeStr(d){
 
 return String(d.getHours()).padStart(2,"0")+":"+
 String(d.getMinutes()).padStart(2,"0");
 
 }
 
-/* BUILD SLOTS */
+/* BUILD PLANNING */
 
-function buildSlots(){
+function buildPlanning(){
 
-const duration=parseInt(durationSelect.value);
-
-const open=addMinutes(OPEN,0);
+let current=addMinutes(OPEN,0);
 const close=addMinutes(CLOSE,0);
 
-let t=new Date(open);
+let slots=[];
 
-const list=[];
+while(current < close){
 
-while(true){
-
-const end=new Date(t);
-end.setMinutes(end.getMinutes()+duration);
-
-if(end>close) break;
-
-list.push(timeToStr(t));
-
-t.setMinutes(t.getMinutes()+60);
+slots.push(timeStr(current));
+current.setMinutes(current.getMinutes()+60);
 
 }
 
-return list;
+reservations.forEach(r=>{
+
+const start=r.time;
+const end=timeStr(addMinutes(r.time,r.duration));
+
+const index=slots.indexOf(start);
+
+if(index!==-1){
+
+slots[index]=start+"|reserved";
+
+if(slots[index+1]) slots[index+1]=end;
 
 }
 
-/* DURATION FILTER */
+});
 
-const paddockSelect=document.getElementById("paddock");
-const durationSelect=document.getElementById("duration");
-
-function updateDurations(){
-
-if(paddockSelect.value==="maison"){
-
-durationSelect.innerHTML=`<option value="60">1h</option>`;
-
-}else{
-
-durationSelect.innerHTML=`
-<option value="60">1h</option>
-<option value="90">1h30</option>
-`;
-
-}
+return slots;
 
 }
 
@@ -321,7 +295,7 @@ function render(){
 
 slotsContainer.innerHTML="";
 
-const slots=buildSlots();
+const slots=buildPlanning();
 
 const paddock=paddockSelect.value;
 const day=daySelect.value;
@@ -331,37 +305,24 @@ slots.forEach(t=>{
 const slot=document.createElement("div");
 slot.className="slot";
 
-const r=reservations.find(e=>e.paddock===paddock && e.day===day && e.time===t);
+if(t.includes("|reserved")){
 
-if(!r){
+const time=t.split("|")[0];
 
 slot.innerHTML=`
-<div class="time">${t}</div>
+<div>${time}</div>
+<div class="booked">Réservé</div>
+`;
+
+}else{
+
+slot.innerHTML=`
+<div>${t}</div>
 <div class="free">Libre</div>
 <button class="reserve">Réserver</button>
 `;
 
 slot.querySelector("button").onclick=()=>reserve(paddock,day,t);
-
-}else{
-
-const myId=localStorage.getItem("reservation_id");
-
-slot.innerHTML=`
-<div class="time">${t}</div>
-<div class="booked">${r.name}</div>
-`;
-
-if(myId===r.id){
-
-const btn=document.createElement("button");
-btn.textContent="Annuler";
-btn.className="cancel";
-btn.onclick=()=>cancel(r.id);
-
-slot.appendChild(btn);
-
-}
 
 }
 
@@ -379,7 +340,9 @@ const name=prompt("Votre prénom");
 
 if(!name) return;
 
-const id=Math.random().toString(36).substring(2,9);
+const duration=parseInt(durationSelect.value);
+
+const id=Math.random().toString(36).substring(2,8);
 
 localStorage.setItem("reservation_id",id);
 
@@ -388,18 +351,9 @@ id,
 name,
 paddock,
 day,
-time
+time,
+duration
 });
-
-render();
-
-}
-
-/* CANCEL */
-
-function cancel(id){
-
-reservations=reservations.filter(r=>r.id!==id);
 
 render();
 
@@ -407,16 +361,10 @@ render();
 
 /* EVENTS */
 
-paddockSelect.onchange=()=>{
-updateDurations();
-render();
-};
-
+paddockSelect.onchange=render;
+daySelect.onchange=render;
 durationSelect.onchange=render;
 
-daySelect.onchange=render;
-
-updateDurations();
 render();
 
 /* BACK */
