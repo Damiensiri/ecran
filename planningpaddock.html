@@ -318,11 +318,12 @@ horaires={};
 
 horairesSheet.forEach(row=>{
 
-const p=row.paddock;
+const p=String(row.paddock).trim().toLowerCase();
+const j=String(row.jour).trim().toLowerCase();
 
 if(!horaires[p]) horaires[p]={};
 
-horaires[p][row.jour]={
+horaires[p][j]={
 open:formatTime(row.open),
 close:formatTime(row.close),
 durations:String(row.durations).split(",").map(Number)
@@ -391,12 +392,10 @@ function generate(){
 const duration=parseInt(document.getElementById("duration").value);
 const paddock=document.getElementById("paddock").value;
 
-const now=new Date();
-
 const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 
 const d=new Date(selectedDate+"T12:00:00");
-const dayName=todayName[d.getDay()];
+const dayName=todayName[d.getDay()].toLowerCase();
 
 const container=document.getElementById("planning");
 container.innerHTML="";
@@ -431,11 +430,6 @@ let next=new Date(current.getTime()+duration*60000);
 if(next>close) break;
 
 let time=current.toTimeString().slice(0,5);
-
-if(!admin && selectedDate===now.toISOString().slice(0,10) && current<now){
-current=next;
-continue;
-}
 
 let r=reservations.find(r=>r.date===selectedDate && r.time===time && r.paddock===paddock);
 
@@ -476,21 +470,6 @@ label='<span class="reservedText">réservé</span>';
 
 row.innerHTML=`<div>${time}</div><div>${label}</div>`;
 
-if(myReservations.includes(r.id) || admin){
-
-const btn=document.createElement("div");
-btn.className="cancel";
-btn.innerText="Annuler";
-
-btn.onclick=(e)=>{
-e.stopPropagation();
-cancelReservation(r.id);
-};
-
-row.appendChild(btn);
-
-}
-
 }
 
 container.appendChild(row);
@@ -500,96 +479,18 @@ current=next;
 }
 
 if(!freeFound){
-
 container.innerHTML='<div class="fullMessage">Complet aujourd’hui</div>';
-
 }
 
 }
 
-async function book(){
-
-let name=document.getElementById("name").value.trim();
-
-if(!name){
-alert("Prénom obligatoire");
-return;
-}
-
-if(!selected){
-alert("Choisissez un créneau");
-return;
-}
-
-if(!admin){
-
-if(reservations.find(r=>r.date===selected.date && r.name===name)){
-alert("Vous avez déjà une réservation ce jour");
-return;
-}
-
-}
-
-if(reservations.find(r=>r.date===selected.date && r.time===selected.time && r.paddock===selected.paddock)){
-alert("Créneau déjà réservé");
-return;
-}
-
-const id=Date.now().toString();
-
-await fetch(API,{
-method:"POST",
-body:JSON.stringify({
-id,
-name,
-email:document.getElementById("email").value,
-paddock:selected.paddock,
-date:selected.date,
-time:selected.time,
-duration:selected.duration
-})
-});
-
-myReservations.push(id);
-
-localStorage.setItem("my_reservations",JSON.stringify(myReservations));
-
-loadData();
-
-}
-
-async function cancelReservation(id){
-
-if(!confirm("Annuler cette réservation ?")) return;
-
-await fetch(API+"?id="+id,{method:"DELETE"});
-
-myReservations=myReservations.filter(r=>r!==id);
-
-localStorage.setItem("my_reservations",JSON.stringify(myReservations));
-
-loadData();
-
-}
-
-setInterval(()=>{
-loadData();
-},10000);
-
-document.getElementById("duration").onchange=generate;
-document.getElementById("paddock").onchange=generate;
+setInterval(loadData,10000);
 
 function goBack(){
-
 const p=document.getElementById("page");
-
 p.classList.remove("active");
 p.classList.add("exit");
-
-setTimeout(()=>{
-location.href="index.html";
-},300);
-
+setTimeout(()=>{location.href="index.html";},300);
 }
 
 </script>
