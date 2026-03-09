@@ -297,6 +297,15 @@ setTimeout(()=>{tapCount=0},1500);
 let selectedDate=null;
 let selected=null;
 
+function formatTime(val){
+
+const d=new Date(val);
+
+return String(d.getHours()).padStart(2,"0")+":"+
+String(d.getMinutes()).padStart(2,"0");
+
+}
+
 async function loadData(){
 
 const r=await fetch(API+"?sheet=reservations");
@@ -314,9 +323,9 @@ const p=row.paddock;
 if(!horaires[p]) horaires[p]={};
 
 horaires[p][row.jour]={
-open:row.open,
-close:row.close,
-durations:row.durations.split(",").map(Number)
+open:formatTime(row.open),
+close:formatTime(row.close),
+durations:String(row.durations).split(",").map(Number)
 };
 
 });
@@ -383,8 +392,8 @@ const duration=parseInt(document.getElementById("duration").value);
 const paddock=document.getElementById("paddock").value;
 
 const now=new Date();
-const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 
+const todayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 const dayName=todayName[new Date(selectedDate).getDay()];
 
 const container=document.getElementById("planning");
@@ -564,6 +573,9 @@ loadData();
 setInterval(()=>{
 loadData();
 },10000);
+
+document.getElementById("duration").onchange=generate;
+document.getElementById("paddock").onchange=generate;
 
 function goBack(){
 
