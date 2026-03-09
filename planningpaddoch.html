@@ -9,8 +9,6 @@
 
 <style>
 
-/* ================= BASE ================= */
-
 body{
 margin:0;
 background:#f4f4f4;
@@ -19,18 +17,18 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-/* ================= PAGE ================= */
+/* PAGE */
 
 .page{
 min-height:100vh;
 transform:translateX(100%);
-transition:0.35s;
+transition:.35s;
 }
 
 .page.active{transform:translateX(0);}
 .page.exit{transform:translateX(100%);}
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 header{
 position:relative;
@@ -53,10 +51,7 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{
-width:22px;
-height:22px;
-}
+#backBtn img{width:22px;}
 
 header h1{
 position:absolute;
@@ -68,7 +63,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ================= CARD ================= */
+/* CARD */
 
 .card{
 background:white;
@@ -78,7 +73,7 @@ border-radius:22px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
 }
 
-/* ================= SELECT ================= */
+/* SELECT */
 
 .selectors{
 display:grid;
@@ -90,11 +85,10 @@ select{
 padding:12px;
 border-radius:10px;
 border:1px solid #ccc;
-font-size:14px;
 font-family:'Montserrat';
 }
 
-/* ================= SLOT ================= */
+/* SLOT */
 
 .slot{
 background:#f4f4f4;
@@ -123,22 +117,17 @@ font-family:'Montserrat';
 
 .closed{
 text-align:center;
-font-weight:600;
 padding:20px;
+font-weight:600;
 }
 
-/* ================= DARK MODE ================= */
+/* DARK */
 
 @media (prefers-color-scheme: dark){
 
-body{
-background:#0f1115;
-color:white;
-}
+body{background:#0f1115;color:white;}
 
-header h1{
-color:white;
-}
+header h1{color:white;}
 
 #backBtn{
 background:#1c1f26;
@@ -186,10 +175,7 @@ background:#252a33;
 
 <select id="day"></select>
 
-<select id="duration">
-<option value="60">1h</option>
-<option value="90">1h30</option>
-</select>
+<select id="duration"></select>
 
 </div>
 
@@ -201,7 +187,7 @@ background:#252a33;
 
 <script>
 
-/* ================= PAGE ANIM ================= */
+/* PAGE ANIMATION */
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
@@ -209,10 +195,9 @@ document.getElementById("page").classList.add("active");
 });
 });
 
-/* ================= CONFIG ================= */
+/* HORAIRES (temporaire avant Sheet) */
 
-const horaires = {
-
+const horaires={
 maison:{
 lundi:["08:30","19:00"],
 mardi:["08:30","19:00"],
@@ -222,7 +207,6 @@ vendredi:["08:30","19:00"],
 samedi:["09:00","18:00"],
 dimanche:null
 },
-
 grande:{
 lundi:["09:00","18:00"],
 mardi:["09:00","18:00"],
@@ -232,7 +216,6 @@ vendredi:["09:00","18:00"],
 samedi:["09:00","17:00"],
 dimanche:["09:00","17:00"]
 },
-
 beudot:{
 lundi:null,
 mardi:["10:00","17:00"],
@@ -242,7 +225,14 @@ vendredi:["10:00","17:00"],
 samedi:["10:00","16:00"],
 dimanche:null
 }
+};
 
+/* DURÉE PAR PADDOCK */
+
+const durees={
+maison:[60],
+grande:[60,90],
+beudot:[60,90]
 };
 
 let reservations=[];
@@ -252,7 +242,7 @@ const daySelect=document.getElementById("day");
 const durationSelect=document.getElementById("duration");
 const slotsContainer=document.getElementById("slots");
 
-/* ================= DAYS ================= */
+/* JOURS */
 
 for(let i=0;i<3;i++){
 
@@ -270,7 +260,28 @@ daySelect.appendChild(opt);
 
 }
 
-/* ================= TIME UTILS ================= */
+/* DURÉES */
+
+function updateDurations(){
+
+const p=paddockSelect.value;
+
+durationSelect.innerHTML="";
+
+durees[p].forEach(d=>{
+
+const opt=document.createElement("option");
+
+opt.value=d;
+opt.textContent=(d==60?"1h":"1h30");
+
+durationSelect.appendChild(opt);
+
+});
+
+}
+
+/* TIME */
 
 function addMinutes(time,min){
 
@@ -291,7 +302,7 @@ String(d.getMinutes()).padStart(2,"0");
 
 }
 
-/* ================= BUILD SLOTS ================= */
+/* SLOTS */
 
 function buildSlots(open,close){
 
@@ -304,10 +315,10 @@ const end=addMinutes(close,0);
 
 while(current < end){
 
-const slotEnd=new Date(current);
-slotEnd.setMinutes(slotEnd.getMinutes()+duration);
+const endSlot=new Date(current);
+endSlot.setMinutes(endSlot.getMinutes()+duration);
 
-if(slotEnd <= end){
+if(endSlot <= end){
 slots.push(timeStr(current));
 }
 
@@ -319,7 +330,21 @@ return slots;
 
 }
 
-/* ================= RENDER ================= */
+/* OVERLAP */
+
+function overlap(s1,d1,s2,d2){
+
+const start1=addMinutes(s1,0);
+const end1=addMinutes(s1,d1);
+
+const start2=addMinutes(s2,0);
+const end2=addMinutes(s2,d2);
+
+return(start1 < end2 && end1 > start2);
+
+}
+
+/* RENDER */
 
 function render(){
 
@@ -327,21 +352,18 @@ slotsContainer.innerHTML="";
 
 const paddock=paddockSelect.value;
 
-const dayName=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date(daySelect.value).getDay()];
+const jour=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][new Date(daySelect.value).getDay()];
 
-const h=horaires[paddock][dayName];
+const h=horaires[paddock][jour];
 
 if(!h){
-
 slotsContainer.innerHTML=`<div class="closed">Paddock fermé aujourd'hui</div>`;
 return;
-
 }
 
 let slots=buildSlots(h[0],h[1]);
 
 const now=new Date();
-
 const today=new Date().toISOString().slice(0,10);
 
 slots.forEach(t=>{
@@ -373,23 +395,10 @@ slot.querySelector("button").onclick=()=>reserve(paddock,daySelect.value,t);
 
 }else{
 
-const myId=localStorage.getItem("reservation_id");
-
 slot.innerHTML=`
 <div>${t}</div>
 <div class="booked">${r.name}</div>
 `;
-
-if(myId===r.id){
-
-const btn=document.createElement("button");
-btn.textContent="Annuler";
-btn.className="cancel";
-btn.onclick=()=>cancel(r.id);
-
-slot.appendChild(btn);
-
-}
 
 }
 
@@ -399,7 +408,7 @@ slotsContainer.appendChild(slot);
 
 }
 
-/* ================= RESERVE ================= */
+/* RESERVE */
 
 function reserve(paddock,day,time){
 
@@ -410,9 +419,26 @@ alert("Le prénom est obligatoire");
 return;
 }
 
-let email=prompt("Email pour confirmation (facultatif)");
+let email=prompt("Email confirmation (facultatif)");
 
 const duration=parseInt(durationSelect.value);
+
+/* anti chevauchement */
+
+const conflict=reservations.find(r=>{
+
+if(r.day!==day) return false;
+
+return overlap(time,duration,r.time,r.duration);
+
+});
+
+if(conflict){
+
+alert("Vous avez déjà une réservation sur ce créneau");
+return;
+
+}
 
 const id=Math.random().toString(36).substring(2,8);
 
@@ -432,25 +458,20 @@ render();
 
 }
 
-/* ================= CANCEL ================= */
+/* EVENTS */
 
-function cancel(id){
-
-reservations=reservations.filter(r=>r.id!==id);
-
+paddockSelect.onchange=()=>{
+updateDurations();
 render();
+};
 
-}
-
-/* ================= EVENTS ================= */
-
-paddockSelect.onchange=render;
 daySelect.onchange=render;
 durationSelect.onchange=render;
 
+updateDurations();
 render();
 
-/* ================= BACK ================= */
+/* BACK */
 
 function goBack(){
 
