@@ -159,8 +159,6 @@ font-weight:600;
 color:#999;
 }
 
-/* DARK MODE */
-
 @media(prefers-color-scheme:dark){
 
 body{background:#0f1115;color:white}
@@ -267,8 +265,6 @@ if(code===ADMIN_CODE){
 admin=true;
 adminIcon.style.display="inline";
 
-alert("Mode admin activé");
-
 generate();
 
 }
@@ -277,8 +273,6 @@ generate();
 
 admin=false;
 adminIcon.style.display="none";
-
-alert("Mode admin désactivé");
 
 generate();
 
@@ -301,6 +295,7 @@ buildDays();
 });
 
 let reservations=JSON.parse(localStorage.getItem("paddock_reservations")||"[]");
+let myReservations=JSON.parse(localStorage.getItem("my_reservations")||"[]");
 
 let selectedDate=null;
 let selected=null;
@@ -421,9 +416,7 @@ row.classList.add("selected");
 row.className="row booked";
 row.innerHTML=`<div>${time}</div><div>${r.name}</div>`;
 
-const myId=localStorage.getItem("reservation_id");
-
-if(myId===r.id || admin){
+if(myReservations.includes(r.id) || admin){
 
 const btn=document.createElement("div");
 btn.className="cancel";
@@ -501,7 +494,9 @@ time:selected.time,
 duration:selected.duration
 });
 
-localStorage.setItem("reservation_id",id);
+myReservations.push(id);
+
+localStorage.setItem("my_reservations",JSON.stringify(myReservations));
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
 generate();
@@ -516,12 +511,21 @@ function cancelReservation(id){
 if(!confirm("Annuler cette réservation ?"))return;
 
 reservations=reservations.filter(r=>r.id!==id);
+myReservations=myReservations.filter(r=>r!==id);
 
+localStorage.setItem("my_reservations",JSON.stringify(myReservations));
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
 generate();
 
 }
+
+
+/* REFRESH AUTO */
+
+setInterval(()=>{
+generate();
+},10000);
 
 
 /* EVENTS */
