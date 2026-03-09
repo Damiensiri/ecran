@@ -3,27 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Réservation paddock</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
+/* ===== BASE ===== */
+
 body{
 margin:0;
 background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
+color:#000;
+transition:background .3s ease,color .3s ease;
 }
+
+/* ===== PAGE ANIMATION ===== */
 
 .page{
 min-height:100vh;
 transform:translateX(100%);
-transition:.35s;
+transition:0.35s;
 }
 
-.page.active{transform:translateX(0);}
-.page.exit{transform:translateX(100%);}
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
+
+/* ===== HEADER ===== */
 
 header{
 position:relative;
@@ -46,7 +53,10 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{width:22px;}
+#backBtn img{
+width:22px;
+height:22px;
+}
 
 header h1{
 position:absolute;
@@ -58,49 +68,62 @@ font-size:18px;
 font-weight:700;
 }
 
+/* ===== CARD ===== */
+
 .card{
 background:white;
 margin:20px;
 padding:22px;
 border-radius:22px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
+transition:background .3s ease, box-shadow .3s ease;
+}
+
+/* ===== FORM ===== */
+
+label{
+font-weight:600;
+font-size:14px;
 }
 
 select,input{
 width:100%;
-padding:12px;
-margin-top:8px;
+margin-top:6px;
 margin-bottom:16px;
+padding:12px;
 border-radius:10px;
 border:none;
-background:#f0f0f0;
+background:#f4f4f4;
 font-family:inherit;
 }
 
 button{
 width:100%;
 padding:14px;
-border:none;
 border-radius:12px;
+border:none;
 background:#181E3B;
 color:white;
 font-weight:700;
 cursor:pointer;
 }
 
+/* ===== SLOTS ===== */
+
 .slots{
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:10px;
-margin-top:15px;
+margin-top:20px;
 }
 
 .slot{
-background:#eee;
-padding:10px;
-border-radius:10px;
+background:#f4f4f4;
+padding:12px;
+border-radius:12px;
 text-align:center;
 cursor:pointer;
+font-weight:600;
 }
 
 .slot.booked{
@@ -108,30 +131,59 @@ background:#ddd;
 cursor:default;
 }
 
-.booked{
+.booked-name{
 font-size:12px;
-color:#555;
+margin-top:4px;
+color:#777;
 }
 
 .cancel{
 margin-top:6px;
 background:#c0392b;
 padding:6px;
-font-size:12px;
 border-radius:6px;
+font-size:12px;
 }
 
-@media(prefers-color-scheme:dark){
+/* ===== DARK MODE ===== */
 
-body{background:#0f1115;color:white}
+@media (prefers-color-scheme: dark){
 
-.card{background:#1c1f26}
+body{
+background:#0f1115;
+color:#ffffff;
+}
 
-select,input{background:#252a33;color:white}
+header h1{
+color:#ffffff;
+}
 
-.slot{background:#252a33}
+#backBtn{
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
 
-.slot.booked{background:#333}
+#backBtn img{
+filter:brightness(0) invert(1);
+}
+
+.card{
+background:#1c1f26;
+box-shadow:0 25px 60px rgba(0,0,0,0.75);
+}
+
+select,input{
+background:#252a33;
+color:white;
+}
+
+.slot{
+background:#252a33;
+}
+
+.slot.booked{
+background:#333;
+}
 
 }
 
@@ -170,7 +222,7 @@ select,input{background:#252a33;color:white}
 <label>Prénom</label>
 <input id="name">
 
-<label>Email (confirmation optionnelle)</label>
+<label>Email (optionnel)</label>
 <input id="email">
 
 <button onclick="book()">Réserver</button>
@@ -183,19 +235,25 @@ select,input{background:#252a33;color:white}
 
 <script>
 
+/* ===== ANIMATION ===== */
+
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
 });
 
-let reservations = JSON.parse(localStorage.getItem("paddock_reservations")||"[]");
+/* ===== DATA ===== */
+
+let reservations = JSON.parse(localStorage.getItem("paddock_reservations") || "[]");
 
 const horaires={
 maison:{open:"08:30",close:"19:00"},
 grande:{open:"08:30",close:"19:00"},
 beudot:{open:"08:30",close:"19:00"}
 };
+
+/* ===== GENERATE SLOTS ===== */
 
 function generateSlots(){
 
@@ -221,13 +279,6 @@ while(true){
 let next=new Date(current.getTime()+duration*60000);
 if(next>close)break;
 
-const now=new Date();
-
-if(date===now.toISOString().slice(0,10) && current<now){
-current=next;
-continue;
-}
-
 let time=current.toTimeString().slice(0,5);
 
 let r=reservations.find(r=>r.date===date && r.time===time && r.paddock===paddock);
@@ -240,7 +291,7 @@ if(!r){
 slot.innerHTML=time;
 
 slot.onclick=()=>{
-document.getElementById("selectedTime").value=time;
+document.getElementById("selected").value=time;
 };
 
 }else{
@@ -249,10 +300,7 @@ slot.classList.add("booked");
 
 const myId=localStorage.getItem("reservation_id");
 
-slot.innerHTML=`
-<div>${time}</div>
-<div class="booked">${r.name}</div>
-`;
+slot.innerHTML=`${time}<div class="booked-name">${r.name}</div>`;
 
 if(myId===r.id){
 
@@ -276,34 +324,16 @@ current=next;
 
 }
 
+/* ===== BOOK ===== */
+
 function book(){
 
 const name=document.getElementById("name").value.trim();
 if(!name){alert("Prénom obligatoire");return;}
 
-const paddock=document.getElementById("paddock").value;
-const duration=parseInt(document.getElementById("duration").value);
-const date=document.getElementById("date").value;
-
-const slots=document.querySelectorAll(".slot");
-let time=null;
-
-slots.forEach(s=>{
-if(s.style.border==="2px solid green")time=s.innerText;
-});
-
-if(!time){alert("Choisissez un créneau");return;}
-
-const id=Date.now().toString();
-
-reservations.push({id,name,paddock,date,time,duration});
-
-localStorage.setItem("reservation_id",id);
-localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
-
-generateSlots();
-
 }
+
+/* ===== CANCEL ===== */
 
 function cancelReservation(id){
 
@@ -312,15 +342,20 @@ if(!confirm("Annuler votre réservation ?"))return;
 reservations=reservations.filter(r=>r.id!==id);
 
 localStorage.removeItem("reservation_id");
+
 localStorage.setItem("paddock_reservations",JSON.stringify(reservations));
 
 generateSlots();
 
 }
 
+/* ===== EVENTS ===== */
+
 document.getElementById("paddock").onchange=generateSlots;
 document.getElementById("duration").onchange=generateSlots;
 document.getElementById("date").onchange=generateSlots;
+
+/* ===== BACK ===== */
 
 function goBack(){
 const p=document.getElementById("page");
