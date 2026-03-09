@@ -240,8 +240,6 @@ PADDOCK
 
 <script>
 
-/* ADMIN */
-
 let admin=false;
 let tapCount=0;
 
@@ -264,7 +262,6 @@ if(code===ADMIN_CODE){
 
 admin=true;
 adminIcon.style.display="inline";
-
 generate();
 
 }
@@ -273,7 +270,6 @@ generate();
 
 admin=false;
 adminIcon.style.display="none";
-
 generate();
 
 }
@@ -285,9 +281,6 @@ tapCount=0;
 setTimeout(()=>{tapCount=0},1500);
 
 });
-
-
-/* PAGE */
 
 window.addEventListener("DOMContentLoaded",()=>{
 document.getElementById("page").classList.add("active");
@@ -305,9 +298,6 @@ maison:{open:"08:30",close:"19:00"},
 grande:{open:"08:30",close:"19:00"},
 beudot:{open:"08:30",close:"19:00"}
 };
-
-
-/* JOURS */
 
 function buildDays(){
 
@@ -357,9 +347,6 @@ generate();
 
 }
 
-
-/* CRENEAUX */
-
 function generate(){
 
 const duration=parseInt(document.getElementById("duration").value);
@@ -385,7 +372,9 @@ if(next>close)break;
 
 let time=current.toTimeString().slice(0,5);
 
-if(selectedDate===now.toISOString().slice(0,10) && current<now){
+/* PATCH ADMIN CRENEAUX PASSES */
+
+if(!admin && selectedDate===now.toISOString().slice(0,10) && current<now){
 current=next;
 continue;
 }
@@ -451,9 +440,6 @@ container.appendChild(msg);
 
 }
 
-
-/* RESERVER */
-
 function book(){
 
 let name=document.getElementById("name").value.trim();
@@ -503,9 +489,6 @@ generate();
 
 }
 
-
-/* ANNULER */
-
 function cancelReservation(id){
 
 if(!confirm("Annuler cette réservation ?"))return;
@@ -520,21 +503,12 @@ generate();
 
 }
 
-
-/* REFRESH AUTO */
-
 setInterval(()=>{
 generate();
 },10000);
 
-
-/* EVENTS */
-
 document.getElementById("duration").onchange=generate;
 document.getElementById("paddock").onchange=generate;
-
-
-/* RETOUR */
 
 function goBack(){
 
