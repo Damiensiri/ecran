@@ -167,7 +167,7 @@ select,input{background:#252a33;color:white}
 <img src="image/back.svg">
 </div>
 
-<h1>PADDOCK</h1>
+<h1 id="title">PADDOCK</h1>
 
 </header>
 
@@ -222,6 +222,45 @@ let horaires={}
 
 let selectedDate=null
 let selected=null
+
+let adminMode=false
+let tapCount=0
+
+const title=document.getElementById("title")
+
+title.addEventListener("click",()=>{
+
+tapCount++
+
+if(tapCount>=5){
+
+if(!adminMode){
+
+const pass=prompt("Mot de passe admin")
+
+if(pass==="0359140"){
+
+adminMode=true
+title.innerHTML="PADDOCK 🔧"
+generate()
+
+}
+
+}else{
+
+adminMode=false
+title.innerHTML="PADDOCK"
+generate()
+
+}
+
+tapCount=0
+
+}
+
+setTimeout(()=>{tapCount=0},1200)
+
+})
 
 let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 
@@ -352,6 +391,7 @@ let time=String(h).padStart(2,"0")+":00"
 let conflict=false
 let mine=false
 let docId=null
+let reserverName=""
 
 reservations.forEach(r=>{
 
@@ -363,9 +403,14 @@ let resEnd=resStart+(r.duration/60)
 if(h>=resStart && h<resEnd){
 
 conflict=true
+reserverName=r.name
 
 if(myReservations.includes(r.id)){
 mine=true
+docId=r.id
+}
+
+if(adminMode){
 docId=r.id
 }
 
@@ -404,7 +449,17 @@ row.classList.add("selected")
 else{
 
 row.className="row"
+
+if(adminMode){
+
+row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
+row.onclick=()=>cancelReservation(docId)
+
+}else{
+
 row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
+
+}
 
 }
 
@@ -428,9 +483,13 @@ alert("Choisissez un créneau")
 return
 }
 
+if(!adminMode){
+
 if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
 alert("Vous avez déjà une réservation ce jour")
 return
+}
+
 }
 
 const doc=await db.collection("reservations").add({
