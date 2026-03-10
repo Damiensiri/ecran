@@ -210,7 +210,6 @@ appId:"1:501153278739:web:824b4344c381f2a94548e6"
 }
 
 firebase.initializeApp(firebaseConfig)
-
 const db=firebase.firestore()
 
 let reservations=[]
@@ -292,7 +291,9 @@ durationSelect.addEventListener("change",updatePaddocks)
 async function loadData(){
 
 const r=await db.collection("reservations").get()
+
 reservations=[]
+
 r.forEach(doc=>{
 let data=doc.data()
 data.id=doc.id
@@ -300,7 +301,9 @@ reservations.push(data)
 })
 
 const h=await db.collection("horaires").get()
+
 horaires={}
+
 h.forEach(doc=>{
 horaires[doc.id]=doc.data()
 })
@@ -360,12 +363,16 @@ container.innerHTML=""
 
 const parts=selectedDate.split("-")
 const d=new Date(parts[0],parts[1]-1,parts[2])
+
 const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+
 let jour=names[d.getDay()]
 
 if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
+
 container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
 return
+
 }
 
 const config=horaires[paddock][jour]
@@ -373,37 +380,50 @@ const config=horaires[paddock][jour]
 let start=parseInt(config.open.split(":")[0])
 let end=parseInt(config.close.split(":")[0])
 
+/* timeline dynamique */
+
 let slots=[]
+let current=start
 
-for(let h=start;h<=end-1;h++){
-slots.push(h+":00")
-}
+while(current < end){
 
-reservations.forEach(r=>{
-if(r.date===selectedDate && r.paddock===paddock && r.duration===90){
+let hour=Math.floor(current)
+let minutes=current%1===0 ? "00" : "30"
 
-let parts=r.time.split(":")
-let newSlot=(parseInt(parts[0])+1)+":30"
+let time=String(hour).padStart(2,"0")+":"+minutes
 
-if(!slots.includes(newSlot)) slots.push(newSlot)
+slots.push(time)
 
-}
+let reservation=reservations.find(r=>{
+
+if(r.date!==selectedDate) return false
+if(r.paddock!==paddock) return false
+
+let [rh,rm]=r.time.split(":").map(Number)
+
+let resStart=rh+(rm/60)
+
+return resStart===current
+
 })
 
-slots.sort((a,b)=>{
+if(reservation){
 
-let [h1,m1]=a.split(":").map(Number)
-let [h2,m2]=b.split(":").map(Number)
+current += reservation.duration/60
 
-return (h1*60+m1)-(h2*60+m2)
+}else{
 
-})
+current += 1
+
+}
+
+}
 
 slots.forEach(time=>{
 
 let [hour,minutes]=time.split(":").map(Number)
 
-if(hour + (minutes/60) + (duration/60) > end) return
+if(hour+(minutes/60)+(duration/60) > end) return
 
 let conflict=false
 let mine=false
@@ -418,6 +438,7 @@ let [rh,rm]=r.time.split(":").map(Number)
 
 let resStart=rh+(rm/60)
 let resEnd=resStart+(r.duration/60)
+
 let slotStart=hour+(minutes/60)
 
 if(slotStart>=resStart && slotStart<resEnd){
@@ -453,6 +474,7 @@ row.onclick=()=>cancelReservation(docId)
 else if(!conflict){
 
 row.className="row free"
+
 row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
 
 row.onclick=()=>{
@@ -460,6 +482,7 @@ row.onclick=()=>{
 selected={time,paddock,date:selectedDate,duration}
 
 document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
+
 row.classList.add("selected")
 
 }
