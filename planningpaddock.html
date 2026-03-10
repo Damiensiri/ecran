@@ -16,9 +16,7 @@ background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 }
 
-.page{
-min-height:100vh;
-}
+.page{min-height:100vh;}
 
 header{
 position:relative;
@@ -39,9 +37,6 @@ align-items:center;
 justify-content:center;
 box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
-
-/* léger effet verre */
-backdrop-filter:blur(6px);
 }
 
 #backBtn img{width:22px}
@@ -114,27 +109,18 @@ padding:10px;
 border-bottom:1px solid #eee;
 }
 
-.row.free{cursor:pointer}
+.row.free{cursor:pointer;}
 
 .row.selected{
 background:#c9d7ff;
 border-left:4px solid #181E3B;
 }
 
-.freeText{
-color:#2ecc71;
-font-weight:600;
-}
+.freeText{color:#2ecc71;font-weight:600;}
 
-.reservedText{
-color:#e74c3c;
-font-weight:600;
-}
+.reservedText{color:#e74c3c;font-weight:600;}
 
-.mineText{
-color:#2980b9;
-font-weight:700;
-}
+.mineText{color:#2980b9;font-weight:700;}
 
 .fullMessage{
 text-align:center;
@@ -143,38 +129,27 @@ font-weight:600;
 color:#999;
 }
 
+.hidden{display:none;}
+
+/* DARK MODE */
+
 @media(prefers-color-scheme:dark){
 
-body{
-background:#0f1115;
-color:white;
-}
+body{background:#0f1115;color:white;}
 
-.card{
-background:#1c1f26;
-}
+.card{background:#1c1f26;}
 
-select,input{
-background:#252a33;
-color:white;
-}
+select,input{background:#252a33;color:white;}
 
-.row{
-border-bottom:1px solid #333;
-}
+.row{border-bottom:1px solid #333;}
 
-.dayBtn{
-background:#252a33;
-}
+.dayBtn{background:#252a33;}
 
-#backBtn{
-background:#1c1f26;
-backdrop-filter:blur(6px);
-}
+#backBtn{background:#1c1f26;}
 
-/* vert adouci */
 .freeText{
 color:#7bd89a;
+filter:brightness(0.9);
 }
 
 }
@@ -198,17 +173,34 @@ color:#7bd89a;
 
 <div class="card">
 
+<label>Type de demande</label>
+<select id="requestType">
+<option value="reservation">Réservation paddock</option>
+<option value="mise">Demande mise au paddock (+5€)</option>
+</select>
+
+<div id="durationBlock">
+
 <label>Durée</label>
 <select id="duration">
+<option value="">Choisir</option>
 <option value="60">1h</option>
 <option value="90">1h30</option>
 </select>
 
+</div>
+
+<div id="paddockBlock" class="hidden">
 <label>Paddock</label>
 <select id="paddock"></select>
+</div>
 
+<div id="dayBlock" class="hidden">
 <label>Jour</label>
 <div id="days"></div>
+</div>
+
+<div id="formBlock" class="hidden">
 
 <label>Prénom</label>
 <input id="name">
@@ -219,6 +211,12 @@ color:#7bd89a;
 <div id="planning"></div>
 
 <button onclick="book()">Réserver</button>
+
+</div>
+
+<div id="miseInfo" class="hidden" style="text-align:center;color:#666;">
+Service bientôt disponible
+</div>
 
 </div>
 
@@ -257,22 +255,12 @@ tapCount++
 
 if(tapCount>=5){
 
-if(!adminMode){
-
 const pass=prompt("Mot de passe admin")
 
 if(pass==="0359140"){
-adminMode=true
-title.innerHTML="PADDOCK 🔧"
+adminMode=!adminMode
+title.innerHTML=adminMode?"PADDOCK 🔧":"PADDOCK"
 generate()
-}
-
-}else{
-
-adminMode=false
-title.innerHTML="PADDOCK"
-generate()
-
 }
 
 tapCount=0
@@ -287,6 +275,59 @@ let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 
 const durationSelect=document.getElementById("duration")
 const paddockSelect=document.getElementById("paddock")
+
+const paddockBlock=document.getElementById("paddockBlock")
+const dayBlock=document.getElementById("dayBlock")
+const formBlock=document.getElementById("formBlock")
+
+const requestType=document.getElementById("requestType")
+const miseInfo=document.getElementById("miseInfo")
+
+requestType.addEventListener("change",()=>{
+
+if(requestType.value==="mise"){
+
+document.getElementById("durationBlock").classList.add("hidden")
+paddockBlock.classList.add("hidden")
+dayBlock.classList.remove("hidden")
+formBlock.classList.remove("hidden")
+miseInfo.classList.remove("hidden")
+
+}else{
+
+document.getElementById("durationBlock").classList.remove("hidden")
+miseInfo.classList.add("hidden")
+paddockBlock.classList.add("hidden")
+dayBlock.classList.add("hidden")
+formBlock.classList.add("hidden")
+
+}
+
+})
+
+durationSelect.addEventListener("change",()=>{
+
+if(durationSelect.value){
+
+paddockBlock.classList.remove("hidden")
+updatePaddocks()
+
+}else{
+
+paddockBlock.classList.add("hidden")
+dayBlock.classList.add("hidden")
+formBlock.classList.add("hidden")
+
+}
+
+})
+
+paddockSelect.addEventListener("change",()=>{
+
+dayBlock.classList.remove("hidden")
+generate()
+
+})
 
 function updatePaddocks(){
 
@@ -311,32 +352,8 @@ paddockSelect.innerHTML=`
 
 }
 
-generate()
-
-}
-
-durationSelect.addEventListener("change",updatePaddocks)
-
-async function loadData(){
-
-const r=await db.collection("reservations").get()
-
-reservations=[]
-
-r.forEach(doc=>{
-let data=doc.data()
-data.id=doc.id
-reservations.push(data)
-})
-
-const h=await db.collection("horaires").get()
-
-horaires={}
-
-h.forEach(doc=>{
-horaires[doc.id]=doc.data()
-})
-
+paddockSelect.selectedIndex=0
+dayBlock.classList.remove("hidden")
 generate()
 
 }
@@ -365,6 +382,7 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
 btn.classList.add("active")
 
+formBlock.classList.remove("hidden")
 generate()
 
 }
@@ -380,12 +398,38 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 
 }
 
+async function loadData(){
+
+const r=await db.collection("reservations").get()
+
+reservations=[]
+
+r.forEach(doc=>{
+let data=doc.data()
+data.id=doc.id
+reservations.push(data)
+})
+
+const h=await db.collection("horaires").get()
+
+horaires={}
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data()
+})
+
+generate()
+
+}
+
 function generate(){
+
+if(requestType.value!=="reservation") return
 
 const paddock=paddockSelect.value
 const duration=parseInt(durationSelect.value)
 
-if(!paddock)return
+if(!paddock || !selectedDate)return
 
 const container=document.getElementById("planning")
 container.innerHTML=""
@@ -409,7 +453,6 @@ const config=horaires[paddock][jour]
 let start=parseInt(config.open.split(":")[0])
 let end=parseInt(config.close.split(":")[0])
 
-let slots=[]
 let current=start
 
 while(current < end){
@@ -419,72 +462,22 @@ let minutes=current%1===0 ? "00" : "30"
 
 let time=String(hour).padStart(2,"0")+":"+minutes
 
-slots.push(time)
-
-let reservation=reservations.find(r=>{
-
-if(r.date!==selectedDate) return false
-if(r.paddock!==paddock) return false
-
-let [rh,rm]=r.time.split(":").map(Number)
-
-let resStart=rh+(rm/60)
-
-return resStart===current
-
-})
-
-if(reservation){
-
-current += reservation.duration/60
-
-}else{
-
-current += 1
-
-}
-
-}
-
-slots.forEach(time=>{
-
-let [hour,minutes]=time.split(":").map(Number)
-
-const now=new Date()
-const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
-
-let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
-
-if(!adminMode && selectedDate===today){
-
-let diff=(slotTime-now)/60000
-
-if(diff<10) return
-
-}
-
-if(hour+(minutes/60)+(duration/60) > end) return
-
 let conflict=false
 let mine=false
 let docId=null
-let reserverName=""
 
 reservations.forEach(r=>{
 
 if(r.date===selectedDate && r.paddock===paddock){
 
 let [rh,rm]=r.time.split(":").map(Number)
-
 let resStart=rh+(rm/60)
 let resEnd=resStart+(r.duration/60)
-
 let slotStart=hour+(minutes/60)
 
 if(slotStart>=resStart && slotStart<resEnd){
 
 conflict=true
-reserverName=r.name
 
 if(myReservations.includes(r.id)){
 mine=true
@@ -514,7 +507,6 @@ row.onclick=()=>cancelReservation(docId)
 else if(!conflict){
 
 row.className="row free"
-
 row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
 
 row.onclick=()=>{
@@ -522,7 +514,6 @@ row.onclick=()=>{
 selected={time,paddock,date:selectedDate,duration}
 
 document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
-
 row.classList.add("selected")
 
 }
@@ -535,7 +526,7 @@ row.className="row"
 
 if(adminMode){
 
-row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
+row.innerHTML=`<div>${time}</div><div class="reservedText">Réservé</div>`
 row.onclick=()=>cancelReservation(docId)
 
 }else{
@@ -548,11 +539,23 @@ row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
 
 container.appendChild(row)
 
-})
+current+=1
 
 }
 
-async function book(){
+}
+
+function book(){
+
+if(requestType.value==="mise"){
+alert("Service bientôt disponible")
+return
+}
+
+if(!selected){
+alert("Veuillez choisir un créneau")
+return
+}
 
 let name=document.getElementById("name").value.trim()
 
@@ -561,21 +564,12 @@ alert("Prénom obligatoire")
 return
 }
 
-if(!selected){
-alert("Choisissez un créneau")
-return
-}
-
-if(!adminMode){
-
 if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
 alert("Vous avez déjà une réservation ce jour")
 return
 }
 
-}
-
-const doc=await db.collection("reservations").add({
+db.collection("reservations").add({
 
 name:name,
 email:document.getElementById("email").value,
@@ -584,15 +578,15 @@ date:selected.date,
 time:selected.time,
 duration:selected.duration
 
-})
+}).then(doc=>{
 
 myReservations.push(doc.id)
-
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation confirmée")
-
 loadData()
+
+})
 
 }
 
@@ -601,7 +595,6 @@ async function cancelReservation(id){
 await db.collection("reservations").doc(id).delete()
 
 myReservations=myReservations.filter(r=>r!==id)
-
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation annulée")
@@ -613,12 +606,9 @@ loadData()
 window.addEventListener("DOMContentLoaded",()=>{
 
 buildDays()
-updatePaddocks()
 loadData()
 
 })
-
-paddockSelect.onchange=generate
 
 </script>
 
