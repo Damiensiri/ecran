@@ -189,13 +189,24 @@ color:#999;
 
 </div>
 
-<script>
+<script type="module">
 
-const API="https://script.google.com/macros/s/AKfycbwudqNrwrDPIz2OWGg1h3OjCxl95V_5oiz4lPGLm-nDMepv9MBF9K_zWwqnqA9CufND/exec";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
+authDomain:"ecurie-paddock.firebaseapp.com",
+projectId:"ecurie-paddock",
+storageBucket:"ecurie-paddock.firebasestorage.app",
+messagingSenderId:"501153278739",
+appId:"1:501153278739:web:824b4344c381f2a94548e6"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
 let reservations=[];
-let horaires={};
-
 let selectedDate=null;
 let selected=null;
 
@@ -205,27 +216,12 @@ let bookingLock=false;
 
 async function loadData(){
 
-const r=await fetch(API+"?sheet=reservations");
-reservations=await r.json();
+reservations=[];
 
-const h=await fetch(API+"?sheet=horaires");
-const horairesSheet=await h.json();
+const snapshot=await getDocs(collection(db,"reservations"));
 
-horaires={};
-
-horairesSheet.forEach(row=>{
-
-const paddock=row.paddock.trim().toLowerCase();
-const jour=row.jour.trim().toLowerCase();
-
-if(!horaires[paddock]) horaires[paddock]={};
-
-horaires[paddock][jour]={
-open:row.open,
-close:row.close,
-durations:String(row.durations).split(",").map(Number)
-};
-
+snapshot.forEach(doc=>{
+reservations.push(doc.data());
 });
 
 generate();
@@ -299,34 +295,14 @@ function generate(){
 const paddock=document.getElementById("paddock").value;
 const duration=parseInt(document.getElementById("duration").value);
 
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
-
 const parts=selectedDate.split("-");
 const d=new Date(parts[0],parts[1]-1,parts[2]);
-
-const jour=names[d.getDay()];
 
 const container=document.getElementById("planning");
 container.innerHTML="";
 
-if(!horaires[paddock] || !horaires[paddock][jour]){
-container.innerHTML='<div class="fullMessage">Paddock fermé</div>';
-return;
-}
-
-const config=horaires[paddock][jour];
-
-if(!config.durations.includes(duration)){
-container.innerHTML='<div class="fullMessage">Durée non disponible</div>';
-return;
-}
-
-let start=config.open.split(":");
-let end=config.close.split(":");
-
-let startMinutes=parseInt(start[0])*60+parseInt(start[1]);
-let endMinutes=parseInt(end[0])*60+parseInt(end[1]);
-
+let startMinutes=480;
+let endMinutes=1140;
 let step=30;
 
 for(let m=startMinutes; m<=endMinutes-duration; m+=step){
@@ -384,9 +360,15 @@ if(bookingLock) return;
 
 let name=document.getElementById("name").value.trim();
 
-if(!name){alert("Prénom obligatoire");return;}
+if(!name){
+alert("Prénom obligatoire");
+return;
+}
 
-if(!selected){alert("Choisissez un créneau");return;}
+if(!selected){
+alert("Choisissez un créneau");
+return;
+}
 
 if(reservations.find(r=>r.date===selected.date && r.name===name)){
 alert("Vous avez déjà une réservation ce jour");
@@ -395,24 +377,16 @@ return;
 
 bookingLock=true;
 
-const id=Date.now().toString();
+await addDoc(collection(db,"reservations"),{
 
-await fetch(API,{
-method:"POST",
-body:JSON.stringify({
-id,
-name,
+name:name,
 email:document.getElementById("email").value,
 paddock:selected.paddock,
 date:selected.date,
 time:selected.time,
 duration:selected.duration
-})
+
 });
-
-myReservations.push(id);
-
-localStorage.setItem("my_reservations",JSON.stringify(myReservations));
 
 bookingLock=false;
 
