@@ -223,7 +223,7 @@ function buildCard(e){
   `;
 }
 
-/* ===== LOAD DATA ===== */
+/* LOAD DATA */
 
 function loadData(){
 fetch(SHEET_URL,{cache:"no-store"})
@@ -240,7 +240,7 @@ fetch(SHEET_URL,{cache:"no-store"})
 loadData();
 setInterval(loadData,REFRESH);
 
-/* ===== CLOCK ===== */
+/* CLOCK */
 
 function updateClock(){
   const d=new Date();
@@ -252,7 +252,7 @@ function updateClock(){
 updateClock();
 setInterval(updateClock,1000);
 
-/* ===== DOUBLE TAP → PLANNING ===== */
+/* DOUBLE TAP → PLANNING */
 
 let lastTap = 0;
 
@@ -271,12 +271,6 @@ document.addEventListener("click", function(){
   }
   lastTap = now;
 });
-
-/* ===== REFRESH PAGE ===== */
-
-setInterval(()=>{
-  location.reload();
-},10000);
 
 </script>
 </body>
