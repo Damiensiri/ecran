@@ -84,15 +84,12 @@ cursor:pointer;
 margin-top:15px;
 }
 
-.cancelBtn{
-background:#c0392b;
-}
-
 .dayBtn{
-padding:10px;
+padding:12px;
 margin-bottom:8px;
-border-radius:10px;
-background:#f4f4f4;
+border-radius:12px;
+background:#2a2f3a;
+color:white;
 text-align:center;
 cursor:pointer;
 font-weight:600;
@@ -100,14 +97,13 @@ font-weight:600;
 
 .dayBtn.active{
 background:#181E3B;
-color:white;
 }
 
 .row{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:10px;
+padding:12px;
 border-bottom:1px solid #eee;
 }
 
@@ -119,7 +115,9 @@ border-left:4px solid #181E3B;
 }
 
 .row.mine{
-background:#ffeaa7;
+background:#1c2b4a;
+border-left:4px solid #4da3ff;
+cursor:pointer;
 }
 
 .freeText{
@@ -133,8 +131,8 @@ font-weight:600;
 }
 
 .mineText{
-color:#2980b9;
-font-weight:700;
+color:#4da3ff;
+font-weight:600;
 }
 
 .fullMessage{
@@ -211,8 +209,6 @@ border-bottom:1px solid #333;
 
 <button onclick="book()">Réserver</button>
 
-<button class="cancelBtn" onclick="cancelReservation()">Annuler ma réservation</button>
-
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -240,7 +236,14 @@ let horaires={}
 let selectedDate=null
 let selected=null
 
-let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
+/* TOKEN UNIQUE TELEPHONE */
+
+let userToken=localStorage.getItem("paddockToken")
+
+if(!userToken){
+userToken=Math.random().toString(36).substring(2)
+localStorage.setItem("paddockToken",userToken)
+}
 
 async function loadData(){
 
@@ -325,7 +328,6 @@ let jour=names[d.getDay()]
 if(!horaires[paddock][jour]) jour="lundi"
 
 const config=horaires[paddock][jour]
-const durations=horaires[paddock].durations
 
 const container=document.getElementById("planning")
 container.innerHTML=""
@@ -357,7 +359,7 @@ if(h>=resStart && h<resEnd){
 
 conflict=true
 
-if(myReservations.includes(r.id)){
+if(r.token===userToken){
 mine=true
 docId=r.id
 }
@@ -373,7 +375,7 @@ let row=document.createElement("div")
 if(mine){
 
 row.className="row mine"
-row.innerHTML=`<div>${time}</div><div class="mineText">ma réservation</div>`
+row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
 
 row.onclick=()=>cancelReservation(docId)
 
@@ -426,20 +428,17 @@ alert("Vous avez déjà une réservation ce jour")
 return
 }
 
-const doc=await db.collection("reservations").add({
+await db.collection("reservations").add({
 
 name:name,
 email:document.getElementById("email").value,
 paddock:selected.paddock,
 date:selected.date,
 time:selected.time,
-duration:selected.duration
+duration:selected.duration,
+token:userToken
 
 })
-
-myReservations.push(doc.id)
-
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation confirmée")
 
@@ -449,16 +448,7 @@ loadData()
 
 async function cancelReservation(id){
 
-if(!id){
-alert("Cliquez sur votre réservation pour annuler")
-return
-}
-
 await db.collection("reservations").doc(id).delete()
-
-myReservations=myReservations.filter(r=>r!==id)
-
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation annulée")
 
