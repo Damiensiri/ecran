@@ -142,8 +142,6 @@ font-weight:600;
 color:#999;
 }
 
-/* DARK MODE */
-
 @media (prefers-color-scheme: dark){
 
 body{
@@ -190,11 +188,7 @@ border-bottom:1px solid #333;
 </select>
 
 <label>Paddock</label>
-<select id="paddock">
-<option value="maison">Maison</option>
-<option value="grande">Grande voie</option>
-<option value="beudot">Beudot</option>
-</select>
+<select id="paddock"></select>
 
 <label>Jour</label>
 <div id="days"></div>
@@ -232,11 +226,8 @@ db.settings({experimentalForceLongPolling:true})
 
 let reservations=[]
 let horaires={}
-
 let selectedDate=null
 let selected=null
-
-/* TOKEN UNIQUE TELEPHONE */
 
 let userToken=localStorage.getItem("paddockToken")
 
@@ -244,6 +235,38 @@ if(!userToken){
 userToken=Math.random().toString(36).substring(2)
 localStorage.setItem("paddockToken",userToken)
 }
+
+const durationSelect=document.getElementById("duration")
+const paddockSelect=document.getElementById("paddock")
+
+function updatePaddocks(){
+
+const duration=durationSelect.value
+
+paddockSelect.innerHTML=""
+
+if(duration==="90"){
+
+paddockSelect.innerHTML=`
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}else{
+
+paddockSelect.innerHTML=`
+<option value="maison">Maison</option>
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}
+
+generate()
+
+}
+
+durationSelect.addEventListener("change",updatePaddocks)
 
 async function loadData(){
 
@@ -315,8 +338,10 @@ d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate(
 
 function generate(){
 
-const paddock=document.getElementById("paddock").value
-const duration=parseInt(document.getElementById("duration").value)
+const paddock=paddockSelect.value
+const duration=parseInt(durationSelect.value)
+
+if(!paddock)return
 
 const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 
@@ -376,7 +401,6 @@ if(mine){
 
 row.className="row mine"
 row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
-
 row.onclick=()=>cancelReservation(docId)
 
 }
@@ -459,11 +483,11 @@ loadData()
 window.addEventListener("DOMContentLoaded",()=>{
 
 buildDays()
+updatePaddocks()
 loadData()
 
 })
 
-document.getElementById("duration").onchange=generate
 document.getElementById("paddock").onchange=generate
 
 </script>
