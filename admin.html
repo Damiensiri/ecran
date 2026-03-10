@@ -24,8 +24,6 @@ font-size:22px;
 font-weight:700;
 }
 
-/* onglets paddocks */
-
 .tabs{
 display:flex;
 justify-content:center;
@@ -44,16 +42,12 @@ cursor:pointer;
 background:#2e7d32;
 }
 
-/* card */
-
 .card{
 background:#1c1f26;
 margin:12px;
 padding:16px;
 border-radius:16px;
 }
-
-/* ligne jour */
 
 .dayRow{
 display:flex;
@@ -94,8 +88,6 @@ font-size:12px;
 background:#2e7d32;
 }
 
-/* durée */
-
 .durations{
 display:flex;
 gap:12px;
@@ -123,9 +115,9 @@ cursor:pointer;
 
 <div class="tabs">
 
-<div class="tab active" onclick="switchTab('maison')">Maison</div>
-<div class="tab" onclick="switchTab('grande')">Grande voie</div>
-<div class="tab" onclick="switchTab('beudot')">Beudot</div>
+<div class="tab active" onclick="switchTab('maison',event)">Maison</div>
+<div class="tab" onclick="switchTab('grande',event)">Grande voie</div>
+<div class="tab" onclick="switchTab('beudot',event)">Beudot</div>
 
 </div>
 
@@ -151,7 +143,27 @@ cursor:pointer;
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
+
+/* FIREBASE */
+
+const firebaseConfig={
+apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
+authDomain:"ecurie-paddock.firebaseapp.com",
+projectId:"ecurie-paddock",
+storageBucket:"ecurie-paddock.firebasestorage.app",
+messagingSenderId:"501153278739",
+appId:"1:501153278739:web:824b4344c381f2a94548e6"
+};
+
+firebase.initializeApp(firebaseConfig)
+
+const db=firebase.firestore()
+
+/* CONFIG */
 
 let paddock="maison"
 
@@ -164,6 +176,8 @@ const days=[
 "samedi",
 "dimanche"
 ]
+
+/* HEURES */
 
 function hourOptions(){
 
@@ -181,13 +195,24 @@ return html
 
 }
 
-function build(){
+/* BUILD UI */
+
+function build(data){
 
 const container=document.getElementById("days")
-
 container.innerHTML=""
 
 days.forEach(day=>{
+
+let open="08:00"
+let close="19:00"
+let closed=false
+
+if(data && data[day]){
+open=data[day].open
+close=data[day].close
+closed=data[day].closed
+}
 
 container.innerHTML+=`
 
@@ -197,15 +222,17 @@ container.innerHTML+=`
 
 <div class="row">
 
-<div class="closed off" onclick="toggleClosed(this)">Ouvert</div>
+<div class="closed ${closed?'':'off'}" onclick="toggleClosed(this)">
+${closed?"Fermé":"Ouvert"}
+</div>
 
-<select>
+<select class="open">
 ${hourOptions()}
 </select>
 
 <span>→</span>
 
-<select>
+<select class="close">
 ${hourOptions()}
 </select>
 
@@ -217,7 +244,50 @@ ${hourOptions()}
 
 })
 
+/* appliquer valeurs */
+
+document.querySelectorAll(".dayRow").forEach((row,i)=>{
+
+if(data && data[days[i]]){
+
+row.querySelector(".open").value=data[days[i]].open
+row.querySelector(".close").value=data[days[i]].close
+
 }
+
+})
+
+}
+
+/* SWITCH PADDOCK */
+
+async function switchTab(name,e){
+
+paddock=name
+
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+e.target.classList.add("active")
+
+const doc=await db.collection("horaires").doc(paddock).get()
+
+if(doc.exists){
+
+const data=doc.data()
+
+document.getElementById("d60").checked=data.durations.includes(60)
+document.getElementById("d90").checked=data.durations.includes(90)
+
+build(data)
+
+}else{
+
+build()
+
+}
+
+}
+
+/* OPEN CLOSE */
 
 function toggleClosed(btn){
 
@@ -235,36 +305,39 @@ btn.innerText="Ouvert"
 
 }
 
-function switchTab(name){
+/* SAVE */
 
-paddock=name
-
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-
-event.target.classList.add("active")
-
-build()
-
-}
-
-function save(){
+async function save(){
 
 const data={}
-
-data.paddock=paddock
 
 data.durations=[]
 
 if(document.getElementById("d60").checked) data.durations.push(60)
 if(document.getElementById("d90").checked) data.durations.push(90)
 
-alert("Sauvegarde Firebase ici plus tard")
+document.querySelectorAll(".dayRow").forEach((row,i)=>{
 
-console.log(data)
+const day=days[i]
+
+const closed=!row.querySelector(".closed").classList.contains("off")
+
+const open=row.querySelector(".open").value
+const close=row.querySelector(".close").value
+
+data[day]={open,close,closed}
+
+})
+
+await db.collection("horaires").doc(paddock).set(data)
+
+alert("Sauvegardé ✔")
 
 }
 
-build()
+/* INIT */
+
+switchTab("maison",{target:document.querySelector(".tab.active")})
 
 </script>
 
