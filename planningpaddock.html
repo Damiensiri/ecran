@@ -380,8 +380,6 @@ const config=horaires[paddock][jour]
 let start=parseInt(config.open.split(":")[0])
 let end=parseInt(config.close.split(":")[0])
 
-/* timeline dynamique */
-
 let slots=[]
 let current=start
 
@@ -429,6 +427,7 @@ let conflict=false
 let mine=false
 let docId=null
 let reserverName=""
+let reservationFound=null
 
 reservations.forEach(r=>{
 
@@ -444,6 +443,7 @@ let slotStart=hour+(minutes/60)
 if(slotStart>=resStart && slotStart<resEnd){
 
 conflict=true
+reservationFound=r
 reserverName=r.name
 
 if(myReservations.includes(r.id)){
