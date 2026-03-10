@@ -189,10 +189,10 @@ color:#999;
 
 </div>
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+<script>
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
@@ -203,22 +203,19 @@ messagingSenderId:"501153278739",
 appId:"1:501153278739:web:824b4344c381f2a94548e6"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
 
 let reservations=[];
 let selectedDate=null;
 let selected=null;
-
-let myReservations=JSON.parse(localStorage.getItem("my_reservations")||"[]");
-
 let bookingLock=false;
 
 async function loadData(){
 
 reservations=[];
 
-const snapshot=await getDocs(collection(db,"reservations"));
+const snapshot=await db.collection("reservations").get();
 
 snapshot.forEach(doc=>{
 reservations.push(doc.data());
@@ -295,9 +292,6 @@ function generate(){
 const paddock=document.getElementById("paddock").value;
 const duration=parseInt(document.getElementById("duration").value);
 
-const parts=selectedDate.split("-");
-const d=new Date(parts[0],parts[1]-1,parts[2]);
-
 const container=document.getElementById("planning");
 container.innerHTML="";
 
@@ -370,14 +364,9 @@ alert("Choisissez un créneau");
 return;
 }
 
-if(reservations.find(r=>r.date===selected.date && r.name===name)){
-alert("Vous avez déjà une réservation ce jour");
-return;
-}
-
 bookingLock=true;
 
-await addDoc(collection(db,"reservations"),{
+await db.collection("reservations").add({
 
 name:name,
 email:document.getElementById("email").value,
@@ -411,7 +400,6 @@ function goBack(){
 const p=document.getElementById("page");
 
 p.classList.remove("active");
-
 p.classList.add("exit");
 
 setTimeout(()=>{location.href="index.html";},300);
