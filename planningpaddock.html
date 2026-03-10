@@ -379,8 +379,8 @@ let row=document.createElement("div")
 
 if(mine){
 
+row.className="row"
 row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
-
 row.onclick=()=>cancelReservation(docId)
 
 }
@@ -388,7 +388,6 @@ row.onclick=()=>cancelReservation(docId)
 else if(!conflict){
 
 row.className="row free"
-
 row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
 
 row.onclick=()=>{
@@ -404,6 +403,7 @@ row.classList.add("selected")
 
 else{
 
+row.className="row"
 row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
 
 }
