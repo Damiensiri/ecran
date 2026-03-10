@@ -61,8 +61,8 @@ opacity:0.9;
 /* BARRE HAUT */
 
 .topbar{
-display:flex;
-justify-content:space-between;
+display:grid;
+grid-template-columns:1fr auto 1fr;
 align-items:center;
 padding:0 10px;
 margin-top:6px;
@@ -81,12 +81,16 @@ cursor:pointer;
 background:#2a2f38;
 }
 
-/* bouton central */
+.leftBtn{
+justify-self:start;
+}
 
 .centerBtn{
-position:absolute;
-left:50%;
-transform:translateX(-50%);
+justify-self:center;
+}
+
+.rightBtn{
+justify-self:end;
 }
 
 /* WRAPPER */
@@ -194,11 +198,11 @@ font-weight:600;
 
 <div class="topbar">
 
-<button id="viewBtn" onclick="toggleView()">Vue jour</button>
+<button id="viewBtn" class="leftBtn" onclick="toggleView()">Vue jour</button>
 
 <button class="centerBtn" onclick="openWix()">Agenda</button>
 
-<button onclick="goEcran()">FERMER</button>
+<button class="rightBtn" onclick="goEcran()">FERMER</button>
 
 </div>
 
@@ -208,7 +212,7 @@ font-weight:600;
 
 <script>
 
-/* OUVERTURE AGENDA WIX */
+/* BOUTON AGENDA WIX */
 
 function openWix(){
 window.location.href="https://manage.wix.com/dashboard/3cad6f3c-36bb-45f1-89f5-2db25e5f6107/bookings/calendar?referralInfo=sidebar";
@@ -249,7 +253,258 @@ function goEcran(){
 location.href="ecran.html";
 }
 
-/* ... le reste de ton code reste IDENTIQUE ... */
+/* SEMAINE */
+
+function getWeekNumber(){
+const d=new Date();
+d.setHours(0,0,0,0);
+d.setDate(d.getDate()+3-(d.getDay()+6)%7);
+const week1=new Date(d.getFullYear(),0,4);
+return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
+}
+
+let currentWeek=getWeekNumber();
+
+let planningData=[];
+let validations=[];
+let viewMode="week";
+
+/* JOUR ACTUEL */
+
+const todayIndex=new Date().getDay();
+const dayMap=[6,0,1,2,3,4,5];
+const todayColumn=dayMap[todayIndex];
+
+/* ICONES */
+
+function taskIcon(text){
+
+const t=text.toLowerCase();
+
+if(t.includes("travail")) return {icon:"🐎 ",class:"travail"};
+if(t.includes("paddock")) return {icon:"🌿 ",class:"paddock"};
+if(t.includes("repos")) return {icon:"😴 ",class:"repos"};
+if(t.includes("concours")) return {icon:"🏆 ",class:"concours"};
+if(t.includes("propriétaire")) return {icon:"👤 ",class:"proprio"};
+if(t.includes("longe")) return {icon:"🪢 ",class:"longe"};
+
+return {icon:"",class:""};
+
+}
+
+/* VALIDATION */
+
+function isValidated(cheval,jour,tache){
+
+return validations.some(v=>
+String(v.Semaine)==String(currentWeek)
+&& v.Cheval.toLowerCase()==cheval.toLowerCase()
+&& v.Jour.toLowerCase()==jour.toLowerCase()
+&& v["Tâche"].toLowerCase()==tache.toLowerCase()
+);
+
+}
+
+/* ENVOI FORM */
+
+function sendToForm(cheval,jour,tache){
+
+const data=new FormData();
+
+data.append(ENTRY_WEEK,currentWeek);
+data.append(ENTRY_HORSE,cheval);
+data.append(ENTRY_DAY,jour);
+data.append(ENTRY_TASK,tache);
+
+fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
+
+}
+
+/* FORMAT TACHES */
+
+function formatTasks(tasks,cheval,jour){
+
+if(!tasks) return "";
+
+const list=tasks.split("/");
+
+return list.map(t=>{
+
+const text=t.trim();
+const iconData=taskIcon(text);
+let done=isValidated(cheval,jour,text);
+
+return `<div class="task ${iconData.class} ${done?"done":""}" data-cheval="${cheval}" data-jour="${jour}" data-task="${text}">
+${done?"✔ ":""}${iconData.icon}${text}
+</div>`;
+
+}).join("");
+
+}
+
+/* TABLEAU */
+
+function buildPlanning(){
+
+let html="<tr>";
+
+html+="<th class='horse'>Cheval</th>";
+
+days.forEach((day,i)=>{
+
+let cls="";
+
+if(i < todayColumn) cls="past";
+if(i === todayColumn) cls="today";
+
+html+=`<th class="${cls}">${day.toUpperCase()}</th>`;
+
+});
+
+html+="</tr>";
+
+planningData.forEach(row=>{
+
+html+="<tr>";
+
+html+=`<td class="horse">${row.cheval}</td>`;
+
+days.forEach((day,i)=>{
+
+let cls="";
+
+if(i < todayColumn) cls="past";
+if(i === todayColumn) cls="today";
+
+html+=`<td class="${cls}">
+${formatTasks(row[day],row.cheval,day)}
+</td>`;
+
+});
+
+html+="</tr>";
+
+});
+
+document.getElementById("planning").innerHTML=html;
+
+addTaskEvents();
+
+}
+
+/* VUE JOUR */
+
+function buildDayView(){
+
+const day=days[todayColumn];
+
+let html="<tr>";
+
+html+="<th class='horse'>Cheval</th>";
+html+=`<th>${day.toUpperCase()}</th>`;
+html+="</tr>";
+
+planningData.forEach(row=>{
+
+html+="<tr>";
+html+=`<td class="horse">${row.cheval}</td>`;
+html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
+html+="</tr>";
+
+});
+
+document.getElementById("planning").innerHTML=html;
+
+addTaskEvents();
+
+}
+
+/* CLIC TACHE */
+
+function addTaskEvents(){
+
+document.querySelectorAll(".task").forEach(el=>{
+
+el.onclick=()=>{
+
+const cheval=el.dataset.cheval;
+const jour=el.dataset.jour;
+const task=el.dataset.task;
+
+if(!el.classList.contains("done")){
+
+sendToForm(cheval,jour,task);
+
+el.classList.add("done");
+
+if(!el.innerHTML.startsWith("✔")){
+el.innerHTML="✔ "+el.innerHTML;
+}
+
+}
+
+};
+
+});
+
+}
+
+/* NAV SEMAINE */
+
+function changeWeek(delta){
+currentWeek+=delta;
+loadPlanning();
+}
+
+/* VUE */
+
+function toggleView(){
+
+const btn=document.getElementById("viewBtn");
+
+if(viewMode==="week"){
+viewMode="day";
+btn.innerText="Vue semaine";
+buildDayView();
+}else{
+viewMode="week";
+btn.innerText="Vue jour";
+buildPlanning();
+}
+
+}
+
+/* LOAD */
+
+async function loadPlanning(){
+
+let week=String(currentWeek).padStart(2,"0");
+let year=new Date().getFullYear();
+
+const planningURL=`https://opensheet.elk.sh/${SHEET_PLANNING}/semaine_${week}`;
+const validationURL=`https://opensheet.elk.sh/${SHEET_VALIDATIONS}/1`;
+
+const res1=await fetch(planningURL);
+planningData=await res1.json();
+
+const res2=await fetch(validationURL);
+validations=await res2.json();
+
+if(viewMode==="week"){
+buildPlanning();
+}else{
+buildDayView();
+}
+
+}
+
+loadPlanning();
+
+/* REFRESH */
+
+setInterval(()=>{
+location.reload();
+},180000);
 
 </script>
 </body>
