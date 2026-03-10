@@ -204,21 +204,31 @@ appId:"1:501153278739:web:824b4344c381f2a94548e6"
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db=firebase.firestore();
+db.settings({experimentalForceLongPolling:true});
 
 let reservations=[];
+let horaires={};
+
 let selectedDate=null;
 let selected=null;
-let bookingLock=false;
 
 async function loadData(){
 
 reservations=[];
+horaires={};
 
-const snapshot=await db.collection("reservations").get();
+const r=await db.collection("reservations").get();
 
-snapshot.forEach(doc=>{
+r.forEach(doc=>{
 reservations.push(doc.data());
+});
+
+const h=await db.collection("horaires").get();
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data();
 });
 
 generate();
@@ -292,11 +302,36 @@ function generate(){
 const paddock=document.getElementById("paddock").value;
 const duration=parseInt(document.getElementById("duration").value);
 
+const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+
+const parts=selectedDate.split("-");
+const d=new Date(parts[0],parts[1]-1,parts[2]);
+
+let jour=names[d.getDay()];
+
+if(!horaires[paddock][jour]) jour="lundi";
+
+const config=horaires[paddock][jour];
+
 const container=document.getElementById("planning");
 container.innerHTML="";
 
-let startMinutes=480;
-let endMinutes=1140;
+if(!config){
+container.innerHTML='<div class="fullMessage">Paddock fermé</div>';
+return;
+}
+
+if(!config.durations.includes(duration)){
+container.innerHTML='<div class="fullMessage">Durée non disponible</div>';
+return;
+}
+
+let start=config.open.split(":");
+let end=config.close.split(":");
+
+let startMinutes=parseInt(start[0])*60+parseInt(start[1]);
+let endMinutes=parseInt(end[0])*60+parseInt(end[1]);
+
 let step=30;
 
 for(let m=startMinutes; m<=endMinutes-duration; m+=step){
@@ -350,8 +385,6 @@ container.appendChild(row);
 
 async function book(){
 
-if(bookingLock) return;
-
 let name=document.getElementById("name").value.trim();
 
 if(!name){
@@ -364,8 +397,6 @@ alert("Choisissez un créneau");
 return;
 }
 
-bookingLock=true;
-
 await db.collection("reservations").add({
 
 name:name,
@@ -377,7 +408,7 @@ duration:selected.duration
 
 });
 
-bookingLock=false;
+alert("Réservation confirmée");
 
 loadData();
 
@@ -392,8 +423,6 @@ buildDays();
 loadData();
 
 });
-
-setInterval(loadData,10000);
 
 function goBack(){
 
