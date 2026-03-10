@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+m<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -37,6 +37,7 @@ align-items:center;
 justify-content:center;
 box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
+backdrop-filter:blur(6px);
 }
 
 #backBtn img{width:22px}
@@ -109,18 +110,27 @@ padding:10px;
 border-bottom:1px solid #eee;
 }
 
-.row.free{cursor:pointer;}
+.row.free{cursor:pointer}
 
 .row.selected{
 background:#c9d7ff;
 border-left:4px solid #181E3B;
 }
 
-.freeText{color:#2ecc71;font-weight:600;}
+.freeText{
+color:#2ecc71;
+font-weight:600;
+}
 
-.reservedText{color:#e74c3c;font-weight:600;}
+.reservedText{
+color:#e74c3c;
+font-weight:600;
+}
 
-.mineText{color:#2980b9;font-weight:700;}
+.mineText{
+color:#2980b9;
+font-weight:700;
+}
 
 .fullMessage{
 text-align:center;
@@ -131,25 +141,21 @@ color:#999;
 
 .hidden{display:none;}
 
-/* DARK MODE */
-
 @media(prefers-color-scheme:dark){
 
-body{background:#0f1115;color:white;}
+body{background:#0f1115;color:white}
+.card{background:#1c1f26}
+select,input{background:#252a33;color:white}
+.row{border-bottom:1px solid #333}
+.dayBtn{background:#252a33}
 
-.card{background:#1c1f26;}
-
-select,input{background:#252a33;color:white;}
-
-.row{border-bottom:1px solid #333;}
-
-.dayBtn{background:#252a33;}
-
-#backBtn{background:#1c1f26;}
+#backBtn{
+background:#1c1f26;
+backdrop-filter:blur(6px);
+}
 
 .freeText{
 color:#7bd89a;
-filter:brightness(0.9);
 }
 
 }
@@ -183,7 +189,6 @@ filter:brightness(0.9);
 
 <label>Durée</label>
 <select id="duration">
-<option value="">Choisir</option>
 <option value="60">1h</option>
 <option value="90">1h30</option>
 </select>
@@ -214,7 +219,7 @@ filter:brightness(0.9);
 
 </div>
 
-<div id="miseInfo" class="hidden" style="text-align:center;color:#666;">
+<div id="miseInfo" class="hidden" style="text-align:center;font-size:14px;color:#666">
 Service bientôt disponible
 </div>
 
@@ -255,12 +260,22 @@ tapCount++
 
 if(tapCount>=5){
 
+if(!adminMode){
+
 const pass=prompt("Mot de passe admin")
 
 if(pass==="0359140"){
-adminMode=!adminMode
-title.innerHTML=adminMode?"PADDOCK 🔧":"PADDOCK"
+adminMode=true
+title.innerHTML="PADDOCK 🔧"
 generate()
+}
+
+}else{
+
+adminMode=false
+title.innerHTML="PADDOCK"
+generate()
+
 }
 
 tapCount=0
@@ -273,13 +288,10 @@ setTimeout(()=>{tapCount=0},1200)
 
 let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 
-const durationSelect=document.getElementById("duration")
-const paddockSelect=document.getElementById("paddock")
-
+const durationBlock=document.getElementById("durationBlock")
 const paddockBlock=document.getElementById("paddockBlock")
 const dayBlock=document.getElementById("dayBlock")
 const formBlock=document.getElementById("formBlock")
-
 const requestType=document.getElementById("requestType")
 const miseInfo=document.getElementById("miseInfo")
 
@@ -287,7 +299,7 @@ requestType.addEventListener("change",()=>{
 
 if(requestType.value==="mise"){
 
-document.getElementById("durationBlock").classList.add("hidden")
+durationBlock.classList.add("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.remove("hidden")
 formBlock.classList.remove("hidden")
@@ -295,30 +307,23 @@ miseInfo.classList.remove("hidden")
 
 }else{
 
-document.getElementById("durationBlock").classList.remove("hidden")
-miseInfo.classList.add("hidden")
+durationBlock.classList.remove("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.add("hidden")
 formBlock.classList.add("hidden")
+miseInfo.classList.add("hidden")
 
 }
 
 })
 
-durationSelect.addEventListener("change",()=>{
+const durationSelect=document.getElementById("duration")
+const paddockSelect=document.getElementById("paddock")
 
-if(durationSelect.value){
+durationSelect.addEventListener("change",()=>{
 
 paddockBlock.classList.remove("hidden")
 updatePaddocks()
-
-}else{
-
-paddockBlock.classList.add("hidden")
-dayBlock.classList.add("hidden")
-formBlock.classList.add("hidden")
-
-}
 
 })
 
@@ -352,263 +357,9 @@ paddockSelect.innerHTML=`
 
 }
 
-paddockSelect.selectedIndex=0
-dayBlock.classList.remove("hidden")
 generate()
 
 }
-
-function buildDays(){
-
-const container=document.getElementById("days")
-container.innerHTML=""
-
-for(let i=0;i<3;i++){
-
-let d=new Date()
-d.setDate(d.getDate()+i)
-
-let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain"
-
-let btn=document.createElement("div")
-btn.className="dayBtn"
-
-btn.innerText=label+" "+d.getDate()
-
-btn.onclick=()=>{
-
-selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-
-document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
-btn.classList.add("active")
-
-formBlock.classList.remove("hidden")
-generate()
-
-}
-
-container.appendChild(btn)
-
-if(i===0){
-btn.classList.add("active")
-selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-}
-
-}
-
-}
-
-async function loadData(){
-
-const r=await db.collection("reservations").get()
-
-reservations=[]
-
-r.forEach(doc=>{
-let data=doc.data()
-data.id=doc.id
-reservations.push(data)
-})
-
-const h=await db.collection("horaires").get()
-
-horaires={}
-
-h.forEach(doc=>{
-horaires[doc.id]=doc.data()
-})
-
-generate()
-
-}
-
-function generate(){
-
-if(requestType.value!=="reservation") return
-
-const paddock=paddockSelect.value
-const duration=parseInt(durationSelect.value)
-
-if(!paddock || !selectedDate)return
-
-const container=document.getElementById("planning")
-container.innerHTML=""
-
-const parts=selectedDate.split("-")
-const d=new Date(parts[0],parts[1]-1,parts[2])
-
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
-
-let jour=names[d.getDay()]
-
-if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
-
-container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
-return
-
-}
-
-const config=horaires[paddock][jour]
-
-let start=parseInt(config.open.split(":")[0])
-let end=parseInt(config.close.split(":")[0])
-
-let current=start
-
-while(current < end){
-
-let hour=Math.floor(current)
-let minutes=current%1===0 ? "00" : "30"
-
-let time=String(hour).padStart(2,"0")+":"+minutes
-
-let conflict=false
-let mine=false
-let docId=null
-
-reservations.forEach(r=>{
-
-if(r.date===selectedDate && r.paddock===paddock){
-
-let [rh,rm]=r.time.split(":").map(Number)
-let resStart=rh+(rm/60)
-let resEnd=resStart+(r.duration/60)
-let slotStart=hour+(minutes/60)
-
-if(slotStart>=resStart && slotStart<resEnd){
-
-conflict=true
-
-if(myReservations.includes(r.id)){
-mine=true
-docId=r.id
-}
-
-if(adminMode){
-docId=r.id
-}
-
-}
-
-}
-
-})
-
-let row=document.createElement("div")
-
-if(mine){
-
-row.className="row"
-row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
-row.onclick=()=>cancelReservation(docId)
-
-}
-
-else if(!conflict){
-
-row.className="row free"
-row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
-
-row.onclick=()=>{
-
-selected={time,paddock,date:selectedDate,duration}
-
-document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
-row.classList.add("selected")
-
-}
-
-}
-
-else{
-
-row.className="row"
-
-if(adminMode){
-
-row.innerHTML=`<div>${time}</div><div class="reservedText">Réservé</div>`
-row.onclick=()=>cancelReservation(docId)
-
-}else{
-
-row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
-
-}
-
-}
-
-container.appendChild(row)
-
-current+=1
-
-}
-
-}
-
-function book(){
-
-if(requestType.value==="mise"){
-alert("Service bientôt disponible")
-return
-}
-
-if(!selected){
-alert("Veuillez choisir un créneau")
-return
-}
-
-let name=document.getElementById("name").value.trim()
-
-if(!name){
-alert("Prénom obligatoire")
-return
-}
-
-if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
-alert("Vous avez déjà une réservation ce jour")
-return
-}
-
-db.collection("reservations").add({
-
-name:name,
-email:document.getElementById("email").value,
-paddock:selected.paddock,
-date:selected.date,
-time:selected.time,
-duration:selected.duration
-
-}).then(doc=>{
-
-myReservations.push(doc.id)
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-alert("Réservation confirmée")
-loadData()
-
-})
-
-}
-
-async function cancelReservation(id){
-
-await db.collection("reservations").doc(id).delete()
-
-myReservations=myReservations.filter(r=>r!==id)
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-alert("Réservation annulée")
-
-loadData()
-
-}
-
-window.addEventListener("DOMContentLoaded",()=>{
-
-buildDays()
-loadData()
-
-})
 
 </script>
 
