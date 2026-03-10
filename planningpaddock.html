@@ -143,13 +143,9 @@ color:#999;
 @media(prefers-color-scheme:dark){
 
 body{background:#0f1115;color:white}
-
 .card{background:#1c1f26}
-
 select,input{background:#252a33;color:white}
-
 .row{border-bottom:1px solid #333}
-
 .dayBtn{background:#252a33}
 
 }
@@ -219,7 +215,6 @@ const db=firebase.firestore()
 
 let reservations=[]
 let horaires={}
-
 let selectedDate=null
 let selected=null
 
@@ -239,11 +234,9 @@ if(!adminMode){
 const pass=prompt("Mot de passe admin")
 
 if(pass==="0359140"){
-
 adminMode=true
 title.innerHTML="PADDOCK 🔧"
 generate()
-
 }
 
 }else{
@@ -318,8 +311,6 @@ generate()
 
 function buildDays(){
 
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
-
 const container=document.getElementById("days")
 container.innerHTML=""
 
@@ -367,18 +358,12 @@ if(!paddock)return
 const container=document.getElementById("planning")
 container.innerHTML=""
 
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
-
 const parts=selectedDate.split("-")
 const d=new Date(parts[0],parts[1]-1,parts[2])
-
+const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 let jour=names[d.getDay()]
 
-if(
-!horaires[paddock] ||
-!horaires[paddock][jour] ||
-horaires[paddock][jour].closed
-){
+if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
 container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
 return
 }
@@ -388,9 +373,37 @@ const config=horaires[paddock][jour]
 let start=parseInt(config.open.split(":")[0])
 let end=parseInt(config.close.split(":")[0])
 
-for(let h=start;h<=end-1;h++){
+let slots=[]
 
-let time=String(h).padStart(2,"0")+":00"
+for(let h=start;h<=end-1;h++){
+slots.push(h+":00")
+}
+
+reservations.forEach(r=>{
+if(r.date===selectedDate && r.paddock===paddock && r.duration===90){
+
+let parts=r.time.split(":")
+let newSlot=(parseInt(parts[0])+1)+":30"
+
+if(!slots.includes(newSlot)) slots.push(newSlot)
+
+}
+})
+
+slots.sort((a,b)=>{
+
+let [h1,m1]=a.split(":").map(Number)
+let [h2,m2]=b.split(":").map(Number)
+
+return (h1*60+m1)-(h2*60+m2)
+
+})
+
+slots.forEach(time=>{
+
+let [hour,minutes]=time.split(":").map(Number)
+
+if(hour + (minutes/60) + (duration/60) > end) return
 
 let conflict=false
 let mine=false
@@ -401,10 +414,13 @@ reservations.forEach(r=>{
 
 if(r.date===selectedDate && r.paddock===paddock){
 
-let resStart=parseInt(r.time.split(":")[0])
-let resEnd=resStart+(r.duration/60)
+let [rh,rm]=r.time.split(":").map(Number)
 
-if(h>=resStart && h<resEnd){
+let resStart=rh+(rm/60)
+let resEnd=resStart+(r.duration/60)
+let slotStart=hour+(minutes/60)
+
+if(slotStart>=resStart && slotStart<resEnd){
 
 conflict=true
 reserverName=r.name
@@ -469,7 +485,7 @@ row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
 
 container.appendChild(row)
 
-}
+})
 
 }
 
