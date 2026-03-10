@@ -144,16 +144,6 @@ color:#999;
 display:none;
 }
 
-@media(prefers-color-scheme:dark){
-
-body{background:#0f1115;color:white}
-.card{background:#1c1f26}
-select,input{background:#252a33;color:white}
-.row{border-bottom:1px solid #333}
-.dayBtn{background:#252a33}
-
-}
-
 </style>
 </head>
 
@@ -218,7 +208,7 @@ select,input{background:#252a33;color:white}
 
 </div>
 
-<div id="miseInfo" class="hidden" style="text-align:center;font-size:14px;color:#666;margin-top:10px;">
+<div id="miseInfo" class="hidden" style="text-align:center;color:#666;">
 Service bientôt disponible
 </div>
 
@@ -253,10 +243,10 @@ let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 const durationSelect=document.getElementById("duration")
 const paddockSelect=document.getElementById("paddock")
 
-const durationBlock=document.getElementById("durationBlock")
 const paddockBlock=document.getElementById("paddockBlock")
 const dayBlock=document.getElementById("dayBlock")
 const formBlock=document.getElementById("formBlock")
+
 const requestType=document.getElementById("requestType")
 const miseInfo=document.getElementById("miseInfo")
 
@@ -264,7 +254,7 @@ requestType.addEventListener("change",()=>{
 
 if(requestType.value==="mise"){
 
-durationBlock.classList.add("hidden")
+document.getElementById("durationBlock").classList.add("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.remove("hidden")
 formBlock.classList.remove("hidden")
@@ -272,11 +262,11 @@ miseInfo.classList.remove("hidden")
 
 }else{
 
-durationBlock.classList.remove("hidden")
+document.getElementById("durationBlock").classList.remove("hidden")
 miseInfo.classList.add("hidden")
-formBlock.classList.add("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.add("hidden")
+formBlock.classList.add("hidden")
 
 }
 
@@ -301,12 +291,8 @@ formBlock.classList.add("hidden")
 
 paddockSelect.addEventListener("change",()=>{
 
-if(paddockSelect.value){
-
 dayBlock.classList.remove("hidden")
 generate()
-
-}
 
 })
 
@@ -332,6 +318,14 @@ paddockSelect.innerHTML=`
 `
 
 }
+
+/* sélection auto premier paddock */
+
+paddockSelect.selectedIndex=0
+
+dayBlock.classList.remove("hidden")
+
+generate()
 
 }
 
@@ -407,7 +401,7 @@ if(requestType.value!=="reservation") return
 const paddock=paddockSelect.value
 const duration=parseInt(durationSelect.value)
 
-if(!paddock)return
+if(!paddock || !selectedDate)return
 
 const container=document.getElementById("planning")
 container.innerHTML=""
@@ -456,7 +450,7 @@ row.classList.add("selected")
 
 container.appendChild(row)
 
-current += 1
+current+=1
 
 }
 
@@ -478,7 +472,6 @@ alert("Réservation confirmée")
 window.addEventListener("DOMContentLoaded",()=>{
 
 buildDays()
-updatePaddocks()
 loadData()
 
 })
