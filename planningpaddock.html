@@ -421,13 +421,27 @@ slots.forEach(time=>{
 
 let [hour,minutes]=time.split(":").map(Number)
 
+/* cacher créneaux passés et <10min sauf admin */
+
+const now=new Date()
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
+
+let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
+
+if(!adminMode && selectedDate===today){
+
+let diff=(slotTime-now)/60000
+
+if(diff<10) return
+
+}
+
 if(hour+(minutes/60)+(duration/60) > end) return
 
 let conflict=false
 let mine=false
 let docId=null
 let reserverName=""
-let reservationFound=null
 
 reservations.forEach(r=>{
 
@@ -443,7 +457,6 @@ let slotStart=hour+(minutes/60)
 if(slotStart>=resStart && slotStart<resEnd){
 
 conflict=true
-reservationFound=r
 reserverName=r.name
 
 if(myReservations.includes(r.id)){
