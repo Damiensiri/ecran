@@ -125,11 +125,13 @@ color:#999;
 }
 
 @media(prefers-color-scheme:dark){
+
 body{background:#0f1115;color:white}
 .card{background:#1c1f26}
 select,input{background:#252a33;color:white}
 .row{border-bottom:1px solid #333}
 .dayBtn{background:#252a33}
+
 }
 
 </style>
@@ -188,8 +190,6 @@ select,input{background:#252a33;color:white}
 
 <script>
 
-/* FIREBASE */
-
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
 authDomain:"ecurie-paddock.firebaseapp.com",
@@ -210,13 +210,7 @@ let selected=null
 let adminMode=false
 let tapCount=0
 
-let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
-
 const title=document.getElementById("title")
-const durationSelect=document.getElementById("duration")
-const paddockSelect=document.getElementById("paddock")
-
-/* ADMIN */
 
 title.addEventListener("click",()=>{
 
@@ -250,6 +244,11 @@ setTimeout(()=>{tapCount=0},1200)
 
 })
 
+let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
+
+const durationSelect=document.getElementById("duration")
+const paddockSelect=document.getElementById("paddock")
+
 /* TYPE DEMANDE */
 
 function initType(){
@@ -270,7 +269,7 @@ document.getElementById("mainButton").innerText=mise?"Demander":"Réserver"
 
 }
 
-/* PADDOCK */
+/* PADDOCKS */
 
 function updatePaddocks(){
 
@@ -327,7 +326,7 @@ generate()
 
 }
 
-/* DAYS */
+/* JOURS */
 
 function buildDays(){
 
@@ -368,11 +367,9 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 
 }
 
-/* PLANNING */
+/* PLANNING ORIGINAL */
 
 function generate(){
-
-if(!selectedDate)return
 
 const paddock=paddockSelect.value
 const duration=parseInt(durationSelect.value)
@@ -386,6 +383,7 @@ const parts=selectedDate.split("-")
 const d=new Date(parts[0],parts[1]-1,parts[2])
 
 const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+
 let jour=names[d.getDay()]
 
 if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
@@ -400,13 +398,61 @@ const config=horaires[paddock][jour]
 let start=parseInt(config.open.split(":")[0])
 let end=parseInt(config.close.split(":")[0])
 
+let slots=[]
 let current=start
 
 while(current < end){
 
 let hour=Math.floor(current)
-let minutes=current%1===0?"00":"30"
+let minutes=current%1===0 ? "00" : "30"
+
 let time=String(hour).padStart(2,"0")+":"+minutes
+
+slots.push(time)
+
+let reservation=reservations.find(r=>{
+
+if(r.date!==selectedDate) return false
+if(r.paddock!==paddock) return false
+
+let [rh,rm]=r.time.split(":").map(Number)
+
+let resStart=rh+(rm/60)
+
+return resStart===current
+
+})
+
+if(reservation){
+
+current += reservation.duration/60
+
+}else{
+
+current += 1
+
+}
+
+}
+
+slots.forEach(time=>{
+
+let [hour,minutes]=time.split(":").map(Number)
+
+const now=new Date()
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
+
+let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
+
+if(!adminMode && selectedDate===today){
+
+let diff=(slotTime-now)/60000
+
+if(diff<10) return
+
+}
+
+if(hour+(minutes/60)+(duration/60) > end) return
 
 let conflict=false
 let mine=false
@@ -418,8 +464,10 @@ reservations.forEach(r=>{
 if(r.date===selectedDate && r.paddock===paddock){
 
 let [rh,rm]=r.time.split(":").map(Number)
+
 let resStart=rh+(rm/60)
 let resEnd=resStart+(r.duration/60)
+
 let slotStart=hour+(minutes/60)
 
 if(slotStart>=resStart && slotStart<resEnd){
@@ -455,6 +503,7 @@ row.onclick=()=>cancelReservation(docId)
 else if(!conflict){
 
 row.className="row free"
+
 row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
 
 row.onclick=()=>{
@@ -462,6 +511,7 @@ row.onclick=()=>{
 selected={time,paddock,date:selectedDate,duration}
 
 document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
+
 row.classList.add("selected")
 
 }
@@ -487,9 +537,7 @@ row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
 
 container.appendChild(row)
 
-current+=1
-
-}
+})
 
 }
 
@@ -516,6 +564,7 @@ return
 
 const now=new Date()
 const veille=new Date(d)
+
 veille.setDate(veille.getDate()-1)
 veille.setHours(20,0,0,0)
 
@@ -553,29 +602,28 @@ duration:selected.duration
 })
 
 myReservations.push(doc.id)
+
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation confirmée")
-selected=null
+
 loadData()
 
 }
-
-/* CANCEL */
 
 async function cancelReservation(id){
 
 await db.collection("reservations").doc(id).delete()
 
 myReservations=myReservations.filter(r=>r!==id)
+
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 alert("Réservation annulée")
+
 loadData()
 
 }
-
-/* START */
 
 window.addEventListener("DOMContentLoaded",()=>{
 
