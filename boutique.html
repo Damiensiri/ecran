@@ -65,20 +65,12 @@ margin:10px;
 border-radius:18px;
 overflow:hidden;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
-transition:transform .35s ease,opacity .35s ease;
 }
 
-.featuredImg{
-overflow:hidden;
-}
-
-.featuredImg img{
+#featured img{
 width:100%;
 height:180px;
 object-fit:cover;
-transform:scale(1);
-transition:transform .2s ease-out;
-will-change:transform;
 }
 
 #featuredContent{
@@ -118,7 +110,7 @@ object-fit:cover;
 position:absolute;
 top:10px;
 left:10px;
-background:#2e43b8;
+background:#ff4757;
 color:white;
 padding:4px 10px;
 border-radius:20px;
@@ -152,7 +144,7 @@ font-size:18px;
 }
 
 button{
-background:#24338a;
+background:#181E3B;
 color:white;
 border:none;
 padding:8px 12px;
@@ -166,12 +158,12 @@ cursor:pointer;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#24338a;
+background:#181E3B;
 color:white;
-padding:14px 18px;
+padding:12px 16px;
 border:none;
 border-radius:30px;
-box-shadow:0 10px 25px rgba(0,0,0,0.35);
+box-shadow:0 8px 20px rgba(0,0,0,0.3);
 cursor:pointer;
 z-index:100;
 }
@@ -190,20 +182,6 @@ overflow:auto;
 
 #cartPanel.open{
 right:0;
-}
-
-.closeCartBtn{
-width:46px;
-height:46px;
-border-radius:14px;
-background:#24338a;
-color:white;
-border:none;
-font-size:22px;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
 .cartItem{
@@ -233,7 +211,7 @@ border:none;
 background:#f4f4f4;
 }
 
-/* PANIER ANIMATION */
+/* ANIMATION PANIER */
 
 @keyframes cartPulse{
 0%{transform:scale(1)}
@@ -245,6 +223,16 @@ background:#f4f4f4;
 animation:cartPulse .4s ease;
 }
 
+/* IMAGE VOLANTE */
+
+.flyImg{
+position:fixed;
+z-index:9999;
+pointer-events:none;
+border-radius:12px;
+transition:all .7s cubic-bezier(.2,.8,.2,1);
+}
+
 /* DARK MODE */
 
 @media(prefers-color-scheme:dark){
@@ -252,14 +240,6 @@ animation:cartPulse .4s ease;
 body{
 background:#0f1115;
 color:white;
-}
-
-#backBtn{
-background:#1c1f26;
-}
-
-#backBtn img{
-filter:brightness(0) invert(1);
 }
 
 .card{
@@ -277,10 +257,6 @@ background:#1c1f26;
 #cartPanel input{
 background:#252a33;
 color:white;
-}
-
-button{
-background:#2e43b8;
 }
 
 }
@@ -301,7 +277,6 @@ background:#2e43b8;
 </header>
 
 <div id="featured"></div>
-
 <div id="products"></div>
 
 <button id="cartBtn" onclick="toggleCart()">
@@ -311,11 +286,8 @@ background:#2e43b8;
 <div id="cartPanel">
 
 <div style="display:flex;justify-content:space-between;align-items:center">
-
 <h2>Panier</h2>
-
-<button class="closeCartBtn" onclick="toggleCart()">✕</button>
-
+<button onclick="toggleCart()">✕</button>
 </div>
 
 <div id="cartItems"></div>
@@ -334,17 +306,11 @@ background:#2e43b8;
 
 <script>
 
-/* CATEGORY */
-
-const params = new URLSearchParams(window.location.search)
-const currentCategory = params.get("cat")
-
 /* PRODUITS DEMO */
 
 const products=[
 
 {
-categorie:"coaching",
 nom:"Coaching CSO",
 description:"Séance 45 minutes",
 prix:30,
@@ -354,7 +320,6 @@ featured:true
 },
 
 {
-categorie:"coaching",
 nom:"Travail cheval",
 description:"Travail monté",
 prix:25,
@@ -363,10 +328,9 @@ badge:""
 },
 
 {
-categorie:"laverie",
-nom:"Laverie couverture",
-description:"Nettoyage couverture",
-prix:18,
+nom:"Préparation concours",
+description:"Coaching concours",
+prix:40,
 image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
 badge:"Populaire"
 }
@@ -382,32 +346,23 @@ function render(){
 
 products.forEach(p=>{
 
-if(currentCategory && p.categorie !== currentCategory) return
-
 if(p.featured){
 
 document.getElementById("featured").innerHTML=`
 
-<div class="featuredImg">
 <img src="${p.image}">
-</div>
 
 <div id="featuredContent">
 
 <h2>${p.nom}</h2>
-
 <p>${p.description}</p>
-
 <b>${p.prix} €</b>
 
 <br><br>
 
-<button onclick="addCart('${p.nom}',${p.prix})">
-Ajouter
-</button>
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 
 </div>
-
 `
 
 }else{
@@ -429,21 +384,17 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 <div class="content">
 
 <div class="title">${p.nom}</div>
-
 <div class="desc">${p.description}</div>
 
 <div class="bottom">
 
 <div class="price">${p.prix} €</div>
 
-<button onclick="addCart('${p.nom}',${p.prix})">
-Ajouter
-</button>
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 
 </div>
 
 </div>
-
 `
 
 document.getElementById("products").appendChild(card)
@@ -454,9 +405,48 @@ document.getElementById("products").appendChild(card)
 
 }
 
-/* AJOUT PANIER */
+/* AJOUT PANIER + ANIMATION VOL */
 
-function addCart(name,price){
+function addCart(name,price,btn){
+
+if(btn){
+
+let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+
+if(img){
+
+let rect = img.getBoundingClientRect()
+let cartBtn = document.getElementById("cartBtn")
+let cartRect = cartBtn.getBoundingClientRect()
+
+let fly = img.cloneNode(true)
+
+fly.classList.add("flyImg")
+
+fly.style.left = rect.left+"px"
+fly.style.top = rect.top+"px"
+fly.style.width = rect.width+"px"
+fly.style.height = rect.height+"px"
+
+document.body.appendChild(fly)
+
+setTimeout(()=>{
+
+fly.style.left = cartRect.left+"px"
+fly.style.top = cartRect.top+"px"
+fly.style.width = "20px"
+fly.style.height = "20px"
+fly.style.opacity="0.3"
+
+},10)
+
+setTimeout(()=>{
+fly.remove()
+},700)
+
+}
+
+}
 
 let item=cart.find(i=>i.name===name)
 
@@ -477,8 +467,6 @@ cartBtn.classList.remove("pulse")
 },400)
 
 }
-
-/* UPDATE */
 
 function updateCart(){
 
@@ -538,12 +526,8 @@ updateCart()
 }
 
 function toggleCart(){
-
 document.getElementById("cartPanel").classList.toggle("open")
-
 }
-
-/* CHECKOUT */
 
 function checkout(){
 
@@ -562,34 +546,6 @@ cart=[]
 updateCart()
 
 }
-
-/* EFFET APPLE */
-
-window.addEventListener("scroll",()=>{
-
-let featured=document.getElementById("featured")
-if(!featured) return
-
-let img=document.querySelector(".featuredImg img")
-
-let scroll=window.scrollY
-
-let zoom = 1 + scroll / 2000
-if(zoom > 1.12) zoom = 1.12
-
-img.style.transform = "scale("+zoom+")"
-
-let scale = 1 - scroll / 900
-if(scale < 0.88) scale = 0.88
-
-featured.style.transform = "scale("+scale+")"
-
-let opacity = 1 - scroll / 600
-if(opacity < 0.35) opacity = 0.35
-
-featured.style.opacity = opacity
-
-})
 
 </script>
 
