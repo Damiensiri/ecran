@@ -10,6 +10,8 @@
 
 <style>
 
+/* BASE */
+
 body{
 margin:0;
 font-family:'Montserrat',sans-serif;
@@ -43,6 +45,7 @@ cursor:pointer;
 
 #backBtn img{
 width:22px;
+height:22px;
 }
 
 header h1{
@@ -52,41 +55,57 @@ top:50%;
 transform:translate(-50%,-50%);
 margin:0;
 font-size:18px;
+font-weight:700;
 }
 
-/* PRODUITS */
+/* FEATURED */
+
+#featured{
+margin:10px;
+border-radius:18px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+transition:transform .35s ease,opacity .35s ease;
+}
+
+#featured img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+#featuredContent{
+padding:16px;
+background:white;
+}
+
+/* GRID */
 
 #products{
 padding:10px;
+padding-bottom:120px;
 display:grid;
+gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-gap:14px;
 }
 
-.product{
+.card{
 background:white;
 border-radius:16px;
-padding:10px;
-box-shadow:0 5px 12px rgba(0,0,0,0.12);
-display:flex;
-flex-direction:column;
-position:relative;
 overflow:hidden;
+box-shadow:0 8px 20px rgba(0,0,0,0.12);
 }
 
-/* PRODUIT VEDETTE */
-
-.product.featured{
-grid-column:1 / -1;
-animation:pop .4s ease;
+.imgBox{
+height:140px;
+position:relative;
 }
 
-@keyframes pop{
-from{opacity:0;transform:scale(.96);}
-to{opacity:1;transform:scale(1);}
+.imgBox img{
+width:100%;
+height:100%;
+object-fit:cover;
 }
-
-/* BADGE */
 
 .badge{
 position:absolute;
@@ -94,65 +113,42 @@ top:10px;
 left:10px;
 background:#181E3B;
 color:white;
+padding:4px 10px;
+border-radius:20px;
 font-size:12px;
-padding:4px 8px;
-border-radius:6px;
-font-weight:600;
 }
 
-/* IMAGE */
-
-.product img{
-width:100%;
-border-radius:12px;
-transition:transform .35s;
+.content{
+padding:14px;
 }
 
-.product:hover img{
-transform:scale(1.05);
-}
-
-/* TEXT */
-
-.name{
+.title{
 font-weight:700;
-margin-top:6px;
+font-size:18px;
 }
 
 .desc{
-font-size:13px;
+font-size:14px;
 opacity:.7;
-}
-
-.price{
-font-weight:600;
 margin:6px 0;
 }
 
-/* QUANTITY */
-
-.qty{
+.bottom{
 display:flex;
+justify-content:space-between;
 align-items:center;
-gap:6px;
 }
 
-.qty button{
-border:none;
-background:#181E3B;
-color:white;
-width:26px;
-height:26px;
-border-radius:6px;
-cursor:pointer;
+.price{
+font-weight:700;
+font-size:18px;
 }
 
-.add{
-margin-top:6px;
-padding:8px;
+button{
 background:#181E3B;
 color:white;
 border:none;
+padding:8px 12px;
 border-radius:10px;
 cursor:pointer;
 }
@@ -165,74 +161,53 @@ bottom:20px;
 right:20px;
 background:#181E3B;
 color:white;
-padding:14px 18px;
-border-radius:30px;
+padding:12px 16px;
 border:none;
-font-weight:700;
-box-shadow:0 10px 25px rgba(0,0,0,0.35);
+border-radius:30px;
+box-shadow:0 8px 20px rgba(0,0,0,0.3);
 cursor:pointer;
 z-index:100;
 }
 
-#cart{
+#cartPanel{
 position:fixed;
-bottom:0;
-left:0;
-right:0;
+right:-340px;
+top:0;
+width:320px;
+height:100%;
 background:white;
-border-radius:20px 20px 0 0;
-box-shadow:0 -5px 20px rgba(0,0,0,0.3);
-padding:16px;
-display:none;
-max-height:80vh;
+padding:20px;
+transition:.3s;
 overflow:auto;
 }
 
-.cartHeader{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.closeCart{
-font-size:20px;
-width:36px;
-height:36px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#181E3B;
-color:white;
-border:none;
-cursor:pointer;
+#cartPanel.open{
+right:0;
 }
 
 .cartItem{
 display:flex;
 justify-content:space-between;
-margin:8px 0;
+align-items:center;
+margin-bottom:10px;
 }
 
-.checkout{
-margin-top:10px;
-padding:12px;
-width:100%;
-background:#181E3B;
-color:white;
-border:none;
-border-radius:12px;
-font-weight:700;
-cursor:pointer;
+.qty{
+display:flex;
+gap:6px;
 }
 
-/* FORM */
+.qty button{
+padding:4px 8px;
+}
 
-input{
+/* INPUT */
+
+#cartPanel input{
 width:100%;
 padding:10px;
-margin-top:8px;
-border-radius:10px;
+margin-bottom:10px;
+border-radius:8px;
 border:none;
 background:#f4f4f4;
 }
@@ -246,14 +221,6 @@ background:#0f1115;
 color:white;
 }
 
-.product{
-background:#1c1f26;
-}
-
-#cart{
-background:#1c1f26;
-}
-
 #backBtn{
 background:#1c1f26;
 }
@@ -262,7 +229,19 @@ background:#1c1f26;
 filter:brightness(0) invert(1);
 }
 
-input{
+.card{
+background:#1c1f26;
+}
+
+#featuredContent{
+background:#1c1f26;
+}
+
+#cartPanel{
+background:#1c1f26;
+}
+
+#cartPanel input{
 background:#252a33;
 color:white;
 }
@@ -284,136 +263,239 @@ color:white;
 
 </header>
 
+<div id="featured"></div>
+
 <div id="products"></div>
 
-<button id="cartBtn" onclick="toggleCart()">🛒 0</button>
+<button id="cartBtn" onclick="toggleCart()">
+🛒 <span id="count">0</span>
+</button>
 
-<div id="cart">
+<div id="cartPanel">
 
-<div class="cartHeader">
-<h3>Votre panier</h3>
-<button class="closeCart" onclick="toggleCart()">✕</button>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h2>Panier</h2>
+<button onclick="toggleCart()">✕</button>
 </div>
 
 <div id="cartItems"></div>
 
-<input id="clientNom" placeholder="Nom">
-<input id="clientPrenom" placeholder="Prénom">
-<input id="clientEmail" placeholder="Email">
+<p>Total : <b><span id="total">0</span> €</b></p>
 
-<button class="checkout" onclick="checkout()">Commander</button>
+<hr>
+
+<input id="clientNom" placeholder="Nom *">
+<input id="clientPrenom" placeholder="Prénom *">
+<input id="clientEmail" placeholder="Email *">
+
+<button onclick="checkout()">Commander</button>
 
 </div>
 
 <script>
 
-/* PRODUITS DEMO */
+/* CATEGORY FILTER */
+
+const params = new URLSearchParams(window.location.search)
+const currentCategory = params.get("cat")
+
+/* DEMO DATA */
 
 const products=[
 
-{ id:1, name:"Coaching CSO", desc:"Cours personnalisé", price:30, img:"https://picsum.photos/300?1", badge:"⭐ Vedette", featured:true },
+{
+categorie:"coaching",
+nom:"Coaching CSO",
+description:"Séance 45 minutes",
+prix:30,
+image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
+badge:"Nouveau",
+featured:true
+},
 
-{ id:2, name:"Travail cheval", desc:"Travail monté", price:45, img:"https://picsum.photos/300?2", badge:"Promo" },
+{
+categorie:"coaching",
+nom:"Travail cheval",
+description:"Travail monté",
+prix:25,
+image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
+badge:""
+},
 
-{ id:3, name:"Laverie couverture", desc:"Nettoyage couverture", price:25, img:"https://picsum.photos/300?3" }
+{
+categorie:"laverie",
+nom:"Laverie couverture",
+description:"Nettoyage couverture",
+prix:18,
+image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
+badge:"Populaire"
+}
 
 ]
 
-let cart=JSON.parse(localStorage.getItem("cart")||"[]")
+/* PANIER */
 
-/* RENDER */
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
-function renderProducts(){
+render()
+updateCart()
 
-const container=document.getElementById("products")
-
-container.innerHTML=""
+function render(){
 
 products.forEach(p=>{
 
-let el=document.createElement("div")
-el.className="product"
+if(currentCategory && p.categorie !== currentCategory) return
 
-if(p.featured) el.classList.add("featured")
+if(p.featured){
 
-let badgeHTML=p.badge?`<div class="badge">${p.badge}</div>`:""
+document.getElementById("featured").innerHTML=`
 
-el.innerHTML=`
+<img src="${p.image}">
 
-${badgeHTML}
+<div id="featuredContent">
 
-<img src="${p.img}">
+<h2>${p.nom}</h2>
 
-<div class="name">${p.name}</div>
-<div class="desc">${p.desc}</div>
-<div class="price">${p.price}€</div>
+<p>${p.description}</p>
 
-<button class="add" onclick="addToCart(${p.id})">
+<b>${p.prix} €</b>
+
+<br><br>
+
+<button onclick="addCart('${p.nom}',${p.prix},this)">
 Ajouter
 </button>
 
+</div>
+
 `
 
-container.appendChild(el)
+}else{
+
+let card=document.createElement("div")
+
+card.className="card"
+
+card.innerHTML=`
+
+<div class="imgBox">
+
+<img src="${p.image}">
+
+${p.badge?`<div class="badge">${p.badge}</div>`:""}
+
+</div>
+
+<div class="content">
+
+<div class="title">${p.nom}</div>
+
+<div class="desc">${p.description}</div>
+
+<div class="bottom">
+
+<div class="price">${p.prix} €</div>
+
+<button onclick="addCart('${p.nom}',${p.prix},this)">
+Ajouter
+</button>
+
+</div>
+
+</div>
+
+`
+
+document.getElementById("products").appendChild(card)
+
+}
 
 })
 
 }
 
-/* CART */
+/* AJOUT PANIER */
 
-function addToCart(id){
+function addCart(name,price){
 
-let p=products.find(x=>x.id===id)
+let item=cart.find(i=>i.name===name)
 
-let item=cart.find(x=>x.id===id)
-
-if(item) item.qty++
-else cart.push({id:id,name:p.name,price:p.price,qty:1})
-
-saveCart()
-
+if(item){
+item.qty++
+}else{
+cart.push({name,price,qty:1})
 }
 
-function saveCart(){
-
-localStorage.setItem("cart",JSON.stringify(cart))
 updateCart()
 
 }
 
+/* UPDATE */
+
 function updateCart(){
 
-document.getElementById("cartBtn").innerText="🛒 "+cart.length
+localStorage.setItem("cart", JSON.stringify(cart))
 
-const list=document.getElementById("cartItems")
+let count=cart.reduce((a,b)=>a+b.qty,0)
 
-list.innerHTML=""
+document.getElementById("count").innerText=count
 
-cart.forEach(i=>{
+let html=""
+let total=0
 
-let row=document.createElement("div")
+cart.forEach((item,i)=>{
 
-row.className="cartItem"
+html+=`
 
-row.innerHTML=`
-${i.name} x${i.qty}
-<span>${i.price*i.qty}€</span>
+<div class="cartItem">
+
+<div>
+${item.name}<br>
+${item.price}€
+</div>
+
+<div class="qty">
+
+<button onclick="changeQty(${i},-1)">-</button>
+
+${item.qty}
+
+<button onclick="changeQty(${i},1)">+</button>
+
+</div>
+
+</div>
+
 `
 
-list.appendChild(row)
+total+=item.price*item.qty
 
 })
+
+document.getElementById("cartItems").innerHTML=html
+document.getElementById("total").innerText=total
+
+}
+
+function changeQty(i,v){
+
+cart[i].qty+=v
+
+if(cart[i].qty<=0){
+cart.splice(i,1)
+}
+
+updateCart()
 
 }
 
 function toggleCart(){
 
-let cartEl=document.getElementById("cart")
-
-cartEl.style.display=cartEl.style.display==="block"?"none":"block"
+document.getElementById("cartPanel").classList.toggle("open")
 
 }
+
+/* CHECKOUT */
 
 function checkout(){
 
@@ -422,22 +504,18 @@ let prenom=document.getElementById("clientPrenom").value.trim()
 let email=document.getElementById("clientEmail").value.trim()
 
 if(!nom || !prenom || !email){
-
 alert("Veuillez remplir Nom, Prénom et Email")
 return
-
 }
 
 let orders=JSON.parse(localStorage.getItem("orders")||"[]")
 
 orders.push({
-
 date:new Date().toISOString(),
 nom,
 prenom,
 email,
 items:cart
-
 })
 
 localStorage.setItem("orders",JSON.stringify(orders))
@@ -453,8 +531,27 @@ toggleCart()
 
 }
 
-renderProducts()
-updateCart()
+/* SCROLL FEATURED */
+
+window.addEventListener("scroll",()=>{
+
+let featured=document.getElementById("featured")
+
+if(!featured) return
+
+let scroll=window.scrollY
+
+let scale=1-(scroll/800)
+if(scale<0.85) scale=0.85
+
+featured.style.transform="scale("+scale+")"
+
+let opacity=1-(scroll/600)
+if(opacity<0.4) opacity=0.4
+
+featured.style.opacity=opacity
+
+})
 
 </script>
 
