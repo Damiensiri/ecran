@@ -187,8 +187,11 @@ select,input{background:#252a33;color:white}
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
+
+emailjs.init("03cdce-AcdCC03k_v")
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
@@ -249,8 +252,6 @@ let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 const durationSelect=document.getElementById("duration")
 const paddockSelect=document.getElementById("paddock")
 
-/* TYPE DEMANDE */
-
 function initType(){
 
 const typeSelect=document.getElementById("type")
@@ -268,8 +269,6 @@ document.getElementById("mainButton").innerText=mise?"Demander":"Réserver"
 })
 
 }
-
-/* PADDOCKS */
 
 function updatePaddocks(){
 
@@ -300,8 +299,6 @@ generate()
 
 durationSelect.addEventListener("change",updatePaddocks)
 
-/* FIREBASE LOAD */
-
 async function loadData(){
 
 const r=await db.collection("reservations").get()
@@ -325,8 +322,6 @@ horaires[doc.id]=doc.data()
 generate()
 
 }
-
-/* JOURS */
 
 function buildDays(){
 
@@ -366,8 +361,6 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 }
 
 }
-
-/* PLANNING ORIGINAL */
 
 function generate(){
 
@@ -424,13 +417,9 @@ return resStart===current
 })
 
 if(reservation){
-
 current += reservation.duration/60
-
 }else{
-
 current += 1
-
 }
 
 }
@@ -541,8 +530,6 @@ container.appendChild(row)
 
 }
 
-/* BOOK */
-
 async function book(){
 
 const type=document.getElementById("type").value
@@ -573,7 +560,30 @@ alert("Demande possible uniquement jusqu'à 20h la veille")
 return
 }
 
-alert("Demande de mise au paddock enregistrée (5€)")
+let name=document.getElementById("name").value.trim()
+let email=document.getElementById("email").value
+
+if(!name){
+alert("Prénom obligatoire")
+return
+}
+
+emailjs.send("service_mkpsbdf","template_0qhjhhg",{
+
+jour:selectedDate,
+prenom:name,
+email:email
+
+}).then(()=>{
+
+alert("Demande envoyée (5€)")
+
+}).catch(()=>{
+
+alert("Erreur envoi mail")
+
+})
+
 return
 
 }
