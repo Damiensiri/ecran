@@ -10,8 +10,6 @@
 
 <style>
 
-/* BASE */
-
 body{
 margin:0;
 font-family:'Montserrat',sans-serif;
@@ -45,7 +43,6 @@ cursor:pointer;
 
 #backBtn img{
 width:22px;
-height:22px;
 }
 
 header h1{
@@ -53,109 +50,70 @@ position:absolute;
 left:50%;
 top:50%;
 transform:translate(-50%,-50%);
-margin:0;
 font-size:18px;
-font-weight:700;
+margin:0;
 }
 
-/* FEATURED */
-
-#featured{
-
-margin:10px;
-border-radius:18px;
-overflow:hidden;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
-
-transition:transform .35s ease,opacity .35s ease;
-
-}
-
-#featured img{
-width:100%;
-height:180px;
-object-fit:cover;
-}
-
-#featuredContent{
-padding:16px;
-background:white;
-}
-
-/* GRID */
+/* PRODUITS */
 
 #products{
 padding:10px;
-padding-bottom:120px;
 display:grid;
-gap:16px;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:12px;
 }
 
-.card{
+.product{
 background:white;
 border-radius:16px;
-overflow:hidden;
-box-shadow:0 8px 20px rgba(0,0,0,0.12);
+padding:10px;
+box-shadow:0 5px 12px rgba(0,0,0,0.12);
+display:flex;
+flex-direction:column;
 }
 
-.imgBox{
-height:140px;
-position:relative;
-}
-
-.imgBox img{
+.product img{
 width:100%;
-height:100%;
-object-fit:cover;
+border-radius:12px;
 }
 
-.badge{
-position:absolute;
-top:10px;
-left:10px;
-background:#ff4757;
-color:white;
-padding:4px 10px;
-border-radius:20px;
-font-size:12px;
-}
-
-.content{
-padding:14px;
-}
-
-.title{
+.name{
 font-weight:700;
-font-size:18px;
+margin-top:6px;
 }
 
-.desc{
-font-size:14px;
-opacity:.7;
-margin:6px 0;
+.price{
+font-weight:600;
+margin:4px 0;
 }
 
-.bottom{
+.qty{
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-.price{
-font-weight:700;
-font-size:18px;
+.qty button{
+border:none;
+background:#181E3B;
+color:white;
+width:26px;
+height:26px;
+border-radius:6px;
+cursor:pointer;
 }
 
-button{
+.add{
+margin-top:6px;
+padding:8px;
 background:#181E3B;
 color:white;
 border:none;
-padding:8px 12px;
 border-radius:10px;
 cursor:pointer;
 }
 
-/* PANIER */
+/* PANIER FLOTTANT */
 
 #cartBtn{
 position:fixed;
@@ -163,90 +121,78 @@ bottom:20px;
 right:20px;
 background:#181E3B;
 color:white;
-padding:12px 16px;
-border:none;
+padding:14px 18px;
 border-radius:30px;
-box-shadow:0 8px 20px rgba(0,0,0,0.3);
+border:none;
+font-weight:700;
+box-shadow:0 10px 25px rgba(0,0,0,0.35);
 cursor:pointer;
 z-index:100;
 }
 
-#cartPanel{
+/* PANIER */
+
+#cart{
 position:fixed;
-right:-340px;
-top:0;
-width:320px;
-height:100%;
+bottom:0;
+left:0;
+right:0;
 background:white;
-padding:20px;
-transition:.3s;
+border-radius:20px 20px 0 0;
+box-shadow:0 -5px 20px rgba(0,0,0,0.3);
+padding:16px;
+display:none;
+max-height:80vh;
 overflow:auto;
 }
 
-#cartPanel.open{
-right:0;
+.cartHeader{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.closeCart{
+font-size:20px;
+width:36px;
+height:36px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#181E3B;
+color:white;
+border:none;
+cursor:pointer;
 }
 
 .cartItem{
 display:flex;
 justify-content:space-between;
-align-items:center;
-margin-bottom:10px;
+margin:8px 0;
 }
 
-.qty{
-display:flex;
-gap:6px;
+.checkout{
+margin-top:10px;
+padding:12px;
+width:100%;
+background:#181E3B;
+color:white;
+border:none;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
 }
 
-.qty button{
-padding:4px 8px;
-}
+/* FORM */
 
-/* INPUT */
-
-#cartPanel input{
-
+input{
 width:100%;
 padding:10px;
-margin-bottom:10px;
-
-border-radius:8px;
+margin-top:8px;
+border-radius:10px;
 border:none;
 background:#f4f4f4;
-
-}
-
-/* ANIMATIONS */
-
-@keyframes cartPulse{
-
-0%{transform:scale(1)}
-40%{transform:scale(1.25)}
-100%{transform:scale(1)}
-
-}
-
-.pulse{
-animation:cartPulse .4s ease;
-}
-
-.countPop{
-
-animation:countPop .3s ease;
-
-}
-
-@keyframes countPop{
-
-0%{transform:scale(1)}
-50%{transform:scale(1.4)}
-100%{transform:scale(1)}
-
-}
-
-.added{
-background:#2ecc71 !important;
 }
 
 /* DARK MODE */
@@ -258,29 +204,23 @@ background:#0f1115;
 color:white;
 }
 
+.product{
+background:#1c1f26;
+}
+
+#cart{
+background:#1c1f26;
+}
+
 #backBtn{
 background:#1c1f26;
-box-shadow:0 12px 30px rgba(0,0,0,0.6);
 }
 
 #backBtn img{
 filter:brightness(0) invert(1);
 }
 
-.card{
-background:#1c1f26;
-box-shadow:0 20px 50px rgba(0,0,0,0.75);
-}
-
-#featuredContent{
-background:#1c1f26;
-}
-
-#cartPanel{
-background:#1c1f26;
-}
-
-#cartPanel input{
+input{
 background:#252a33;
 color:white;
 }
@@ -294,164 +234,86 @@ color:white;
 
 <header>
 
-<div id="backBtn">
-<img src="https://img.icons8.com/ios-filled/50/000000/left.png">
+<div id="backBtn" onclick="location.href='index.html'">
+<img src="image/back.svg">
 </div>
 
 <h1>SERVICES</h1>
 
 </header>
 
-<div id="featured"></div>
-
 <div id="products"></div>
 
-<button id="cartBtn" onclick="toggleCart()">
-🛒 <span id="count">0</span>
-</button>
+<button id="cartBtn" onclick="toggleCart()">🛒 0</button>
 
-<div id="cartPanel">
+<div id="cart">
 
-<div style="display:flex;justify-content:space-between;align-items:center">
-
-<h2>Panier</h2>
-
-<button onclick="toggleCart()">✕</button>
-
+<div class="cartHeader">
+<h3>Votre panier</h3>
+<button class="closeCart" onclick="toggleCart()">✕</button>
 </div>
 
 <div id="cartItems"></div>
 
-<p>Total : <b><span id="total">0</span> €</b></p>
+<input id="clientNom" placeholder="Nom">
+<input id="clientPrenom" placeholder="Prénom">
+<input id="clientEmail" placeholder="Email">
 
-<hr>
-
-<input id="clientNom" placeholder="Nom *">
-<input id="clientPrenom" placeholder="Prénom *">
-<input id="clientEmail" placeholder="Email *">
-
-<button onclick="checkout()">Commander</button>
+<button class="checkout" onclick="checkout()">Commander</button>
 
 </div>
 
 <script>
 
-/* FAKE DATA */
+/* PRODUITS DEMO */
 
 const products=[
-
-{
-nom:"Coaching CSO",
-description:"Séance 45 minutes",
-prix:30,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:"Nouveau",
-featured:true
-},
-
-{
-nom:"Travail cheval",
-description:"Travail monté",
-prix:25,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:""
-},
-
-{
-nom:"Préparation concours",
-description:"Coaching concours",
-prix:40,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:"Populaire"
-}
-
+{ id:1, name:"Coaching CSO", price:30, img:"https://picsum.photos/300?1"},
+{ id:2, name:"Travail cheval", price:45, img:"https://picsum.photos/300?2"},
+{ id:3, name:"Laverie couverture", price:25, img:"https://picsum.photos/300?3"}
 ]
 
-/* PANIER */
+let cart=JSON.parse(localStorage.getItem("cart")||"[]")
 
-let cart = JSON.parse(localStorage.getItem("cart") || "[]")
+/* RENDER PRODUITS */
 
-render()
+function renderProducts(){
 
-updateCart()
+const container=document.getElementById("products")
 
-function render(){
+container.innerHTML=""
 
 products.forEach(p=>{
 
-if(p.featured){
+let el=document.createElement("div")
+el.className="product"
 
-document.getElementById("featured").innerHTML=`
+el.innerHTML=`
 
-<img src="${p.image}">
+<img src="${p.img}">
 
-<div id="featuredContent">
+<div class="name">${p.name}</div>
+<div class="price">${p.price}€</div>
 
-<h2>${p.nom}</h2>
-
-<p>${p.description}</p>
-
-<b>${p.prix} €</b>
-
-<br><br>
-
-<button onclick="addCart('${p.nom}',${p.prix},this)">
+<button class="add" onclick="addToCart(${p.id})">
 Ajouter
 </button>
 
-</div>
-
 `
 
-}else{
-
-let card=document.createElement("div")
-
-card.className="card"
-
-card.innerHTML=`
-
-<div class="imgBox">
-
-<img src="${p.image}">
-
-${p.badge?`<div class="badge">${p.badge}</div>`:""}
-
-</div>
-
-<div class="content">
-
-<div class="title">${p.nom}</div>
-
-<div class="desc">${p.description}</div>
-
-<div class="bottom">
-
-<div class="price">${p.prix} €</div>
-
-<button onclick="addCart('${p.nom}',${p.prix},this)">
-Ajouter
-</button>
-
-</div>
-
-</div>
-
-`
-
-document.getElementById("products").appendChild(card)
-
-}
+container.appendChild(el)
 
 })
 
 }
 
-/* AJOUT PANIER */
+/* PANIER */
 
-function addCart(name,price,btn){
+function addToCart(id){
 
-let item=cart.find(i=>i.name===name)
+let p=products.find(x=>x.id===id)
+
+let item=cart.find(x=>x.id===id)
 
 if(item){
 
@@ -459,124 +321,62 @@ item.qty++
 
 }else{
 
-cart.push({name,price,qty:1})
+cart.push({id:id,name:p.name,price:p.price,qty:1})
 
 }
+
+saveCart()
+
+}
+
+/* SAVE */
+
+function saveCart(){
+
+localStorage.setItem("cart",JSON.stringify(cart))
 
 updateCart()
 
-if(btn){
-
-let original=btn.innerText
-
-btn.innerText="✓ Ajouté"
-
-btn.classList.add("added")
-
-setTimeout(()=>{
-
-btn.innerText="Ajouter"
-btn.classList.remove("added")
-
-},900)
-
 }
 
-let cartBtn=document.getElementById("cartBtn")
-
-cartBtn.classList.add("pulse")
-
-setTimeout(()=>{
-
-cartBtn.classList.remove("pulse")
-
-},400)
-
-}
-
-/* UPDATE PANIER */
+/* UPDATE */
 
 function updateCart(){
 
-localStorage.setItem("cart", JSON.stringify(cart))
+document.getElementById("cartBtn").innerText="🛒 "+cart.length
 
-let count=cart.reduce((a,b)=>a+b.qty,0)
+const list=document.getElementById("cartItems")
 
-let el=document.getElementById("count")
+list.innerHTML=""
 
-if(el.innerText!=count){
+cart.forEach(i=>{
 
-el.classList.add("countPop")
+let row=document.createElement("div")
 
-setTimeout(()=>{
+row.className="cartItem"
 
-el.classList.remove("countPop")
-
-},300)
-
-}
-
-el.innerText=count
-
-let html=""
-let total=0
-
-cart.forEach((item,i)=>{
-
-html+=`
-
-<div class="cartItem">
-
-<div>
-
-${item.name}<br>
-${item.price}€
-
-</div>
-
-<div class="qty">
-
-<button onclick="changeQty(${i},-1)">-</button>
-
-${item.qty}
-
-<button onclick="changeQty(${i},1)">+</button>
-
-</div>
-
-</div>
-
+row.innerHTML=`
+${i.name} x${i.qty}
+<span>${i.price*i.qty}€</span>
 `
 
-total+=item.price*item.qty
+list.appendChild(row)
 
 })
 
-document.getElementById("cartItems").innerHTML=html
-
-document.getElementById("total").innerText=total
-
 }
 
-function changeQty(i,v){
-
-cart[i].qty+=v
-
-if(cart[i].qty<=0){
-cart.splice(i,1)
-}
-
-updateCart()
-
-}
+/* OUVRIR PANIER */
 
 function toggleCart(){
 
-document.getElementById("cartPanel").classList.toggle("open")
+let cartEl=document.getElementById("cart")
+
+cartEl.style.display=cartEl.style.display==="block"?"none":"block"
 
 }
 
-/* EMAILJS READY */
+/* COMMANDER */
 
 function checkout(){
 
@@ -587,38 +387,39 @@ let email=document.getElementById("clientEmail").value.trim()
 if(!nom || !prenom || !email){
 
 alert("Veuillez remplir Nom, Prénom et Email")
-
 return
 
 }
 
-alert("Commande envoyée (EmailJS à connecter)")
+let orders=JSON.parse(localStorage.getItem("orders")||"[]")
+
+orders.push({
+
+date:new Date().toISOString(),
+nom,
+prenom,
+email,
+items:cart
+
+})
+
+localStorage.setItem("orders",JSON.stringify(orders))
+
+cart=[]
+localStorage.removeItem("cart")
+
+updateCart()
+
+alert("Commande envoyée")
+
+toggleCart()
 
 }
 
-/* SCROLL FEATURED */
+/* INIT */
 
-window.addEventListener("scroll",()=>{
-
-let featured=document.getElementById("featured")
-
-if(!featured) return
-
-let scroll=window.scrollY
-
-let scale=1-(scroll/800)
-
-if(scale<0.85) scale=0.85
-
-featured.style.transform="scale("+scale+")"
-
-let opacity=1-(scroll/600)
-
-if(opacity<0.4) opacity=0.4
-
-featured.style.opacity=opacity
-
-})
+renderProducts()
+updateCart()
 
 </script>
 
