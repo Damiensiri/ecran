@@ -61,10 +61,6 @@ border-radius:22px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
 }
 
-.section{
-margin-bottom:10px;
-}
-
 label{
 font-weight:600;
 font-size:14px;
@@ -173,33 +169,29 @@ select,input{background:#252a33;color:white}
 
 <div class="card">
 
-<div class="section">
+<label>Type</label>
+<select id="type">
+<option value="reservation">Réservation paddock</option>
+<option value="mise">Demande mise au paddock (+5€)</option>
+</select>
+
 <label>Durée</label>
 <select id="duration">
 <option value="60">1h</option>
 <option value="90">1h30</option>
 </select>
-</div>
 
-<div class="section">
 <label>Paddock</label>
 <select id="paddock"></select>
-</div>
 
-<div class="section">
 <label>Jour</label>
 <div id="days"></div>
-</div>
 
-<div class="section">
 <label>Prénom</label>
 <input id="name">
-</div>
 
-<div class="section">
 <label>Email (optionnel)</label>
 <input id="email">
-</div>
 
 <div id="planning"></div>
 
@@ -213,8 +205,6 @@ select,input{background:#252a33;color:white}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-
-/* TOUT LE SCRIPT EST EXACTEMENT LE TIEN */
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
@@ -304,7 +294,317 @@ generate()
 
 durationSelect.addEventListener("change",updatePaddocks)
 
-/* le reste du script est identique à ton code */
+async function loadData(){
+
+const r=await db.collection("reservations").get()
+
+reservations=[]
+
+r.forEach(doc=>{
+let data=doc.data()
+data.id=doc.id
+reservations.push(data)
+})
+
+const h=await db.collection("horaires").get()
+
+horaires={}
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data()
+})
+
+generate()
+
+}
+
+function buildDays(){
+
+const container=document.getElementById("days")
+container.innerHTML=""
+
+for(let i=0;i<3;i++){
+
+let d=new Date()
+d.setDate(d.getDate()+i)
+
+let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain"
+
+let btn=document.createElement("div")
+btn.className="dayBtn"
+
+btn.innerText=label+" "+d.getDate()
+
+btn.onclick=()=>{
+
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+
+document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
+btn.classList.add("active")
+
+generate()
+
+}
+
+container.appendChild(btn)
+
+if(i===0){
+btn.classList.add("active")
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+}
+
+}
+
+}
+
+function generate(){
+
+const paddock=paddockSelect.value
+const duration=parseInt(durationSelect.value)
+
+if(!paddock)return
+
+const container=document.getElementById("planning")
+container.innerHTML=""
+
+const parts=selectedDate.split("-")
+const d=new Date(parts[0],parts[1]-1,parts[2])
+
+const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+
+let jour=names[d.getDay()]
+
+if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
+
+container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
+return
+
+}
+
+const config=horaires[paddock][jour]
+
+let start=parseInt(config.open.split(":")[0])
+let end=parseInt(config.close.split(":")[0])
+
+let slots=[]
+let current=start
+
+while(current < end){
+
+let hour=Math.floor(current)
+let minutes=current%1===0 ? "00" : "30"
+
+let time=String(hour).padStart(2,"0")+":"+minutes
+
+slots.push(time)
+
+let reservation=reservations.find(r=>{
+
+if(r.date!==selectedDate) return false
+if(r.paddock!==paddock) return false
+
+let [rh,rm]=r.time.split(":").map(Number)
+
+let resStart=rh+(rm/60)
+
+return resStart===current
+
+})
+
+if(reservation){
+
+current += reservation.duration/60
+
+}else{
+
+current += 1
+
+}
+
+}
+
+slots.forEach(time=>{
+
+let [hour,minutes]=time.split(":").map(Number)
+
+const now=new Date()
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
+
+let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
+
+if(!adminMode && selectedDate===today){
+
+let diff=(slotTime-now)/60000
+
+if(diff<10) return
+
+}
+
+if(hour+(minutes/60)+(duration/60) > end) return
+
+let conflict=false
+let mine=false
+let docId=null
+let reserverName=""
+
+reservations.forEach(r=>{
+
+if(r.date===selectedDate && r.paddock===paddock){
+
+let [rh,rm]=r.time.split(":").map(Number)
+
+let resStart=rh+(rm/60)
+let resEnd=resStart+(r.duration/60)
+
+let slotStart=hour+(minutes/60)
+
+if(slotStart>=resStart && slotStart<resEnd){
+
+conflict=true
+reserverName=r.name
+
+if(myReservations.includes(r.id)){
+mine=true
+docId=r.id
+}
+
+if(adminMode){
+docId=r.id
+}
+
+}
+
+}
+
+})
+
+let row=document.createElement("div")
+
+if(mine){
+
+row.className="row"
+row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
+row.onclick=()=>cancelReservation(docId)
+
+}
+
+else if(!conflict){
+
+row.className="row free"
+
+row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
+
+row.onclick=()=>{
+
+selected={time,paddock,date:selectedDate,duration}
+
+document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
+
+row.classList.add("selected")
+
+}
+
+}
+
+else{
+
+row.className="row"
+
+if(adminMode){
+
+row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
+row.onclick=()=>cancelReservation(docId)
+
+}else{
+
+row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
+
+}
+
+}
+
+container.appendChild(row)
+
+})
+
+}
+
+async function book(){
+
+const type=document.getElementById("type").value
+
+if(type==="mise"){
+
+alert("Demande de mise au paddock enregistrée. Service facturé 5€.")
+return
+
+}
+
+let name=document.getElementById("name").value.trim()
+
+if(!name){
+alert("Prénom obligatoire")
+return
+}
+
+if(!selected){
+alert("Choisissez un créneau")
+return
+}
+
+if(!adminMode){
+
+if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
+alert("Vous avez déjà une réservation ce jour")
+return
+}
+
+}
+
+const doc=await db.collection("reservations").add({
+
+name:name,
+email:document.getElementById("email").value,
+paddock:selected.paddock,
+date:selected.date,
+time:selected.time,
+duration:selected.duration
+
+})
+
+myReservations.push(doc.id)
+
+localStorage.setItem("myReservations",JSON.stringify(myReservations))
+
+alert("Réservation confirmée")
+
+loadData()
+
+}
+
+async function cancelReservation(id){
+
+await db.collection("reservations").doc(id).delete()
+
+myReservations=myReservations.filter(r=>r!==id)
+
+localStorage.setItem("myReservations",JSON.stringify(myReservations))
+
+alert("Réservation annulée")
+
+loadData()
+
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+buildDays()
+updatePaddocks()
+loadData()
+
+})
+
+paddockSelect.onchange=generate
 
 </script>
 
