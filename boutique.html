@@ -184,6 +184,20 @@ overflow:auto;
 right:0;
 }
 
+.closeCart{
+font-size:26px;
+width:46px;
+height:46px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#181E3B;
+color:white;
+border:none;
+cursor:pointer;
+}
+
 .cartItem{
 display:flex;
 justify-content:space-between;
@@ -211,7 +225,7 @@ border:none;
 background:#f4f4f4;
 }
 
-/* ANIMATION PANIER */
+/* ANIMATIONS */
 
 @keyframes cartPulse{
 0%{transform:scale(1)}
@@ -222,8 +236,6 @@ background:#f4f4f4;
 .pulse{
 animation:cartPulse .4s ease;
 }
-
-/* IMAGE VOLANTE */
 
 .flyImg{
 position:fixed;
@@ -259,6 +271,20 @@ background:#252a33;
 color:white;
 }
 
+/* bleu plus visible */
+
+button{
+background:#2e43b8;
+}
+
+#cartBtn{
+background:#2e43b8;
+}
+
+.closeCart{
+background:#2e43b8;
+}
+
 }
 
 </style>
@@ -287,7 +313,7 @@ color:white;
 
 <div style="display:flex;justify-content:space-between;align-items:center">
 <h2>Panier</h2>
-<button onclick="toggleCart()">✕</button>
+<button class="closeCart" onclick="toggleCart()">✕</button>
 </div>
 
 <div id="cartItems"></div>
@@ -405,11 +431,18 @@ document.getElementById("products").appendChild(card)
 
 }
 
-/* AJOUT PANIER + ANIMATION VOL */
+/* AJOUT PANIER */
 
 function addCart(name,price,btn){
 
 if(btn){
+
+let original=btn.innerText
+btn.innerText="✓ Ajouté"
+
+setTimeout(()=>{
+btn.innerText=original
+},1000)
 
 let img = btn.closest(".card, #featuredContent")?.querySelector("img")
 
@@ -431,13 +464,11 @@ fly.style.height = rect.height+"px"
 document.body.appendChild(fly)
 
 setTimeout(()=>{
-
 fly.style.left = cartRect.left+"px"
 fly.style.top = cartRect.top+"px"
 fly.style.width = "20px"
 fly.style.height = "20px"
 fly.style.opacity="0.3"
-
 },10)
 
 setTimeout(()=>{
