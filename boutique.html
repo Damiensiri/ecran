@@ -50,8 +50,8 @@ position:absolute;
 left:50%;
 top:50%;
 transform:translate(-50%,-50%);
-font-size:18px;
 margin:0;
+font-size:18px;
 }
 
 /* PRODUITS */
@@ -60,7 +60,7 @@ margin:0;
 padding:10px;
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-gap:12px;
+gap:14px;
 }
 
 .product{
@@ -70,27 +70,71 @@ padding:10px;
 box-shadow:0 5px 12px rgba(0,0,0,0.12);
 display:flex;
 flex-direction:column;
+position:relative;
+overflow:hidden;
 }
+
+/* PRODUIT VEDETTE */
+
+.product.featured{
+grid-column:1 / -1;
+animation:pop .4s ease;
+}
+
+@keyframes pop{
+from{opacity:0;transform:scale(.96);}
+to{opacity:1;transform:scale(1);}
+}
+
+/* BADGE */
+
+.badge{
+position:absolute;
+top:10px;
+left:10px;
+background:#181E3B;
+color:white;
+font-size:12px;
+padding:4px 8px;
+border-radius:6px;
+font-weight:600;
+}
+
+/* IMAGE */
 
 .product img{
 width:100%;
 border-radius:12px;
+transition:transform .35s;
 }
+
+.product:hover img{
+transform:scale(1.05);
+}
+
+/* TEXT */
 
 .name{
 font-weight:700;
 margin-top:6px;
 }
 
+.desc{
+font-size:13px;
+opacity:.7;
+}
+
 .price{
 font-weight:600;
-margin:4px 0;
+margin:6px 0;
 }
+
+/* QUANTITY */
 
 .qty{
 display:flex;
-justify-content:space-between;
 align-items:center;
+gap:6px;
 }
 
 .qty button{
@@ -113,7 +157,7 @@ border-radius:10px;
 cursor:pointer;
 }
 
-/* PANIER FLOTTANT */
+/* PANIER */
 
 #cartBtn{
 position:fixed;
@@ -129,8 +173,6 @@ box-shadow:0 10px 25px rgba(0,0,0,0.35);
 cursor:pointer;
 z-index:100;
 }
-
-/* PANIER */
 
 #cart{
 position:fixed;
@@ -268,14 +310,18 @@ color:white;
 /* PRODUITS DEMO */
 
 const products=[
-{ id:1, name:"Coaching CSO", price:30, img:"https://picsum.photos/300?1"},
-{ id:2, name:"Travail cheval", price:45, img:"https://picsum.photos/300?2"},
-{ id:3, name:"Laverie couverture", price:25, img:"https://picsum.photos/300?3"}
+
+{ id:1, name:"Coaching CSO", desc:"Cours personnalisé", price:30, img:"https://picsum.photos/300?1", badge:"⭐ Vedette", featured:true },
+
+{ id:2, name:"Travail cheval", desc:"Travail monté", price:45, img:"https://picsum.photos/300?2", badge:"Promo" },
+
+{ id:3, name:"Laverie couverture", desc:"Nettoyage couverture", price:25, img:"https://picsum.photos/300?3" }
+
 ]
 
 let cart=JSON.parse(localStorage.getItem("cart")||"[]")
 
-/* RENDER PRODUITS */
+/* RENDER */
 
 function renderProducts(){
 
@@ -288,11 +334,18 @@ products.forEach(p=>{
 let el=document.createElement("div")
 el.className="product"
 
+if(p.featured) el.classList.add("featured")
+
+let badgeHTML=p.badge?`<div class="badge">${p.badge}</div>`:""
+
 el.innerHTML=`
+
+${badgeHTML}
 
 <img src="${p.img}">
 
 <div class="name">${p.name}</div>
+<div class="desc">${p.desc}</div>
 <div class="price">${p.price}€</div>
 
 <button class="add" onclick="addToCart(${p.id})">
@@ -307,7 +360,7 @@ container.appendChild(el)
 
 }
 
-/* PANIER */
+/* CART */
 
 function addToCart(id){
 
@@ -315,31 +368,19 @@ let p=products.find(x=>x.id===id)
 
 let item=cart.find(x=>x.id===id)
 
-if(item){
-
-item.qty++
-
-}else{
-
-cart.push({id:id,name:p.name,price:p.price,qty:1})
-
-}
+if(item) item.qty++
+else cart.push({id:id,name:p.name,price:p.price,qty:1})
 
 saveCart()
 
 }
 
-/* SAVE */
-
 function saveCart(){
 
 localStorage.setItem("cart",JSON.stringify(cart))
-
 updateCart()
 
 }
-
-/* UPDATE */
 
 function updateCart(){
 
@@ -366,8 +407,6 @@ list.appendChild(row)
 
 }
 
-/* OUVRIR PANIER */
-
 function toggleCart(){
 
 let cartEl=document.getElementById("cart")
@@ -375,8 +414,6 @@ let cartEl=document.getElementById("cart")
 cartEl.style.display=cartEl.style.display==="block"?"none":"block"
 
 }
-
-/* COMMANDER */
 
 function checkout(){
 
@@ -415,8 +452,6 @@ alert("Commande envoyée")
 toggleCart()
 
 }
-
-/* INIT */
 
 renderProducts()
 updateCart()
