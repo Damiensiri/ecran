@@ -10,7 +10,7 @@
 
 <style>
 
-/* ===== BASE ===== */
+/* BASE */
 
 body{
 margin:0;
@@ -20,7 +20,7 @@ color:#000;
 transition:.3s;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 
 header{
 position:relative;
@@ -43,7 +43,10 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{width:22px}
+#backBtn img{
+width:22px;
+height:22px;
+}
 
 header h1{
 position:absolute;
@@ -55,13 +58,17 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ===== FEATURED ===== */
+/* FEATURED */
 
 #featured{
+
 margin:10px;
 border-radius:18px;
 overflow:hidden;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
+
+transition:transform .35s ease,opacity .35s ease;
+
 }
 
 #featured img{
@@ -75,10 +82,11 @@ padding:16px;
 background:white;
 }
 
-/* ===== GRID ===== */
+/* GRID */
 
 #products{
 padding:10px;
+padding-bottom:120px;
 display:grid;
 gap:16px;
 }
@@ -147,7 +155,7 @@ border-radius:10px;
 cursor:pointer;
 }
 
-/* ===== PANIER ===== */
+/* PANIER */
 
 #cartBtn{
 position:fixed;
@@ -160,6 +168,7 @@ border:none;
 border-radius:30px;
 box-shadow:0 8px 20px rgba(0,0,0,0.3);
 cursor:pointer;
+z-index:100;
 }
 
 #cartPanel{
@@ -194,25 +203,53 @@ gap:6px;
 padding:4px 8px;
 }
 
-/* ===== ADD ANIMATION ===== */
+/* INPUT */
 
-.fly{
-position:fixed;
-background:#2ecc71;
-color:white;
-padding:6px 10px;
-border-radius:20px;
-animation:fly .8s forwards;
+#cartPanel input{
+
+width:100%;
+padding:10px;
+margin-bottom:10px;
+
+border-radius:8px;
+border:none;
+background:#f4f4f4;
+
 }
 
-@keyframes fly{
-to{
-transform:translateY(-100px) scale(.5);
-opacity:0;
-}
+/* ANIMATIONS */
+
+@keyframes cartPulse{
+
+0%{transform:scale(1)}
+40%{transform:scale(1.25)}
+100%{transform:scale(1)}
+
 }
 
-/* ===== DARK MODE ===== */
+.pulse{
+animation:cartPulse .4s ease;
+}
+
+.countPop{
+
+animation:countPop .3s ease;
+
+}
+
+@keyframes countPop{
+
+0%{transform:scale(1)}
+50%{transform:scale(1.4)}
+100%{transform:scale(1)}
+
+}
+
+.added{
+background:#2ecc71 !important;
+}
+
+/* DARK MODE */
 
 @media(prefers-color-scheme:dark){
 
@@ -223,11 +260,16 @@ color:white;
 
 #backBtn{
 background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
+#backBtn img{
+filter:brightness(0) invert(1);
 }
 
 .card{
 background:#1c1f26;
-box-shadow:0 20px 50px rgba(0,0,0,0.7);
+box-shadow:0 20px 50px rgba(0,0,0,0.75);
 }
 
 #featuredContent{
@@ -236,6 +278,11 @@ background:#1c1f26;
 
 #cartPanel{
 background:#1c1f26;
+}
+
+#cartPanel input{
+background:#252a33;
+color:white;
 }
 
 }
@@ -265,11 +312,23 @@ background:#1c1f26;
 
 <div id="cartPanel">
 
+<div style="display:flex;justify-content:space-between;align-items:center">
+
 <h2>Panier</h2>
+
+<button onclick="toggleCart()">✕</button>
+
+</div>
 
 <div id="cartItems"></div>
 
-<p>Total : <span id="total">0</span> €</p>
+<p>Total : <b><span id="total">0</span> €</b></p>
+
+<hr>
+
+<input id="clientNom" placeholder="Nom *">
+<input id="clientPrenom" placeholder="Prénom *">
+<input id="clientEmail" placeholder="Email *">
 
 <button onclick="checkout()">Commander</button>
 
@@ -277,7 +336,7 @@ background:#1c1f26;
 
 <script>
 
-/* ===== FAKE DATA ===== */
+/* FAKE DATA */
 
 const products=[
 
@@ -308,31 +367,21 @@ badge:"Populaire"
 
 ]
 
-/* ===== PANIER ===== */
+/* PANIER */
 
-let cart=[]
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
 render()
+
+updateCart()
 
 function render(){
 
 products.forEach(p=>{
 
 if(p.featured){
-renderFeatured(p)
-}else{
-renderCard(p)
-}
 
-})
-
-}
-
-function renderFeatured(p){
-
-const el=document.getElementById("featured")
-
-el.innerHTML=`
+document.getElementById("featured").innerHTML=`
 
 <img src="${p.image}">
 
@@ -344,7 +393,9 @@ el.innerHTML=`
 
 <b>${p.prix} €</b>
 
-<button onclick="addCart('${p.nom}',${p.prix})">
+<br><br>
+
+<button onclick="addCart('${p.nom}',${p.prix},this)">
 Ajouter
 </button>
 
@@ -352,13 +403,10 @@ Ajouter
 
 `
 
-}
-
-function renderCard(p){
-
-const container=document.getElementById("products")
+}else{
 
 let card=document.createElement("div")
+
 card.className="card"
 
 card.innerHTML=`
@@ -381,7 +429,7 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 
 <div class="price">${p.prix} €</div>
 
-<button onclick="addCart('${p.nom}',${p.prix})">
+<button onclick="addCart('${p.nom}',${p.prix},this)">
 Ajouter
 </button>
 
@@ -391,30 +439,84 @@ Ajouter
 
 `
 
-container.appendChild(card)
+document.getElementById("products").appendChild(card)
 
 }
 
-/* ===== PANIER ===== */
+})
 
-function addCart(name,price){
+}
+
+/* AJOUT PANIER */
+
+function addCart(name,price,btn){
 
 let item=cart.find(i=>i.name===name)
 
 if(item){
+
 item.qty++
+
 }else{
+
 cart.push({name,price,qty:1})
+
 }
 
 updateCart()
 
+if(btn){
+
+let original=btn.innerText
+
+btn.innerText="✓ Ajouté"
+
+btn.classList.add("added")
+
+setTimeout(()=>{
+
+btn.innerText="Ajouter"
+btn.classList.remove("added")
+
+},900)
+
 }
+
+let cartBtn=document.getElementById("cartBtn")
+
+cartBtn.classList.add("pulse")
+
+setTimeout(()=>{
+
+cartBtn.classList.remove("pulse")
+
+},400)
+
+}
+
+/* UPDATE PANIER */
 
 function updateCart(){
 
-document.getElementById("count").innerText=
-cart.reduce((a,b)=>a+b.qty,0)
+localStorage.setItem("cart", JSON.stringify(cart))
+
+let count=cart.reduce((a,b)=>a+b.qty,0)
+
+let el=document.getElementById("count")
+
+if(el.innerText!=count){
+
+el.classList.add("countPop")
+
+setTimeout(()=>{
+
+el.classList.remove("countPop")
+
+},300)
+
+}
+
+el.innerText=count
 
 let html=""
 let total=0
@@ -451,6 +553,7 @@ total+=item.price*item.qty
 })
 
 document.getElementById("cartItems").innerHTML=html
+
 document.getElementById("total").innerText=total
 
 }
@@ -467,25 +570,55 @@ updateCart()
 
 }
 
-/* ===== PANIER UI ===== */
-
 function toggleCart(){
+
 document.getElementById("cartPanel").classList.toggle("open")
+
 }
 
-/* ===== COMMANDE ===== */
+/* EMAILJS READY */
 
 function checkout(){
 
-let txt="Commande :\n\n"
+let nom=document.getElementById("clientNom").value.trim()
+let prenom=document.getElementById("clientPrenom").value.trim()
+let email=document.getElementById("clientEmail").value.trim()
 
-cart.forEach(i=>{
-txt+=`${i.name} x${i.qty}\n`
-})
+if(!nom || !prenom || !email){
 
-alert(txt)
+alert("Veuillez remplir Nom, Prénom et Email")
+
+return
 
 }
+
+alert("Commande envoyée (EmailJS à connecter)")
+
+}
+
+/* SCROLL FEATURED */
+
+window.addEventListener("scroll",()=>{
+
+let featured=document.getElementById("featured")
+
+if(!featured) return
+
+let scroll=window.scrollY
+
+let scale=1-(scroll/800)
+
+if(scale<0.85) scale=0.85
+
+featured.style.transform="scale("+scale+")"
+
+let opacity=1-(scroll/600)
+
+if(opacity<0.4) opacity=0.4
+
+featured.style.opacity=opacity
+
+})
 
 </script>
 
