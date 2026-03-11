@@ -111,7 +111,7 @@ object-fit:cover;
 position:absolute;
 top:10px;
 left:10px;
-background:#181E3B;
+background:#2e43b8;
 color:white;
 padding:4px 10px;
 border-radius:20px;
@@ -145,7 +145,7 @@ font-size:18px;
 }
 
 button{
-background:#181E3B;
+background:#24338a;
 color:white;
 border:none;
 padding:8px 12px;
@@ -159,12 +159,12 @@ cursor:pointer;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#181E3B;
+background:#24338a;
 color:white;
-padding:12px 16px;
+padding:14px 18px;
 border:none;
 border-radius:30px;
-box-shadow:0 8px 20px rgba(0,0,0,0.3);
+box-shadow:0 10px 25px rgba(0,0,0,0.35);
 cursor:pointer;
 z-index:100;
 }
@@ -183,6 +183,20 @@ overflow:auto;
 
 #cartPanel.open{
 right:0;
+}
+
+.closeCartBtn{
+width:46px;
+height:46px;
+border-radius:14px;
+background:#24338a;
+color:white;
+border:none;
+font-size:22px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .cartItem{
@@ -210,6 +224,18 @@ margin-bottom:10px;
 border-radius:8px;
 border:none;
 background:#f4f4f4;
+}
+
+/* ANIMATION PANIER */
+
+@keyframes cartPulse{
+0%{transform:scale(1)}
+40%{transform:scale(1.25)}
+100%{transform:scale(1)}
+}
+
+.pulse{
+animation:cartPulse .4s ease;
 }
 
 /* DARK MODE */
@@ -246,6 +272,10 @@ background:#252a33;
 color:white;
 }
 
+button{
+background:#2e43b8;
+}
+
 }
 
 </style>
@@ -274,8 +304,11 @@ color:white;
 <div id="cartPanel">
 
 <div style="display:flex;justify-content:space-between;align-items:center">
+
 <h2>Panier</h2>
-<button onclick="toggleCart()">✕</button>
+
+<button class="closeCartBtn" onclick="toggleCart()">✕</button>
+
 </div>
 
 <div id="cartItems"></div>
@@ -294,12 +327,12 @@ color:white;
 
 <script>
 
-/* CATEGORY FILTER */
+/* CATEGORY */
 
 const params = new URLSearchParams(window.location.search)
 const currentCategory = params.get("cat")
 
-/* DEMO DATA */
+/* PRODUITS DEMO */
 
 const products=[
 
@@ -362,7 +395,7 @@ document.getElementById("featured").innerHTML=`
 
 <br><br>
 
-<button onclick="addCart('${p.nom}',${p.prix},this)">
+<button onclick="addCart('${p.nom}',${p.prix})">
 Ajouter
 </button>
 
@@ -396,7 +429,7 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 
 <div class="price">${p.prix} €</div>
 
-<button onclick="addCart('${p.nom}',${p.prix},this)">
+<button onclick="addCart('${p.nom}',${p.prix})">
 Ajouter
 </button>
 
@@ -427,6 +460,14 @@ cart.push({name,price,qty:1})
 }
 
 updateCart()
+
+let cartBtn=document.getElementById("cartBtn")
+
+cartBtn.classList.add("pulse")
+
+setTimeout(()=>{
+cartBtn.classList.remove("pulse")
+},400)
 
 }
 
@@ -508,50 +549,26 @@ alert("Veuillez remplir Nom, Prénom et Email")
 return
 }
 
-let orders=JSON.parse(localStorage.getItem("orders")||"[]")
-
-orders.push({
-date:new Date().toISOString(),
-nom,
-prenom,
-email,
-items:cart
-})
-
-localStorage.setItem("orders",JSON.stringify(orders))
-
-cart=[]
-localStorage.removeItem("cart")
-
-updateCart()
-
-alert("Commande envoyée")
-
-toggleCart()
+sendOrderEmail(nom,prenom,email)
 
 }
 
-/* SCROLL FEATURED */
+function sendOrderEmail(nom,prenom,email){
 
-window.addEventListener("scroll",()=>{
+let orderText=""
 
-let featured=document.getElementById("featured")
-
-if(!featured) return
-
-let scroll=window.scrollY
-
-let scale=1-(scroll/800)
-if(scale<0.85) scale=0.85
-
-featured.style.transform="scale("+scale+")"
-
-let opacity=1-(scroll/600)
-if(opacity<0.4) opacity=0.4
-
-featured.style.opacity=opacity
-
+cart.forEach(item=>{
+orderText+=item.name+" x"+item.qty+" - "+(item.price*item.qty)+"€\n"
 })
+
+console.log("Commande prête à envoyer")
+
+alert("Commande envoyée")
+
+cart=[]
+updateCart()
+
+}
 
 </script>
 
