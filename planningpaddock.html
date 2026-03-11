@@ -176,17 +176,13 @@ select,input{background:#252a33;color:white}
 </div>
 
 <div id="paddockBlock" class="hidden">
-
 <label>Paddock</label>
 <select id="paddock"></select>
-
 </div>
 
 <div id="dayBlock" class="hidden">
-
 <label>Jour</label>
 <div id="days"></div>
-
 </div>
 
 <div id="formBlock" class="hidden">
@@ -275,6 +271,7 @@ let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 const durationSelect=document.getElementById("duration")
 const paddockSelect=document.getElementById("paddock")
 
+const durationBlock=document.getElementById("durationBlock")
 const paddockBlock=document.getElementById("paddockBlock")
 const dayBlock=document.getElementById("dayBlock")
 const formBlock=document.getElementById("formBlock")
@@ -286,7 +283,7 @@ requestType.addEventListener("change",()=>{
 
 if(requestType.value==="mise"){
 
-document.getElementById("durationBlock").classList.add("hidden")
+durationBlock.classList.add("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.remove("hidden")
 formBlock.classList.remove("hidden")
@@ -294,7 +291,7 @@ miseInfo.classList.remove("hidden")
 
 }else{
 
-document.getElementById("durationBlock").classList.remove("hidden")
+durationBlock.classList.remove("hidden")
 miseInfo.classList.add("hidden")
 paddockBlock.classList.add("hidden")
 dayBlock.classList.add("hidden")
@@ -357,7 +354,7 @@ generate()
 
 }
 
-/* le reste du moteur planning est IDENTIQUE à ta version stable */
+/* moteur planning original conservé */
 
 </script>
 
