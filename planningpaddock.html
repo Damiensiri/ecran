@@ -600,6 +600,17 @@ alert("Choisissez un créneau")
 return
 }
 
+/* SECURITE : 1 RESERVATION PAR JOUR (SAUF ADMIN) */
+
+if(!adminMode){
+
+if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
+alert("Vous avez déjà une réservation ce jour")
+return
+}
+
+}
+
 const doc=await db.collection("reservations").add({
 
 name:name,
