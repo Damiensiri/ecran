@@ -87,6 +87,7 @@ cursor:pointer;
 text-align:center;
 color:#888;
 margin-top:40px;
+font-weight:600;
 }
 
 @media(prefers-color-scheme:dark){
@@ -137,18 +138,15 @@ async function load(){
 const container=document.getElementById("list")
 container.innerHTML=""
 
-if(myReservations.length===0){
-
-container.innerHTML='<div class="empty">Aucune réservation</div>'
-return
-
-}
+let count=0
 
 for(const id of myReservations){
 
 const doc=await db.collection("reservations").doc(id).get()
 
 if(!doc.exists) continue
+
+count++
 
 const data=doc.data()
 
@@ -169,6 +167,10 @@ card.innerHTML=`
 
 container.appendChild(card)
 
+}
+
+if(count===0){
+container.innerHTML='<div class="empty">Aucune réservation</div>'
 }
 
 }
