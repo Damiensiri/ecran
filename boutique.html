@@ -291,21 +291,16 @@ background:#2e43b8;
 <body>
 
 <header>
-
 <div id="backBtn" onclick="location.href='index.html'">
 <img src="image/back.svg">
 </div>
-
 <h1>SERVICES</h1>
-
 </header>
 
 <div id="featured"></div>
 <div id="products"></div>
 
-<button id="cartBtn" onclick="toggleCart()">
-🛒 <span id="count">0</span>
-</button>
+<button id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></button>
 
 <div id="cartPanel">
 
@@ -330,61 +325,56 @@ background:#2e43b8;
 
 <script>
 
-const API="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/service"
+/* URL SHEET */
 
+const SHEET_URL="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/service"
+
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
 let products=[]
-let cart=JSON.parse(localStorage.getItem("cart")||"[]")
 
-fetch(API)
+/* LOAD PRODUITS */
+
+fetch(SHEET_URL)
 .then(res=>res.json())
 .then(data=>{
 
-products=data.filter(p=>p.actif!=="false")
+products=data
+.filter(p=>p.actif==="TRUE")
+.sort((a,b)=>Number(a.rang)-Number(b.rang))
 
 render()
-updateCart()
 
 })
+
+/* RENDER */
 
 function render(){
 
 products.forEach(p=>{
 
-let price=parseFloat(p.prix)
-
-if(p.featured==="true"){
+if(p.featured==="TRUE"){
 
 document.getElementById("featured").innerHTML=`
-
 <img src="${p.image}">
-
 <div id="featuredContent">
-
 <h2>${p.nom}</h2>
 <p>${p.description}</p>
-<b>${price} €</b>
-
+<b>${p.prix} €</b>
 <br><br>
-
-<button onclick="addCart('${p.nom}',${price},this)">Ajouter</button>
-
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 </div>
 `
 
 }else{
 
 let card=document.createElement("div")
-
 card.className="card"
 
 card.innerHTML=`
 
 <div class="imgBox">
-
 <img src="${p.image}">
-
 ${p.badge?`<div class="badge">${p.badge}</div>`:""}
-
 </div>
 
 <div class="content">
@@ -393,11 +383,8 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 <div class="desc">${p.description}</div>
 
 <div class="bottom">
-
-<div class="price">${price} €</div>
-
-<button onclick="addCart('${p.nom}',${price},this)">Ajouter</button>
-
+<div class="price">${p.prix} €</div>
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 </div>
 
 </div>
@@ -409,70 +396,31 @@ document.getElementById("products").appendChild(card)
 
 })
 
+updateCart()
+
 }
 
 /* AJOUT PANIER */
 
 function addCart(name,price,btn){
 
-if(btn){
-
-let original=btn.innerText
-btn.innerText="✓ Ajouté"
-
-setTimeout(()=>{btn.innerText=original},1000)
-
-let img=btn.closest(".card,#featuredContent")?.querySelector("img")
-
-if(img){
-
-let rect=img.getBoundingClientRect()
-let cartBtn=document.getElementById("cartBtn")
-let cartRect=cartBtn.getBoundingClientRect()
-
-let fly=img.cloneNode(true)
-
-fly.classList.add("flyImg")
-
-fly.style.left=rect.left+"px"
-fly.style.top=rect.top+"px"
-fly.style.width=rect.width+"px"
-fly.style.height=rect.height+"px"
-
-document.body.appendChild(fly)
-
-setTimeout(()=>{
-fly.style.left=cartRect.left+"px"
-fly.style.top=cartRect.top+"px"
-fly.style.width="20px"
-fly.style.height="20px"
-fly.style.opacity="0.3"
-},10)
-
-setTimeout(()=>{fly.remove()},700)
-
-}
-
-}
-
 let item=cart.find(i=>i.name===name)
 
-if(item){item.qty++}
-else{cart.push({name,price,qty:1})}
+if(item){
+item.qty++
+}else{
+cart.push({name,price,qty:1})
+}
 
 updateCart()
 
-let cartBtn=document.getElementById("cartBtn")
-
-cartBtn.classList.add("pulse")
-
-setTimeout(()=>{cartBtn.classList.remove("pulse")},400)
-
 }
+
+/* UPDATE PANIER */
 
 function updateCart(){
 
-localStorage.setItem("cart",JSON.stringify(cart))
+localStorage.setItem("cart", JSON.stringify(cart))
 
 let count=cart.reduce((a,b)=>a+b.qty,0)
 
@@ -493,13 +441,9 @@ ${item.price}€
 </div>
 
 <div class="qty">
-
 <button onclick="changeQty(${i},-1)">-</button>
-
 ${item.qty}
-
 <button onclick="changeQty(${i},1)">+</button>
-
 </div>
 
 </div>
@@ -518,7 +462,9 @@ function changeQty(i,v){
 
 cart[i].qty+=v
 
-if(cart[i].qty<=0){cart.splice(i,1)}
+if(cart[i].qty<=0){
+cart.splice(i,1)
+}
 
 updateCart()
 
@@ -534,7 +480,7 @@ let nom=document.getElementById("clientNom").value.trim()
 let prenom=document.getElementById("clientPrenom").value.trim()
 let email=document.getElementById("clientEmail").value.trim()
 
-if(!nom||!prenom||!email){
+if(!nom || !prenom || !email){
 alert("Veuillez remplir Nom, Prénom et Email")
 return
 }
