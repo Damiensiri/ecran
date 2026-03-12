@@ -20,22 +20,6 @@ color:#000;
 transition:.3s;
 }
 
-/* ===== ANIMATION PAGE ===== */
-
-.page{
-min-height:100vh;
-transform:translateX(100%);
-transition:0.35s;
-}
-
-.page.active{
-transform:translateX(0);
-}
-
-.page.exit{
-transform:translateX(100%);
-}
-
 /* HEADER */
 
 header{
@@ -183,7 +167,6 @@ border-radius:30px;
 box-shadow:0 8px 20px rgba(0,0,0,0.3);
 cursor:pointer;
 z-index:100;
-transition:transform .25s ease; /* seule ligne ajoutée */
 }
 
 #cartPanel{
@@ -234,6 +217,8 @@ gap:6px;
 padding:4px 8px;
 }
 
+/* INPUT */
+
 #cartPanel input{
 width:100%;
 padding:10px;
@@ -242,6 +227,8 @@ border-radius:8px;
 border:none;
 background:#f4f4f4;
 }
+
+/* BOUTON COMMANDER */
 
 .checkoutBtn{
 display:block;
@@ -319,11 +306,9 @@ background:#2e43b8;
 
 <body>
 
-<div class="page" id="page">
-
 <header>
 
-<div id="backBtn" onclick="goBack()">
+<div id="backBtn" onclick="location.href='index.html'">
 <img src="image/back.svg">
 </div>
 
@@ -333,8 +318,6 @@ background:#2e43b8;
 
 <div id="featured"></div>
 <div id="products"></div>
-
-</div>
 
 <button id="cartBtn" onclick="toggleCart()">
 🛒 <span id="count">0</span>
@@ -365,37 +348,307 @@ background:#2e43b8;
 
 <script>
 
-/* ===== ANIMATION OUVERTURE ===== */
+emailjs.init("03cdce-AcdCC03k_v")
 
-window.addEventListener("DOMContentLoaded",()=>{
-requestAnimationFrame(()=>{
-document.getElementById("page").classList.add("active");
-});
-});
+const SHEET_URL="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/service"
 
-/* ===== ANIMATION RETOUR ===== */
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
+let products=[]
 
-function goBack(){
-const p=document.getElementById("page");
-p.classList.remove("active");
-p.classList.add("exit");
+fetch(SHEET_URL)
+.then(r=>r.json())
+.then(data=>{
 
-setTimeout(()=>{
-location.href="index.html";
-},300);
+products=data
+.filter(p=>p.actif==="TRUE")
+.sort((a,b)=>Number(a.rang)-Number(b.rang))
+
+render()
+updateCart()
+
+})
+
+function render(){
+
+products.forEach(p=>{
+
+if(p.featured==="TRUE"){
+
+document.getElementById("featured").innerHTML=`
+
+<img src="${p.image}">
+
+<div id="featuredContent">
+
+<h2>${p.nom}</h2>
+<p>${p.description}</p>
+<b>${p.prix} €</b>
+
+<br><br>
+
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
+
+</div>
+`
+
+}else{
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+
+<div class="imgBox">
+
+<img src="${p.image}">
+
+${p.badge?`<div class="badge">${p.badge}</div>`:""}
+
+</div>
+
+<div class="content">
+
+<div class="title">${p.nom}</div>
+<div class="desc">${p.description}</div>
+
+<div class="bottom">
+
+<div class="price">${p.prix} €</div>
+
+<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
+
+</div>
+
+</div>
+`
+
+document.getElementById("products").appendChild(card)
+
 }
 
-/* ===== BOUTON PANIER FLOTTANT ===== */
+})
 
-const cartBtn = document.getElementById("cartBtn");
+}
+
+/* AJOUT PANIER */
+
+function addCart(name,price,btn){
+
+if(btn){
+
+let original=btn.innerText
+btn.innerText="✓ Ajouté"
+
+setTimeout(()=>{
+btn.innerText=original
+},1000)
+
+let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+
+if(img){
+
+let rect = img.getBoundingClientRect()
+let cartBtn = document.getElementById("cartBtn")
+let cartRect = cartBtn.getBoundingClientRect()
+
+let fly = img.cloneNode(true)
+
+fly.classList.add("flyImg")
+
+fly.style.left = rect.left+"px"
+fly.style.top = rect.top+"px"
+fly.style.width = rect.width+"px"
+fly.style.height = rect.height+"px"
+
+document.body.appendChild(fly)
+
+setTimeout(()=>{
+fly.style.left = cartRect.left+"px"
+fly.style.top = cartRect.top+"px"
+fly.style.width = "20px"
+fly.style.height = "20px"
+fly.style.opacity="0.3"
+},10)
+
+setTimeout(()=>{
+fly.remove()
+},700)
+
+}
+
+}
+
+let item=cart.find(i=>i.name===name)
+
+if(item){
+item.qty++
+}else{
+cart.push({name,price,qty:1})
+}
+
+updateCart()
+
+let cartBtn=document.getElementById("cartBtn")
+
+cartBtn.classList.add("pulse")
+
+setTimeout(()=>{
+cartBtn.classList.remove("pulse")
+},400)
+
+}
+
+/* PANIER */
+
+function updateCart(){
+
+localStorage.setItem("cart", JSON.stringify(cart))
+
+let count=cart.reduce((a,b)=>a+b.qty,0)
+
+document.getElementById("count").innerText=count
+
+let html=""
+let total=0
+
+cart.forEach((item,i)=>{
+
+html+=`
+
+<div class="cartItem">
+
+<div>
+${item.name}<br>
+${item.price}€
+</div>
+
+<div class="qty">
+
+<button onclick="changeQty(${i},-1)">-</button>
+
+${item.qty}
+
+<button onclick="changeQty(${i},1)">+</button>
+
+</div>
+
+</div>
+
+`
+
+total+=item.price*item.qty
+
+})
+
+document.getElementById("cartItems").innerHTML=html
+document.getElementById("total").innerText=total
+
+}
+
+function changeQty(i,v){
+
+cart[i].qty+=v
+
+if(cart[i].qty<=0){
+cart.splice(i,1)
+}
+
+updateCart()
+
+}
+
+function toggleCart(){
+document.getElementById("cartPanel").classList.toggle("open")
+}
+
+/* CHECKOUT */
+
+function checkout(){
+
+let nom=document.getElementById("clientNom").value.trim()
+let prenom=document.getElementById("clientPrenom").value.trim()
+let email=document.getElementById("clientEmail").value.trim()
+
+if(!nom || !prenom || !email){
+alert("Veuillez remplir Nom, Prénom et Email")
+return
+}
+
+let commande=""
+let total=0
+
+cart.forEach(item=>{
+
+let lineTotal=item.price*item.qty
+
+commande+=`
+<tr>
+<td>${item.name}</td>
+<td align="center">${item.qty}</td>
+<td align="right">${lineTotal} €</td>
+</tr>
+`
+
+total+=lineTotal
+
+})
+
+emailjs.send("service_mkpsbdf","template_ftv15rb",{
+nom:nom,
+prenom:prenom,
+email:email,
+commande:commande,
+total:total
+})
+
+.then(()=>{
+
+let orders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+orders.push({
+date:new Date().toLocaleString(),
+items:[...cart],
+total:total
+})
+
+localStorage.setItem("orders", JSON.stringify(orders))
+
+cart=[]
+updateCart()
+
+document.getElementById("clientNom").value=""
+document.getElementById("clientPrenom").value=""
+document.getElementById("clientEmail").value=""
+
+window.location.href="mes-commandes.html"
+
+})
+
+}
+
+/* ANIMATION SCROLL */
+
+const featured=document.getElementById("featured")
 
 window.addEventListener("scroll",()=>{
 
-let offset = Math.sin(window.scrollY * 0.02) * 6;
+if(!featured) return
 
-cartBtn.style.transform = "translateY("+offset+"px)";
+let scroll=window.scrollY
 
-});
+let scale=1-(scroll/700)
+
+if(scale<0.85) scale=0.85
+
+featured.style.transform="scale("+scale+")"
+
+let opacity=1-(scroll/500)
+
+if(opacity<0.35) opacity=0.35
+
+featured.style.opacity=opacity
+
+})
 
 </script>
 
