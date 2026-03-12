@@ -16,6 +16,22 @@ background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 }
 
+/* ===== ANIMATION PAGE ===== */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{
+transform:translateX(0);
+}
+
+.page.exit{
+transform:translateX(100%);
+}
+
 header{
 position:relative;
 height:70px;
@@ -113,9 +129,11 @@ filter:brightness(0) invert(1);
 
 <body>
 
+<div class="page" id="page">
+
 <header>
 
-<div id="backBtn" onclick="location.href='index.html'">
+<div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
 
@@ -125,10 +143,37 @@ filter:brightness(0) invert(1);
 
 <div class="container" id="list"></div>
 
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+
+/* ===== ANIMATION OUVERTURE ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== ANIMATION FERMETURE ===== */
+
+function goBack(){
+
+const p=document.getElementById("page")
+
+p.classList.remove("active")
+p.classList.add("exit")
+
+setTimeout(()=>{
+location.href="index.html"
+},300)
+
+}
+
+/* ===== CODE ORIGINAL ===== */
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
