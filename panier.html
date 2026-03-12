@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panier</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background:#0f1115;
+color:white;
+}
+
+header{
+height:70px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:20px;
+}
+
+.container{
+padding:20px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+margin-bottom:15px;
+padding:15px;
+background:#1c1f26;
+border-radius:12px;
+}
+
+.total{
+font-size:22px;
+font-weight:700;
+margin-top:20px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+margin-top:15px;
+font-size:16px;
+cursor:pointer;
+}
+
+.commander{
+background:#2e43b8;
+color:white;
+}
+
+.vider{
+background:#444;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+Panier
+</header>
+
+<div class="container">
+
+<div id="cartList"></div>
+
+<div class="total">
+Total : <span id="total">0</span> €
+</div>
+
+<button class="commander" onclick="commander()">
+Commander
+</button>
+
+<button class="vider" onclick="vider()">
+Vider le panier
+</button>
+
+</div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
+
+function render(){
+
+let html=""
+let total=0
+
+cart.forEach(item=>{
+
+html+=`
+<div class="item">
+<div>${item.name} x${item.qty}</div>
+<div>${item.price*item.qty} €</div>
+</div>
+`
+
+total+=item.price*item.qty
+
+})
+
+document.getElementById("cartList").innerHTML=html
+document.getElementById("total").innerText=total
+
+}
+
+render()
+
+function vider(){
+
+localStorage.removeItem("cart")
+cart=[]
+render()
+
+}
+
+function commander(){
+
+if(cart.length===0){
+alert("Panier vide")
+return
+}
+
+let total=cart.reduce((a,b)=>a+b.price*b.qty,0)
+
+let orders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+orders.push({
+date:new Date().toLocaleString(),
+items:cart,
+total:total
+})
+
+localStorage.setItem("orders", JSON.stringify(orders))
+localStorage.setItem("lastOrder", JSON.stringify({items:cart,total:total}))
+
+localStorage.removeItem("cart")
+
+window.location.href="confirmation.html"
+
+}
+
+</script>
+
+</body>
+</html>
