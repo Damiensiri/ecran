@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mes commandes</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background:#0f1115;
+color:white;
+}
+
+.container{
+padding:20px;
+}
+
+.order{
+background:#1c1f26;
+padding:15px;
+border-radius:12px;
+margin-bottom:20px;
+}
+
+.date{
+font-size:12px;
+opacity:.6;
+margin-bottom:10px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+font-size:14px;
+}
+
+.total{
+margin-top:10px;
+font-weight:700;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Mes commandes</h2>
+
+<div id="orders"></div>
+
+</div>
+
+<script>
+
+let orders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+let html=""
+
+orders.reverse().forEach(order=>{
+
+let items=""
+
+order.items.forEach(i=>{
+
+items+=`
+<div class="item">
+<div>${i.name} x${i.qty}</div>
+<div>${i.price*i.qty} €</div>
+</div>
+`
+
+})
+
+html+=`
+<div class="order">
+
+<div class="date">${order.date}</div>
+
+${items}
+
+<div class="total">
+Total : ${order.total} €
+</div>
+
+</div>
+`
+
+})
+
+document.getElementById("orders").innerHTML=html
+
+</script>
+
+</body>
+</html>
