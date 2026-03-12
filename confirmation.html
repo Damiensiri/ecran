@@ -17,6 +17,42 @@ background:#0f1115;
 color:white;
 }
 
+/* HEADER */
+
+header{
+position:relative;
+height:70px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:20px;
+}
+
+#backBtn{
+position:absolute;
+left:15px;
+top:50%;
+transform:translateY(-50%);
+width:42px;
+height:42px;
+border-radius:50%;
+background:#1c1f26;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 3px 8px rgba(0,0,0,0.4);
+cursor:pointer;
+}
+
+#backBtn img{
+width:22px;
+height:22px;
+filter:brightness(0) invert(1);
+}
+
+/* CONTENT */
+
 .container{
 padding:30px;
 }
@@ -25,6 +61,9 @@ padding:30px;
 display:flex;
 justify-content:space-between;
 margin-bottom:10px;
+padding:12px;
+background:#1c1f26;
+border-radius:10px;
 }
 
 .total{
@@ -50,6 +89,16 @@ cursor:pointer;
 
 <body>
 
+<header>
+
+<div id="backBtn" onclick="location.href='index.html'">
+<img src="image/back.svg">
+</div>
+
+Commande envoyée
+
+</header>
+
 <div class="container">
 
 <h2>Commande envoyée ✔</h2>
@@ -72,6 +121,8 @@ let order = JSON.parse(localStorage.getItem("lastOrder") || "{}")
 
 let html=""
 
+if(order.items){
+
 order.items.forEach(item=>{
 
 html+=`
@@ -85,6 +136,14 @@ html+=`
 
 document.getElementById("order").innerHTML=html
 document.getElementById("total").innerText=order.total
+
+}else{
+
+document.getElementById("order").innerHTML="Aucune commande trouvée."
+
+}
+
+/* BOUTON FERMER */
 
 function closeOrder(){
 
