@@ -238,13 +238,16 @@ filter:brightness(0) invert(1);
 /* ===== ANIMATION RETOUR ===== */
 
 function goBack(){
-const p=document.getElementById("page");
-p.classList.remove("active");
-p.classList.add("exit");
+
+const p=document.getElementById("page")
+
+p.classList.remove("active")
+p.classList.add("exit")
 
 setTimeout(()=>{
-location.href="index.html";
-},300);
+location.href="index.html"
+},300)
+
 }
 
 emailjs.init("03cdce-AcdCC03k_v")
@@ -418,20 +421,20 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 
 }
 
-/* ===== INITIALISATION + ANIMATION ===== */
+/* ===== INITIALISATION ===== */
 
 document.addEventListener("DOMContentLoaded",()=>{
 
-document.getElementById("page").classList.add("active");
+document.getElementById("page").classList.add("active")
 
 initType()
 buildDays()
 updatePaddocks()
 loadData()
 
-})
-
 paddockSelect.onchange=generate
+
+})
 
 </script>
 
