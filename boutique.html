@@ -228,6 +228,19 @@ border:none;
 background:#f4f4f4;
 }
 
+/* BOUTON COMMANDER */
+
+#cartPanel button:last-of-type{
+display:block;
+margin:20px auto 0 auto;
+width:90%;
+font-size:17px;
+font-weight:700;
+padding:14px;
+border-radius:14px;
+box-shadow:0 6px 16px rgba(0,0,0,0.25);
+}
+
 /* ANIMATIONS */
 
 @keyframes cartPulse{
@@ -419,6 +432,50 @@ document.getElementById("products").appendChild(card)
 
 function addCart(name,price,btn){
 
+if(btn){
+
+let original=btn.innerText
+btn.innerText="✓ Ajouté"
+
+setTimeout(()=>{
+btn.innerText=original
+},1000)
+
+let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+
+if(img){
+
+let rect = img.getBoundingClientRect()
+let cartBtn = document.getElementById("cartBtn")
+let cartRect = cartBtn.getBoundingClientRect()
+
+let fly = img.cloneNode(true)
+
+fly.classList.add("flyImg")
+
+fly.style.left = rect.left+"px"
+fly.style.top = rect.top+"px"
+fly.style.width = rect.width+"px"
+fly.style.height = rect.height+"px"
+
+document.body.appendChild(fly)
+
+setTimeout(()=>{
+fly.style.left = cartRect.left+"px"
+fly.style.top = cartRect.top+"px"
+fly.style.width = "20px"
+fly.style.height = "20px"
+fly.style.opacity="0.3"
+},10)
+
+setTimeout(()=>{
+fly.remove()
+},700)
+
+}
+
+}
+
 let item=cart.find(i=>i.name===name)
 
 if(item){
@@ -428,6 +485,14 @@ cart.push({name,price,qty:1})
 }
 
 updateCart()
+
+let cartBtn=document.getElementById("cartBtn")
+
+cartBtn.classList.add("pulse")
+
+setTimeout(()=>{
+cartBtn.classList.remove("pulse")
+},400)
 
 }
 
@@ -545,11 +610,37 @@ localStorage.setItem("orders", JSON.stringify(orders))
 cart=[]
 updateCart()
 
+document.getElementById("clientNom").value=""
+document.getElementById("clientPrenom").value=""
+document.getElementById("clientEmail").value=""
+
 window.location.href="mes-commandes.html"
 
 })
 
 }
+
+const featured=document.getElementById("featured")
+
+window.addEventListener("scroll",()=>{
+
+if(!featured) return
+
+let scroll=window.scrollY
+
+let scale=1-(scroll/700)
+
+if(scale<0.85) scale=0.85
+
+featured.style.transform="scale("+scale+")"
+
+let opacity=1-(scroll/500)
+
+if(opacity<0.35) opacity=0.35
+
+featured.style.opacity=opacity
+
+})
 
 </script>
 
