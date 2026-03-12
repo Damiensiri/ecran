@@ -17,6 +17,42 @@ background:#0f1115;
 color:white;
 }
 
+/* HEADER */
+
+header{
+position:relative;
+height:70px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:20px;
+}
+
+#backBtn{
+position:absolute;
+left:15px;
+top:50%;
+transform:translateY(-50%);
+width:42px;
+height:42px;
+border-radius:50%;
+background:#1c1f26;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 3px 8px rgba(0,0,0,0.4);
+cursor:pointer;
+}
+
+#backBtn img{
+width:22px;
+height:22px;
+filter:brightness(0) invert(1);
+}
+
+/* CONTENT */
+
 .container{
 padding:20px;
 }
@@ -38,6 +74,7 @@ margin-bottom:10px;
 display:flex;
 justify-content:space-between;
 font-size:14px;
+margin-bottom:5px;
 }
 
 .total{
@@ -45,14 +82,27 @@ margin-top:10px;
 font-weight:700;
 }
 
+.empty{
+opacity:.6;
+margin-top:20px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<header>
 
-<h2>Mes commandes</h2>
+<div id="backBtn" onclick="location.href='services.html'">
+<img src="image/back.svg">
+</div>
+
+Mes commandes
+
+</header>
+
+<div class="container">
 
 <div id="orders"></div>
 
@@ -63,6 +113,12 @@ font-weight:700;
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
 
 let html=""
+
+if(orders.length === 0){
+
+html=`<div class="empty">Aucune commande pour le moment.</div>`
+
+}else{
 
 orders.reverse().forEach(order=>{
 
@@ -94,6 +150,8 @@ Total : ${order.total} €
 `
 
 })
+
+}
 
 document.getElementById("orders").innerHTML=html
 
