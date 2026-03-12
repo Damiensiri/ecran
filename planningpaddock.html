@@ -16,7 +16,21 @@ background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 }
 
-.page{min-height:100vh;}
+/* ================= PAGE ANIM ================= */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{
+transform:translateX(0);
+}
+
+.page.exit{
+transform:translateX(100%);
+}
 
 header{
 position:relative;
@@ -153,8 +167,6 @@ border-bottom:1px solid #333;
 background:#252a33;
 }
 
-/* bouton retour identique aux autres pages */
-
 #backBtn{
 background:#1c1f26;
 box-shadow:0 12px 30px rgba(0,0,0,0.6);
@@ -171,10 +183,10 @@ filter:brightness(0) invert(1);
 
 <body>
 
-<div class="page">
+<div class="page" id="page">
 
 <header>
-<div id="backBtn" onclick="location.href='index.html'">
+<div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
 <h1 id="title">PADDOCK</h1>
@@ -222,6 +234,26 @@ filter:brightness(0) invert(1);
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
+
+/* ===== ANIMATION OUVERTURE ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== ANIMATION RETOUR ===== */
+
+function goBack(){
+const p=document.getElementById("page");
+p.classList.remove("active");
+p.classList.add("exit");
+
+setTimeout(()=>{
+location.href="index.html";
+},300);
+}
 
 emailjs.init("03cdce-AcdCC03k_v")
 
@@ -391,288 +423,6 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 }
 
 }
-
-}
-
-function generate(){
-
-const paddock=paddockSelect.value
-const duration=parseInt(durationSelect.value)
-
-if(!paddock)return
-
-const container=document.getElementById("planning")
-container.innerHTML=""
-
-const parts=selectedDate.split("-")
-const d=new Date(parts[0],parts[1]-1,parts[2])
-
-const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
-
-let jour=names[d.getDay()]
-
-if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
-
-container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
-return
-
-}
-
-const config=horaires[paddock][jour]
-
-let start=parseInt(config.open.split(":")[0])
-let end=parseInt(config.close.split(":")[0])
-
-let slots=[]
-let current=start
-
-while(current < end){
-
-let hour=Math.floor(current)
-let minutes=current%1===0 ? "00" : "30"
-
-let time=String(hour).padStart(2,"0")+":"+minutes
-
-slots.push(time)
-
-let reservation=reservations.find(r=>{
-
-if(r.date!==selectedDate) return false
-if(r.paddock!==paddock) return false
-
-let [rh,rm]=r.time.split(":").map(Number)
-
-let resStart=rh+(rm/60)
-
-return resStart===current
-
-})
-
-if(reservation){
-current += reservation.duration/60
-}else{
-current += 1
-}
-
-}
-
-slots.forEach(time=>{
-
-let [hour,minutes]=time.split(":").map(Number)
-
-const now=new Date()
-const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
-
-let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
-
-if(!adminMode && selectedDate===today){
-
-let diff=(slotTime-now)/60000
-
-if(diff<10) return
-
-}
-
-if(hour+(minutes/60)+(duration/60) > end) return
-
-let conflict=false
-let mine=false
-let docId=null
-let reserverName=""
-
-reservations.forEach(r=>{
-
-if(r.date===selectedDate && r.paddock===paddock){
-
-let [rh,rm]=r.time.split(":").map(Number)
-
-let resStart=rh+(rm/60)
-let resEnd=resStart+(r.duration/60)
-
-let slotStart=hour+(minutes/60)
-
-if(slotStart>=resStart && slotStart<resEnd){
-
-conflict=true
-reserverName=r.name
-
-if(myReservations.includes(r.id)){
-mine=true
-docId=r.id
-}
-
-if(adminMode){
-docId=r.id
-}
-
-}
-
-}
-
-})
-
-let row=document.createElement("div")
-
-if(mine){
-
-row.className="row"
-row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
-row.onclick=()=>cancelReservation(docId)
-
-}
-
-else if(!conflict){
-
-row.className="row free"
-
-row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
-
-row.onclick=()=>{
-
-selected={time,paddock,date:selectedDate,duration}
-
-document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
-
-row.classList.add("selected")
-
-}
-
-}
-
-else{
-
-row.className="row"
-
-if(adminMode){
-
-row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
-row.onclick=()=>cancelReservation(docId)
-
-}else{
-
-row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
-
-}
-
-}
-
-container.appendChild(row)
-
-})
-
-}
-
-async function book(){
-
-const type=document.getElementById("type").value
-
-if(type==="mise"){
-
-if(!selectedDate){
-alert("Choisissez un jour")
-return
-}
-
-const d=new Date(selectedDate)
-const day=d.getDay()
-
-if(day===0 || day===6){
-alert("Demande impossible le week-end")
-return
-}
-
-const now=new Date()
-const veille=new Date(d)
-
-veille.setDate(veille.getDate()-1)
-veille.setHours(20,0,0,0)
-
-if(now>veille){
-alert("Demande possible uniquement jusqu'à 20h la veille")
-return
-}
-
-let name=document.getElementById("name").value.trim()
-let email=document.getElementById("email").value
-
-if(!name){
-alert("Prénom obligatoire")
-return
-}
-
-emailjs.send("service_mkpsbdf","template_0qhjhhg",{
-
-jour:selectedDate,
-prenom:name,
-email:email
-
-}).then(()=>{
-
-alert("Demande envoyée (5€)")
-
-}).catch(()=>{
-
-alert("Erreur envoi mail")
-
-})
-
-return
-
-}
-
-let name=document.getElementById("name").value.trim()
-
-if(!name){
-alert("Prénom obligatoire")
-return
-}
-
-if(!selected){
-alert("Choisissez un créneau")
-return
-}
-
-if(!adminMode){
-
-if(reservations.find(r=>r.date===selected.date && r.name.toLowerCase()===name.toLowerCase())){
-alert("Vous avez déjà une réservation ce jour")
-return
-}
-
-}
-
-const doc=await db.collection("reservations").add({
-
-name:name,
-email:document.getElementById("email").value,
-paddock:selected.paddock,
-date:selected.date,
-time:selected.time,
-duration:selected.duration
-
-})
-
-myReservations.push(doc.id)
-
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-alert("Réservation confirmée")
-
-loadData()
-
-}
-
-async function cancelReservation(id){
-
-await db.collection("reservations").doc(id).delete()
-
-myReservations=myReservations.filter(r=>r!==id)
-
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-alert("Réservation annulée")
-
-loadData()
 
 }
 
