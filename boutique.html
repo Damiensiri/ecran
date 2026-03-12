@@ -20,6 +20,22 @@ color:#000;
 transition:.3s;
 }
 
+/* ===== ANIMATION PAGE ===== */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{
+transform:translateX(0);
+}
+
+.page.exit{
+transform:translateX(100%);
+}
+
 /* HEADER */
 
 header{
@@ -306,9 +322,11 @@ background:#2e43b8;
 
 <body>
 
+<div class="page" id="page">
+
 <header>
 
-<div id="backBtn" onclick="location.href='index.html'">
+<div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
 
@@ -344,9 +362,31 @@ background:#2e43b8;
 
 </div>
 
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
+
+/* ===== ANIMATION OUVERTURE ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== ANIMATION RETOUR ===== */
+
+function goBack(){
+const p=document.getElementById("page");
+p.classList.remove("active");
+p.classList.add("exit");
+
+setTimeout(()=>{
+location.href="index.html";
+},300);
+}
 
 emailjs.init("03cdce-AcdCC03k_v")
 
