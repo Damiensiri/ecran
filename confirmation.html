@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Commande confirmée</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background:#0f1115;
+color:white;
+}
+
+.container{
+padding:30px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+.total{
+margin-top:20px;
+font-size:22px;
+font-weight:700;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:30px;
+background:#2e43b8;
+color:white;
+border:none;
+border-radius:12px;
+font-size:16px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Commande envoyée ✔</h2>
+
+<div id="order"></div>
+
+<div class="total">
+Total : <span id="total"></span> €
+</div>
+
+<button onclick="closeOrder()">
+Fermer
+</button>
+
+</div>
+
+<script>
+
+let order = JSON.parse(localStorage.getItem("lastOrder") || "{}")
+
+let html=""
+
+order.items.forEach(item=>{
+
+html+=`
+<div class="item">
+<div>${item.name} x${item.qty}</div>
+<div>${item.price*item.qty} €</div>
+</div>
+`
+
+})
+
+document.getElementById("order").innerHTML=html
+document.getElementById("total").innerText=order.total
+
+function closeOrder(){
+
+window.location.href="mes-commandes.html"
+
+}
+
+</script>
+
+</body>
+</html>
