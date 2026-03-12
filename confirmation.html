@@ -17,6 +17,22 @@ background:#0f1115;
 color:white;
 }
 
+/* ===== ANIMATION PAGE ===== */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{
+transform:translateX(0);
+}
+
+.page.exit{
+transform:translateX(100%);
+}
+
 /* HEADER */
 
 header{
@@ -89,9 +105,11 @@ cursor:pointer;
 
 <body>
 
+<div class="page" id="page">
+
 <header>
 
-<div id="backBtn" onclick="location.href='index.html'">
+<div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
 
@@ -115,7 +133,34 @@ Fermer
 
 </div>
 
+</div>
+
 <script>
+
+/* ===== ANIMATION OUVERTURE ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== ANIMATION RETOUR ===== */
+
+function goBack(){
+
+const p=document.getElementById("page")
+
+p.classList.remove("active")
+p.classList.add("exit")
+
+setTimeout(()=>{
+location.href="index.html"
+},300)
+
+}
+
+/* ===== CONTENU ORIGINAL ===== */
 
 let order = JSON.parse(localStorage.getItem("lastOrder") || "{}")
 
@@ -147,7 +192,14 @@ document.getElementById("order").innerHTML="Aucune commande trouvée."
 
 function closeOrder(){
 
+const p=document.getElementById("page")
+
+p.classList.remove("active")
+p.classList.add("exit")
+
+setTimeout(()=>{
 window.location.href="mes-commandes.html"
+},300)
 
 }
 
