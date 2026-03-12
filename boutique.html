@@ -271,8 +271,6 @@ background:#252a33;
 color:white;
 }
 
-/* bleu plus visible */
-
 button{
 background:#2e43b8;
 }
@@ -332,47 +330,29 @@ background:#2e43b8;
 
 <script>
 
-/* PRODUITS DEMO */
+const API="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/service"
 
-const products=[
+let products=[]
+let cart=JSON.parse(localStorage.getItem("cart")||"[]")
 
-{
-nom:"Coaching CSO",
-description:"Séance 45 minutes",
-prix:30,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:"Nouveau",
-featured:true
-},
+fetch(API)
+.then(res=>res.json())
+.then(data=>{
 
-{
-nom:"Travail cheval",
-description:"Travail monté",
-prix:25,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:""
-},
-
-{
-nom:"Préparation concours",
-description:"Coaching concours",
-prix:40,
-image:"https://res.cloudinary.com/demo/image/upload/sample.jpg",
-badge:"Populaire"
-}
-
-]
-
-let cart = JSON.parse(localStorage.getItem("cart") || "[]")
+products=data.filter(p=>p.actif!=="false")
 
 render()
 updateCart()
+
+})
 
 function render(){
 
 products.forEach(p=>{
 
-if(p.featured){
+let price=parseFloat(p.prix)
+
+if(p.featured==="true"){
 
 document.getElementById("featured").innerHTML=`
 
@@ -382,11 +362,11 @@ document.getElementById("featured").innerHTML=`
 
 <h2>${p.nom}</h2>
 <p>${p.description}</p>
-<b>${p.prix} €</b>
+<b>${price} €</b>
 
 <br><br>
 
-<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
+<button onclick="addCart('${p.nom}',${price},this)">Ajouter</button>
 
 </div>
 `
@@ -414,9 +394,9 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 
 <div class="bottom">
 
-<div class="price">${p.prix} €</div>
+<div class="price">${price} €</div>
 
-<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
+<button onclick="addCart('${p.nom}',${price},this)">Ajouter</button>
 
 </div>
 
@@ -440,40 +420,36 @@ if(btn){
 let original=btn.innerText
 btn.innerText="✓ Ajouté"
 
-setTimeout(()=>{
-btn.innerText=original
-},1000)
+setTimeout(()=>{btn.innerText=original},1000)
 
-let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+let img=btn.closest(".card,#featuredContent")?.querySelector("img")
 
 if(img){
 
-let rect = img.getBoundingClientRect()
-let cartBtn = document.getElementById("cartBtn")
-let cartRect = cartBtn.getBoundingClientRect()
+let rect=img.getBoundingClientRect()
+let cartBtn=document.getElementById("cartBtn")
+let cartRect=cartBtn.getBoundingClientRect()
 
-let fly = img.cloneNode(true)
+let fly=img.cloneNode(true)
 
 fly.classList.add("flyImg")
 
-fly.style.left = rect.left+"px"
-fly.style.top = rect.top+"px"
-fly.style.width = rect.width+"px"
-fly.style.height = rect.height+"px"
+fly.style.left=rect.left+"px"
+fly.style.top=rect.top+"px"
+fly.style.width=rect.width+"px"
+fly.style.height=rect.height+"px"
 
 document.body.appendChild(fly)
 
 setTimeout(()=>{
-fly.style.left = cartRect.left+"px"
-fly.style.top = cartRect.top+"px"
-fly.style.width = "20px"
-fly.style.height = "20px"
+fly.style.left=cartRect.left+"px"
+fly.style.top=cartRect.top+"px"
+fly.style.width="20px"
+fly.style.height="20px"
 fly.style.opacity="0.3"
 },10)
 
-setTimeout(()=>{
-fly.remove()
-},700)
+setTimeout(()=>{fly.remove()},700)
 
 }
 
@@ -481,11 +457,8 @@ fly.remove()
 
 let item=cart.find(i=>i.name===name)
 
-if(item){
-item.qty++
-}else{
-cart.push({name,price,qty:1})
-}
+if(item){item.qty++}
+else{cart.push({name,price,qty:1})}
 
 updateCart()
 
@@ -493,15 +466,13 @@ let cartBtn=document.getElementById("cartBtn")
 
 cartBtn.classList.add("pulse")
 
-setTimeout(()=>{
-cartBtn.classList.remove("pulse")
-},400)
+setTimeout(()=>{cartBtn.classList.remove("pulse")},400)
 
 }
 
 function updateCart(){
 
-localStorage.setItem("cart", JSON.stringify(cart))
+localStorage.setItem("cart",JSON.stringify(cart))
 
 let count=cart.reduce((a,b)=>a+b.qty,0)
 
@@ -532,7 +503,6 @@ ${item.qty}
 </div>
 
 </div>
-
 `
 
 total+=item.price*item.qty
@@ -548,9 +518,7 @@ function changeQty(i,v){
 
 cart[i].qty+=v
 
-if(cart[i].qty<=0){
-cart.splice(i,1)
-}
+if(cart[i].qty<=0){cart.splice(i,1)}
 
 updateCart()
 
@@ -566,7 +534,7 @@ let nom=document.getElementById("clientNom").value.trim()
 let prenom=document.getElementById("clientPrenom").value.trim()
 let email=document.getElementById("clientEmail").value.trim()
 
-if(!nom || !prenom || !email){
+if(!nom||!prenom||!email){
 alert("Veuillez remplir Nom, Prénom et Email")
 return
 }
