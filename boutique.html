@@ -230,15 +230,15 @@ background:#f4f4f4;
 
 /* BOUTON COMMANDER */
 
-#cartPanel button:last-of-type{
+.checkoutBtn{
 display:block;
 margin:20px auto 0 auto;
 width:90%;
-font-size:17px;
+font-size:18px;
 font-weight:700;
-padding:14px;
-border-radius:14px;
-box-shadow:0 6px 16px rgba(0,0,0,0.25);
+padding:16px;
+border-radius:16px;
+box-shadow:0 8px 20px rgba(0,0,0,0.25);
 }
 
 /* ANIMATIONS */
@@ -340,7 +340,7 @@ background:#2e43b8;
 <input id="clientPrenom" placeholder="Prénom *">
 <input id="clientEmail" placeholder="Email *">
 
-<button onclick="checkout()">Commander</button>
+<button class="checkoutBtn" onclick="checkout()">Commander</button>
 
 </div>
 
@@ -430,6 +430,8 @@ document.getElementById("products").appendChild(card)
 
 }
 
+/* AJOUT PANIER */
+
 function addCart(name,price,btn){
 
 if(btn){
@@ -496,6 +498,8 @@ cartBtn.classList.remove("pulse")
 
 }
 
+/* PANIER */
+
 function updateCart(){
 
 localStorage.setItem("cart", JSON.stringify(cart))
@@ -556,6 +560,8 @@ updateCart()
 function toggleCart(){
 document.getElementById("cartPanel").classList.toggle("open")
 }
+
+/* CHECKOUT */
 
 function checkout(){
 
@@ -619,6 +625,8 @@ window.location.href="mes-commandes.html"
 })
 
 }
+
+/* ANIMATION SCROLL */
 
 const featured=document.getElementById("featured")
 
