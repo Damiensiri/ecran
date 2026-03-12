@@ -16,7 +16,7 @@ background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 }
 
-/* ================= PAGE ANIM ================= */
+/* ===== ANIMATION PAGE ===== */
 
 .page{
 min-height:100vh;
@@ -235,14 +235,6 @@ filter:brightness(0) invert(1);
 
 <script>
 
-/* ===== ANIMATION OUVERTURE ===== */
-
-window.addEventListener("DOMContentLoaded",()=>{
-requestAnimationFrame(()=>{
-document.getElementById("page").classList.add("active");
-});
-});
-
 /* ===== ANIMATION RETOUR ===== */
 
 function goBack(){
@@ -426,7 +418,11 @@ selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+Stri
 
 }
 
-window.addEventListener("DOMContentLoaded",()=>{
+/* ===== INITIALISATION + ANIMATION ===== */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+document.getElementById("page").classList.add("active");
 
 initType()
 buildDays()
