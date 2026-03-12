@@ -17,6 +17,22 @@ background:#0f1115;
 color:white;
 }
 
+/* ===== ANIMATION PAGE ===== */
+
+.page{
+min-height:100vh;
+transform:translateX(100%);
+transition:0.35s;
+}
+
+.page.active{
+transform:translateX(0);
+}
+
+.page.exit{
+transform:translateX(100%);
+}
+
 /* HEADER */
 
 header{
@@ -92,9 +108,11 @@ margin-top:20px;
 
 <body>
 
+<div class="page" id="page">
+
 <header>
 
-<div id="backBtn" onclick="location.href='index.html'">
+<div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
 
@@ -108,7 +126,34 @@ Mes commandes
 
 </div>
 
+</div>
+
 <script>
+
+/* ===== ANIMATION OUVERTURE ===== */
+
+window.addEventListener("DOMContentLoaded",()=>{
+requestAnimationFrame(()=>{
+document.getElementById("page").classList.add("active");
+});
+});
+
+/* ===== ANIMATION FERMETURE ===== */
+
+function goBack(){
+
+const p=document.getElementById("page")
+
+p.classList.remove("active")
+p.classList.add("exit")
+
+setTimeout(()=>{
+location.href="index.html"
+},300)
+
+}
+
+/* ===== CODE ORIGINAL ===== */
 
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
 
