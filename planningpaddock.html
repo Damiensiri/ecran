@@ -213,36 +213,397 @@ filter:brightness(0) invert(1);
 </div>
 </div>
 
-
-<!-- POPUP CONFIRMATION -->
-
-<div id="confirmPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center">
-
-<div style="background:white;padding:25px;border-radius:20px;text-align:center;width:260px">
-
-<h3>Réservation confirmée</h3>
-
-<button onclick="location.reload()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#2ecc71;color:white;font-weight:600;margin-bottom:10px">
-Nouvelle réservation
-</button>
-
-<button onclick="location.href='mesreservations.html'" style="width:100%;padding:12px;border:none;border-radius:12px;background:#181E3B;color:white;font-weight:600">
-Terminer
-</button>
-
-</div>
-</div>
-
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
 
-function showConfirm(){
-document.getElementById("confirmPopup").style.display="flex"
+emailjs.init("03cdce-AcdCC03k_v")
+
+const firebaseConfig={
+apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
+authDomain:"ecurie-paddock.firebaseapp.com",
+projectId:"ecurie-paddock",
+storageBucket:"ecurie-paddock.firebasestorage.app",
+messagingSenderId:"501153278739",
+appId:"1:501153278739:web:824b4344c381f2a94548e6"
 }
+
+firebase.initializeApp(firebaseConfig)
+const db=firebase.firestore()
+
+let reservations=[]
+let horaires={}
+let selectedDate=null
+let selected=null
+
+let adminMode=false
+let tapCount=0
+
+const title=document.getElementById("title")
+
+title.addEventListener("click",()=>{
+
+tapCount++
+
+if(tapCount>=5){
+
+if(!adminMode){
+
+const pass=prompt("Mot de passe admin")
+
+if(pass==="0359140"){
+adminMode=true
+title.innerHTML="PADDOCK 🔧"
+generate()
+}
+
+}else{
+
+adminMode=false
+title.innerHTML="PADDOCK"
+generate()
+
+}
+
+tapCount=0
+
+}
+
+setTimeout(()=>{tapCount=0},1200)
+
+})
+
+let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
+
+const durationSelect=document.getElementById("duration")
+const paddockSelect=document.getElementById("paddock")
+
+function initType(){
+
+const typeSelect=document.getElementById("type")
+
+typeSelect.addEventListener("change",()=>{
+
+const mise=typeSelect.value==="mise"
+
+document.getElementById("blocDuration").style.display=mise?"none":"block"
+document.getElementById("blocPaddock").style.display=mise?"none":"block"
+document.getElementById("planning").style.display=mise?"none":"block"
+
+document.getElementById("mainButton").innerText=mise?"Demander":"Réserver"
+
+})
+
+}
+
+function updatePaddocks(){
+
+const duration=durationSelect.value
+
+paddockSelect.innerHTML=""
+
+if(duration==="90"){
+
+paddockSelect.innerHTML=`
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}else{
+
+paddockSelect.innerHTML=`
+<option value="maison">Maison</option>
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}
+
+generate()
+
+}
+
+durationSelect.addEventListener("change",updatePaddocks)
+
+async function loadData(){
+
+const r=await db.collection("reservations").get()
+
+reservations=[]
+
+r.forEach(doc=>{
+let data=doc.data()
+data.id=doc.id
+reservations.push(data)
+})
+
+const h=await db.collection("horaires").get()
+
+horaires={}
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data()
+})
+
+generate()
+
+}
+
+function buildDays(){
+
+const container=document.getElementById("days")
+container.innerHTML=""
+
+for(let i=0;i<3;i++){
+
+let d=new Date()
+d.setDate(d.getDate()+i)
+
+let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain"
+
+let btn=document.createElement("div")
+btn.className="dayBtn"
+
+btn.innerText=label+" "+d.getDate()
+
+btn.onclick=()=>{
+
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+
+document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
+btn.classList.add("active")
+
+generate()
+
+}
+
+container.appendChild(btn)
+
+if(i===0){
+btn.classList.add("active")
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+}
+
+}
+
+}
+
+function generate(){
+
+const paddock=paddockSelect.value
+const duration=parseInt(durationSelect.value)
+
+if(!paddock)return
+
+const container=document.getElementById("planning")
+container.innerHTML=""
+
+const parts=selectedDate.split("-")
+const d=new Date(parts[0],parts[1]-1,parts[2])
+
+const names=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
+
+let jour=names[d.getDay()]
+
+if(!horaires[paddock] || !horaires[paddock][jour] || horaires[paddock][jour].closed){
+
+container.innerHTML='<div class="fullMessage">Paddock fermé</div>'
+return
+
+}
+
+const config=horaires[paddock][jour]
+
+let start=parseInt(config.open.split(":")[0])
+let end=parseInt(config.close.split(":")[0])
+
+let slots=[]
+let current=start
+
+while(current < end){
+
+let hour=Math.floor(current)
+let minutes=current%1===0 ? "00" : "30"
+
+let time=String(hour).padStart(2,"0")+":"+minutes
+
+slots.push(time)
+
+let reservation=reservations.find(r=>{
+if(r.date!==selectedDate) return false
+if(r.paddock!==paddock) return false
+let [rh,rm]=r.time.split(":").map(Number)
+let resStart=rh+(rm/60)
+return resStart===current
+})
+
+if(reservation){
+current += reservation.duration/60
+}else{
+current += 1
+}
+
+}
+
+slots.forEach(time=>{
+
+let [hour,minutes]=time.split(":").map(Number)
+
+const now=new Date()
+const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0")
+
+let slotTime=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hour,minutes)
+
+if(!adminMode && selectedDate===today){
+
+let diff=(slotTime-now)/60000
+if(diff<10) return
+
+}
+
+if(hour+(minutes/60)+(duration/60) > end) return
+
+let conflict=false
+let mine=false
+let docId=null
+let reserverName=""
+
+reservations.forEach(r=>{
+
+if(r.date===selectedDate && r.paddock===paddock){
+
+let [rh,rm]=r.time.split(":").map(Number)
+
+let resStart=rh+(rm/60)
+let resEnd=resStart+(r.duration/60)
+
+let slotStart=hour+(minutes/60)
+
+if(slotStart>=resStart && slotStart<resEnd){
+
+conflict=true
+reserverName=r.name
+
+if(myReservations.includes(r.id)){
+mine=true
+docId=r.id
+}
+
+if(adminMode){
+docId=r.id
+}
+
+}
+
+}
+
+})
+
+let row=document.createElement("div")
+
+if(mine){
+
+row.className="row"
+row.innerHTML=`<div>${time}</div><div class="mineText">Annuler</div>`
+row.onclick=()=>cancelReservation(docId)
+
+}
+
+else if(!conflict){
+
+row.className="row free"
+
+row.innerHTML=`<div>${time}</div><div class="freeText">libre</div>`
+
+row.onclick=()=>{
+selected={time,paddock,date:selectedDate,duration}
+document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
+row.classList.add("selected")
+}
+
+}
+
+else{
+
+row.className="row"
+
+if(adminMode){
+row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
+row.onclick=()=>cancelReservation(docId)
+}else{
+row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
+}
+
+}
+
+container.appendChild(row)
+
+})
+
+}
+
+async function book(){
+
+const type=document.getElementById("type").value
+
+let name=document.getElementById("name").value.trim()
+
+if(!name){
+alert("Prénom obligatoire")
+return
+}
+
+if(!selected){
+alert("Choisissez un créneau")
+return
+}
+
+const doc=await db.collection("reservations").add({
+
+name:name,
+email:document.getElementById("email").value,
+paddock:selected.paddock,
+date:selected.date,
+time:selected.time,
+duration:selected.duration
+
+})
+
+myReservations.push(doc.id)
+localStorage.setItem("myReservations",JSON.stringify(myReservations))
+
+if(confirm("Réservation confirmée\n\nOK = Nouvelle réservation\nAnnuler = Mes réservations")){
+location.reload()
+}else{
+location.href="mesreservations.html"
+}
+
+loadData()
+
+}
+
+async function cancelReservation(id){
+
+await db.collection("reservations").doc(id).delete()
+
+myReservations=myReservations.filter(r=>r!==id)
+localStorage.setItem("myReservations",JSON.stringify(myReservations))
+
+alert("Réservation annulée")
+loadData()
+
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+initType()
+buildDays()
+updatePaddocks()
+loadData()
+})
+
+paddockSelect.onchange=generate
 
 </script>
 
