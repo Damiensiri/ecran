@@ -259,8 +259,6 @@ background:#1c1f26;
 </div>
 </div>
 
-<!-- POPUP -->
-
 <div id="popupConfirm">
 <div class="popupBox">
 
@@ -391,69 +389,6 @@ generate()
 
 durationSelect.addEventListener("change",updatePaddocks)
 
-async function loadData(){
-
-const r=await db.collection("reservations").get()
-
-reservations=[]
-
-r.forEach(doc=>{
-let data=doc.data()
-data.id=doc.id
-reservations.push(data)
-})
-
-const h=await db.collection("horaires").get()
-
-horaires={}
-
-h.forEach(doc=>{
-horaires[doc.id]=doc.data()
-})
-
-generate()
-
-}
-
-function buildDays(){
-
-const container=document.getElementById("days")
-container.innerHTML=""
-
-for(let i=0;i<3;i++){
-
-let d=new Date()
-d.setDate(d.getDate()+i)
-
-let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain"
-
-let btn=document.createElement("div")
-btn.className="dayBtn"
-
-btn.innerText=label+" "+d.getDate()
-
-btn.onclick=()=>{
-
-selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-
-document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
-btn.classList.add("active")
-
-generate()
-
-}
-
-container.appendChild(btn)
-
-if(i===0){
-btn.classList.add("active")
-selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-}
-
-}
-
-}
-
 function showPopupConfirm(){
 document.getElementById("popupConfirm").style.display="flex"
 }
@@ -491,27 +426,6 @@ showPopupConfirm()
 loadData()
 
 }
-
-async function cancelReservation(id){
-
-await db.collection("reservations").doc(id).delete()
-
-myReservations=myReservations.filter(r=>r!==id)
-localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-alert("Réservation annulée")
-loadData()
-
-}
-
-window.addEventListener("DOMContentLoaded",()=>{
-initType()
-buildDays()
-updatePaddocks()
-loadData()
-})
-
-paddockSelect.onchange=generate
 
 </script>
 
