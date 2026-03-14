@@ -784,6 +784,18 @@ loadData()
 
 paddockSelect.onchange=generate
 
+// refresh planning toutes les 3 minutes
+setInterval(()=>{
+loadData()
+},180000)
+
+// refresh quand la page redevient visible
+document.addEventListener("visibilitychange", () => {
+if (!document.hidden) {
+loadData()
+}
+})
+  
 </script>
 <div id="confirmSheet">
 
