@@ -39,9 +39,7 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{
-width:22px;
-}
+#backBtn img{width:22px;}
 
 header h1{
 position:absolute;
@@ -126,7 +124,7 @@ font-weight:600;
 color:#999;
 }
 
-/* BANDEAU */
+/* BANDEAU BAS */
 
 #sheet{
 position:fixed;
@@ -222,7 +220,6 @@ color:white;
 </div>
 </div>
 
-
 <!-- BANDEAU -->
 
 <div id="sheet">
@@ -268,8 +265,8 @@ const db=firebase.firestore()
 
 function showSheet(title,info){
 
-document.getElementById("sheetTitle").innerText=title
-document.getElementById("sheetInfo").innerHTML=info
+document.getElementById("sheetTitle").innerText = title
+document.getElementById("sheetInfo").innerHTML = info
 
 document.getElementById("sheet").classList.add("show")
 
