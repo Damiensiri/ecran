@@ -10,7 +10,25 @@
 
 <style>
 
+:root{
+--sheet-bg:white;
+--sheet-text:black;
+}
+
+@media(prefers-color-scheme:dark){
+:root{
+--sheet-bg:#1c1f26;
+--sheet-text:white;
+}
+
 body{
+margin:0;
+background:#f4f4f4;
+font-family:'Montserrat',sans-serif;
+}
+  
+body{
+
 margin:0;
 background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
@@ -190,8 +208,8 @@ position:fixed;
 bottom:-100%;
 left:0;
 width:100%;
-background:white;
-color:black;
+background:var(--sheet-bg);
+color:var(--sheet-text);
 border-radius:22px 22px 0 0;
 box-shadow:0 -10px 40px rgba(0,0,0,0.25);
 transition:0.35s;
