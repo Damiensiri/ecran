@@ -39,7 +39,9 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{width:22px;}
+#backBtn img{
+width:22px;
+}
 
 header h1{
 position:absolute;
@@ -126,24 +128,25 @@ color:#999;
 
 /* BANDEAU BAS */
 
-#sheet{
+#confirmSheet{
 position:fixed;
 bottom:-100%;
 left:0;
 width:100%;
 background:white;
 border-radius:25px 25px 0 0;
-box-shadow:0 -10px 40px rgba(0,0,0,0.25);
+box-shadow:0 -15px 40px rgba(0,0,0,0.25);
 transition:0.35s;
 z-index:999;
 }
 
-#sheet.show{
+#confirmSheet.show{
 bottom:0;
 }
 
 .sheetContent{
 padding:25px;
+text-align:center;
 }
 
 .sheetBtn{
@@ -152,16 +155,16 @@ width:100%;
 padding:14px;
 border:none;
 border-radius:12px;
-font-weight:600;
+font-weight:700;
 cursor:pointer;
 }
 
-.sheetNew{
+.newBtn{
 background:#181E3B;
 color:white;
 }
 
-.sheetFinish{
+.finishBtn{
 background:#2ecc71;
 color:white;
 }
@@ -174,13 +177,10 @@ color:white;
 <div class="page">
 
 <header>
-
 <div id="backBtn" onclick="location.href='index.html'">
 <img src="image/back.svg">
 </div>
-
 <h1 id="title">PADDOCK</h1>
-
 </header>
 
 <div class="card">
@@ -220,21 +220,22 @@ color:white;
 </div>
 </div>
 
+
 <!-- BANDEAU -->
 
-<div id="sheet">
+<div id="confirmSheet">
 
 <div class="sheetContent">
 
-<h3 id="sheetTitle"></h3>
+<h3 id="sheetTitle">Réservation confirmée</h3>
 
-<div id="sheetInfo"></div>
+<p id="sheetText"></p>
 
-<button class="sheetBtn sheetNew" onclick="closeSheet()">
+<button class="sheetBtn newBtn" onclick="closeSheet()">
 Ajouter une nouvelle réservation
 </button>
 
-<button class="sheetBtn sheetFinish" onclick="location.href='index.html'">
+<button class="sheetBtn finishBtn" onclick="location.href='index.html'">
 Terminer
 </button>
 
@@ -263,17 +264,15 @@ appId:"1:501153278739:web:824b4344c381f2a94548e6"
 firebase.initializeApp(firebaseConfig)
 const db=firebase.firestore()
 
-function showSheet(title,info){
+function showSheet(text){
 
-document.getElementById("sheetTitle").innerText = title
-document.getElementById("sheetInfo").innerHTML = info
-
-document.getElementById("sheet").classList.add("show")
+document.getElementById("sheetText").innerText=text
+document.getElementById("confirmSheet").classList.add("show")
 
 }
 
 function closeSheet(){
-document.getElementById("sheet").classList.remove("show")
+document.getElementById("confirmSheet").classList.remove("show")
 }
 
 let reservations=[]
@@ -281,7 +280,94 @@ let horaires={}
 let selectedDate=null
 let selected=null
 
+let adminMode=false
+let tapCount=0
+
+const title=document.getElementById("title")
+
+title.addEventListener("click",()=>{
+
+tapCount++
+
+if(tapCount>=5){
+
+if(!adminMode){
+
+const pass=prompt("Mot de passe admin")
+
+if(pass==="0359140"){
+adminMode=true
+title.innerHTML="PADDOCK 🔧"
+generate()
+}
+
+}else{
+
+adminMode=false
+title.innerHTML="PADDOCK"
+generate()
+
+}
+
+tapCount=0
+
+}
+
+setTimeout(()=>{tapCount=0},1200)
+
+})
+
 let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
+
+const durationSelect=document.getElementById("duration")
+const paddockSelect=document.getElementById("paddock")
+
+function initType(){
+
+const typeSelect=document.getElementById("type")
+
+typeSelect.addEventListener("change",()=>{
+
+const mise=typeSelect.value==="mise"
+
+document.getElementById("blocDuration").style.display=mise?"none":"block"
+document.getElementById("blocPaddock").style.display=mise?"none":"block"
+document.getElementById("planning").style.display=mise?"none":"block"
+
+document.getElementById("mainButton").innerText=mise?"Demander":"Réserver"
+
+})
+
+}
+
+function updatePaddocks(){
+
+const duration=durationSelect.value
+
+paddockSelect.innerHTML=""
+
+if(duration==="90"){
+
+paddockSelect.innerHTML=`
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}else{
+
+paddockSelect.innerHTML=`
+<option value="maison">Maison</option>
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}
+
+generate()
+
+}
+
+durationSelect.addEventListener("change",updatePaddocks)
 
 async function loadData(){
 
@@ -293,6 +379,14 @@ r.forEach(doc=>{
 let data=doc.data()
 data.id=doc.id
 reservations.push(data)
+})
+
+const h=await db.collection("horaires").get()
+
+horaires={}
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data()
 })
 
 generate()
@@ -329,12 +423,9 @@ myReservations.push(doc.id)
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
 
 showSheet(
-"Réservation confirmée",
-`
-<div>Paddock : ${selected.paddock}</div>
-<div>Date : ${selected.date}</div>
-<div>Heure : ${selected.time}</div>
-`
+"Paddock : "+selected.paddock+
+" — "+selected.date+
+" à "+selected.time
 )
 
 loadData()
@@ -343,9 +434,14 @@ loadData()
 
 window.addEventListener("DOMContentLoaded",()=>{
 
+initType()
+buildDays()
+updatePaddocks()
 loadData()
 
 })
+
+paddockSelect.onchange=generate
 
 </script>
 
