@@ -127,8 +127,6 @@ font-weight:600;
 color:#999;
 }
 
-/* DARK MODE */
-
 @media(prefers-color-scheme:dark){
 
 body{
@@ -215,28 +213,26 @@ filter:brightness(0) invert(1);
 </div>
 </div>
 
+
 <!-- POPUP CONFIRMATION -->
 
-<div id="confirmPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:999;">
+<div id="confirmPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:9999">
 
-<div style="background:#1c1f26;padding:25px;border-radius:18px;width:80%;max-width:320px;text-align:center;color:white;">
+<div style="background:white;padding:25px;border-radius:18px;text-align:center;width:260px">
 
-<h3 style="margin-top:0;">Réservation confirmée</h3>
+<h3>Réservation confirmée</h3>
 
-<div style="display:flex;gap:10px;margin-top:20px;">
-
-<button onclick="newReservation()" style="flex:1;background:#2ecc71;">
+<button onclick="location.reload()" style="background:#2ecc71;margin-bottom:10px">
 Nouvelle réservation
 </button>
 
-<button onclick="finishReservation()" style="flex:1;background:#181E3B;">
+<button onclick="location.href='mesreservations.html'">
 Terminer
 </button>
 
 </div>
+</div>
 
-</div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -244,7 +240,17 @@ Terminer
 
 <script>
 
+/* POPUP */
+
+function showConfirm(){
+document.getElementById("confirmPopup").style.display="flex"
+}
+
+/* EMAILJS */
+
 emailjs.init("03cdce-AcdCC03k_v")
+
+/* FIREBASE */
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
@@ -258,6 +264,8 @@ appId:"1:501153278739:web:824b4344c381f2a94548e6"
 firebase.initializeApp(firebaseConfig)
 const db=firebase.firestore()
 
+/* VARIABLES */
+
 let reservations=[]
 let horaires={}
 let selectedDate=null
@@ -267,6 +275,8 @@ let adminMode=false
 let tapCount=0
 
 const title=document.getElementById("title")
+
+/* ADMIN MODE */
 
 title.addEventListener("click",()=>{
 
@@ -305,17 +315,171 @@ let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
 const durationSelect=document.getElementById("duration")
 const paddockSelect=document.getElementById("paddock")
 
-function showConfirm(){
-document.getElementById("confirmPopup").style.display="flex"
+/* TYPE */
+
+function initType(){
+
+const typeSelect=document.getElementById("type")
+
+typeSelect.addEventListener("change",()=>{
+
+const mise=typeSelect.value==="mise"
+
+document.getElementById("blocDuration").style.display=mise?"none":"block"
+document.getElementById("blocPaddock").style.display=mise?"none":"block"
+document.getElementById("planning").style.display=mise?"none":"block"
+
+document.getElementById("mainButton").innerText=mise?"Demander":"Réserver"
+
+})
+
 }
 
-function newReservation(){
-location.reload()
+/* PADDOCKS */
+
+function updatePaddocks(){
+
+const duration=durationSelect.value
+
+paddockSelect.innerHTML=""
+
+if(duration==="90"){
+
+paddockSelect.innerHTML=`
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
+}else{
+
+paddockSelect.innerHTML=`
+<option value="maison">Maison</option>
+<option value="grande">Grande voie</option>
+<option value="beudot">Beudot</option>
+`
+
 }
 
-function finishReservation(){
-window.location.href="mesreservations.html"
+generate()
+
 }
+
+durationSelect.addEventListener("change",updatePaddocks)
+
+/* LOAD DATA */
+
+async function loadData(){
+
+const r=await db.collection("reservations").get()
+
+reservations=[]
+
+r.forEach(doc=>{
+let data=doc.data()
+data.id=doc.id
+reservations.push(data)
+})
+
+const h=await db.collection("horaires").get()
+
+horaires={}
+
+h.forEach(doc=>{
+horaires[doc.id]=doc.data()
+})
+
+generate()
+
+}
+
+/* DAYS */
+
+function buildDays(){
+
+const container=document.getElementById("days")
+container.innerHTML=""
+
+for(let i=0;i<3;i++){
+
+let d=new Date()
+d.setDate(d.getDate()+i)
+
+let label=i===0?"Aujourd’hui":i===1?"Demain":"Après-demain"
+
+let btn=document.createElement("div")
+btn.className="dayBtn"
+
+btn.innerText=label+" "+d.getDate()
+
+btn.onclick=()=>{
+
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+
+document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
+btn.classList.add("active")
+
+generate()
+
+}
+
+container.appendChild(btn)
+
+if(i===0){
+btn.classList.add("active")
+selectedDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
+}
+
+}
+
+}
+
+/* BOOK */
+
+async function book(){
+
+let name=document.getElementById("name").value.trim()
+
+if(!name){
+alert("Prénom obligatoire")
+return
+}
+
+if(!selected){
+alert("Choisissez un créneau")
+return
+}
+
+const doc=await db.collection("reservations").add({
+
+name:name,
+email:document.getElementById("email").value,
+paddock:selected.paddock,
+date:selected.date,
+time:selected.time,
+duration:selected.duration
+
+})
+
+myReservations.push(doc.id)
+
+localStorage.setItem("myReservations",JSON.stringify(myReservations))
+
+showConfirm()
+
+loadData()
+
+}
+
+/* INIT */
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+initType()
+buildDays()
+updatePaddocks()
+loadData()
+
+})
 
 </script>
 
