@@ -99,11 +99,6 @@ font-weight:600;
 cursor:pointer;
 }
 
-.waiting{
-color:#f39c12;
-font-weight:600;
-}
-
 .empty{
 text-align:center;
 color:#888;
@@ -252,9 +247,10 @@ card.innerHTML=`
 
 <p><strong>Date :</strong> ${mise.date}</p>
 <p><strong>Nom :</strong> ${mise.name}</p>
-<p class="waiting">Demande en attente</p>
 
-<button onclick="cancelMise(${i})">Annuler la demande</button>
+<p style="margin-top:10px;color:#888;font-size:13px;">
+Pour annuler cette demande contacter Damien
+</p>
 
 `
 
@@ -279,18 +275,6 @@ await db.collection("reservations").doc(id).delete()
 myReservations=myReservations.filter(r=>r!==id)
 
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
-
-load()
-
-}
-
-/* ===== ANNULATION DEMANDE ===== */
-
-function cancelMise(index){
-
-myMises.splice(index,1)
-
-localStorage.setItem("myMises",JSON.stringify(myMises))
 
 load()
 
