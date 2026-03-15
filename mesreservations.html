@@ -99,16 +99,33 @@ font-weight:600;
 cursor:pointer;
 }
 
-.waiting{
-color:#f39c12;
-font-weight:600;
-}
-
 .empty{
 text-align:center;
 color:#888;
 margin-top:40px;
 font-weight:600;
+}
+
+/* ===== COULEURS STATUT ===== */
+
+.status{
+font-weight:600;
+}
+
+.status-attente{
+color:#f39c12;
+}
+
+.status-accepte{
+color:#27ae60;
+}
+
+.status-refuse{
+color:#e74c3c;
+}
+
+.status-realise{
+color:#2980b9;
 }
 
 @media(prefers-color-scheme:dark){
@@ -286,6 +303,12 @@ statut=match.statut || "En attente"
 commentaire=match.commentaire || ""
 }
 
+let statusClass="status-attente"
+
+if(statut==="Accepté"){statusClass="status-accepte"}
+if(statut==="Refusé"){statusClass="status-refuse"}
+if(statut==="Réalisé"){statusClass="status-realise"}
+
 let card=document.createElement("div")
 card.className="card"
 
@@ -295,7 +318,9 @@ card.innerHTML=`
 
 <p><strong>Date :</strong> ${mise.date}</p>
 
-<p class="waiting"><strong>Statut :</strong> ${statut}</p>
+<p class="status ${statusClass}">
+<strong>Statut :</strong> ${statut}
+</p>
 
 ${commentaire ? `<p><strong>Info :</strong> ${commentaire}</p>` : ""}
 
