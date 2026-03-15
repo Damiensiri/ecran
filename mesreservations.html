@@ -99,6 +99,11 @@ font-weight:600;
 cursor:pointer;
 }
 
+.waiting{
+color:#f39c12;
+font-weight:600;
+}
+
 .empty{
 text-align:center;
 color:#888;
@@ -110,8 +115,6 @@ font-weight:600;
 
 body{background:#0f1115;color:white}
 .card{background:#1c1f26}
-
-/* correction bouton retour dark */
 
 #backBtn{
 background:#1c1f26;
@@ -173,7 +176,7 @@ location.href="index.html"
 
 }
 
-/* ===== CODE ORIGINAL ===== */
+/* ===== FIREBASE ===== */
 
 const firebaseConfig={
 apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
@@ -187,7 +190,12 @@ appId:"1:501153278739:web:824b4344c381f2a94548e6"
 firebase.initializeApp(firebaseConfig)
 const db=firebase.firestore()
 
-let myReservations=JSON.parse(localStorage.getItem("myReservations")||"[]")
+/* ===== LOCAL STORAGE ===== */
+
+let myReservations = JSON.parse(localStorage.getItem("myReservations") || "[]")
+let myMises = JSON.parse(localStorage.getItem("myMises") || "[]")
+
+/* ===== LOAD ===== */
 
 async function load(){
 
@@ -195,6 +203,8 @@ const container=document.getElementById("list")
 container.innerHTML=""
 
 let count=0
+
+/* ===== RESERVATIONS FIREBASE ===== */
 
 for(const id of myReservations){
 
@@ -217,7 +227,7 @@ card.innerHTML=`
 <p><strong>Heure :</strong> ${data.time}</p>
 <p><strong>Durée :</strong> ${data.duration} min</p>
 
-<button onclick="cancel('${id}')">Annuler</button>
+<button onclick="cancelReservation('${id}')">Annuler</button>
 
 `
 
@@ -225,13 +235,44 @@ container.appendChild(card)
 
 }
 
+/* ===== DEMANDES MISE PADDOCK ===== */
+
+for(let i=0;i<myMises.length;i++){
+
+const mise=myMises[i]
+
+count++
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+
+<h3>Mise au paddock</h3>
+
+<p><strong>Date :</strong> ${mise.date}</p>
+<p><strong>Nom :</strong> ${mise.name}</p>
+<p class="waiting">Demande en attente</p>
+
+<button onclick="cancelMise(${i})">Annuler la demande</button>
+
+`
+
+container.appendChild(card)
+
+}
+
+/* ===== MESSAGE VIDE ===== */
+
 if(count===0){
 container.innerHTML='<div class="empty">Aucune réservation</div>'
 }
 
 }
 
-async function cancel(id){
+/* ===== ANNULATION RESERVATION ===== */
+
+async function cancelReservation(id){
 
 await db.collection("reservations").doc(id).delete()
 
@@ -242,6 +283,20 @@ localStorage.setItem("myReservations",JSON.stringify(myReservations))
 load()
 
 }
+
+/* ===== ANNULATION DEMANDE ===== */
+
+function cancelMise(index){
+
+myMises.splice(index,1)
+
+localStorage.setItem("myMises",JSON.stringify(myMises))
+
+load()
+
+}
+
+/* ===== START ===== */
 
 load()
 
