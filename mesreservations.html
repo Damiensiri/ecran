@@ -357,8 +357,21 @@ load()
 }
 
 /* ===== START ===== */
-
 load()
+
+/* ===== AUTO REFRESH ===== */
+
+setInterval(()=>{
+load()
+},120000)
+
+document.addEventListener("visibilitychange", () => {
+
+if (!document.hidden) {
+load()
+}
+
+})
 
 </script>
 
