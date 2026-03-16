@@ -18,6 +18,9 @@ body{
   color:#000;
   transition:background .3s ease,color .3s ease;
 }
+  :root{
+--haloColor:#2ecc71;
+}
 
 /* ================= ANIMATION ================= */
 
@@ -162,6 +165,31 @@ transition:opacity .25s ease .15s;
 #panel.active #panelIcon{
 opacity:1;
 }
+
+/* halo statut */
+
+#panelIcon::before{
+content:"";
+position:absolute;
+inset:-4px;
+border-radius:50%;
+padding:2px;
+
+background:conic-gradient(
+var(--haloColor) 0deg,
+var(--haloColor) 180deg,
+transparent 180deg,
+transparent 360deg
+);
+
+-webkit-mask:
+radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
+mask:
+radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
+
+animation:haloSpin 1.2s linear infinite;
+pointer-events:none;
+}
   
 #panelIcon img{
 width:30px;
@@ -236,7 +264,12 @@ height:30px;
   font-weight:600;
   cursor:pointer;
 }
-
+  
+@keyframes haloSpin{
+from{ transform:rotate(0deg); }
+to{ transform:rotate(360deg); }
+}
+  
 /* ================= DARK MODE ================= */
 
 @media (prefers-color-scheme: dark){
@@ -468,10 +501,29 @@ if(!e) return;
 
 panelTitle.innerText=formatTitle(e.espace);
 
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
-if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
+if(e.statut_auto==="ouvert"){
+statut.innerText="Ouvert";
+statut.style.color="green";
+document.documentElement.style.setProperty('--haloColor','green');
+}
+
+if(e.statut_auto==="prevision"){
+statut.innerText="Ouverture prévue";
+statut.style.color="#E88B00";
+document.documentElement.style.setProperty('--haloColor','#E88B00');
+}
+
+if(e.statut_auto==="ferme"){
+statut.innerText="Fermé";
+statut.style.color="red";
+document.documentElement.style.setProperty('--haloColor','red');
+}
+
+if(e.statut_auto==="hors-service"){
+statut.innerText="Hors service";
+statut.style.color="gray";
+document.documentElement.style.setProperty('--haloColor','gray');
+}
 
 const special=e.horaire_special && String(e.horaire_special).trim()!=="";
 horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
