@@ -447,9 +447,41 @@ setPanelIcon(espace);
 const e=DATA.find(x=>x.espace===espace);
 if(!e) return;
 
-panelTitle.innerText=e.espace;
+panelTitle.innerText=formatTitle(e.espace);
 
-statut.innerText=e.statut_auto;
+function formatTitle(t){
+
+const map={
+"carriere":"Carrière",
+"manege":"Manège",
+"maison":"Maison",
+"grande-voie":"Grande voie",
+"beudot":"Beudot"
+};
+
+return map[t]||t;
+
+}
+
+if(e.statut_auto==="ouvert"){
+statut.innerText="Ouvert";
+statut.style.color="green";
+}
+
+if(e.statut_auto==="prevision"){
+statut.innerText="Ouverture prévue";
+statut.style.color="#E88B00";
+}
+
+if(e.statut_auto==="ferme"){
+statut.innerText="Fermé";
+statut.style.color="red";
+}
+
+if(e.statut_auto==="hors-service"){
+statut.innerText="Hors service";
+statut.style.color="gray";
+}
 info.innerText=e.info||"Aucune info";
 
 /* couleur halo */
