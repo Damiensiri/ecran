@@ -573,8 +573,13 @@ if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
   reserveBox.style.display="none";
 }
 
-panel.classList.add("active");
+const halo = document.getElementById("panelIcon");
 
+halo.style.animation="none";
+halo.offsetHeight;
+halo.style.animation="";
+
+panel.classList.add("active");
 }
 
 closePanel.onclick=()=>panel.classList.remove("active");
