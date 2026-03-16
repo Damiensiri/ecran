@@ -25,13 +25,8 @@ transform:translateX(100%);
 transition:transform .35s ease;
 }
 
-.page.active{
-transform:translateX(0);
-}
-
-.page.exit{
-transform:translateX(100%);
-}
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
 
 /* HEADER */
 
@@ -56,9 +51,7 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{
-width:22px;
-}
+#backBtn img{ width:22px; }
 
 header h1{
 position:absolute;
@@ -96,9 +89,7 @@ justify-content:center;
 cursor:pointer;
 }
 
-.plan-btn img{
-width:26px;
-}
+.plan-btn img{ width:26px; }
 
 /* positions */
 
@@ -122,9 +113,7 @@ gap:10px;
 margin-bottom:15px;
 }
 
-.legend-item img{
-width:22px;
-}
+.legend-item img{ width:22px; }
 
 /* PANEL */
 
@@ -171,6 +160,7 @@ box-shadow:0 8px 25px rgba(0,0,0,0.25);
 #panelIcon img{
 width:30px;
 position:absolute;
+z-index:2;
 }
 
 /* HALO SVG */
@@ -188,13 +178,6 @@ stroke-width:3;
 stroke-linecap:round;
 stroke-dasharray:188;
 stroke-dashoffset:188;
-animation:haloFill .9s ease forwards;
-}
-
-@keyframes haloFill{
-to{
-stroke-dashoffset:0;
-}
 }
 
 /* PANEL CONTENT */
@@ -215,9 +198,7 @@ font-size:22px;
 cursor:pointer;
 }
 
-.row{
-margin-top:14px;
-}
+.row{ margin-top:14px; }
 
 .label{
 font-size:12px;
@@ -277,9 +258,7 @@ background:#0f1115;
 color:white;
 }
 
-header h1{
-color:white;
-}
+header h1{ color:white; }
 
 #backBtn{
 background:#1c1f26;
@@ -299,28 +278,16 @@ box-shadow:0 25px 60px rgba(0,0,0,0.75);
 background:#1c1f26;
 }
 
-.label{
-color:#9aa0a6;
-}
-
-.value{
-color:#e5e5e5;
-}
-
-.legend{
-color:#ddd;
-}
+.label{ color:#9aa0a6; }
+.value{ color:#e5e5e5; }
+.legend{ color:#ddd; }
 
 #map{
 filter:brightness(0.92) contrast(0.95);
-box-shadow:
-0 30px 70px rgba(0,0,0,0.8),
-0 0 0 1px rgba(255,255,255,0.04);
 }
 
 #reserveBox{
 background:#c87400;
-box-shadow:0 12px 30px rgba(0,0,0,0.6);
 }
 
 }
@@ -436,37 +403,29 @@ const closePanel=document.getElementById("closePanel");
 const haloCircle=document.getElementById("haloCircle");
 
 function setPanelIcon(espace){
-
 if(espace==="carriere" || espace==="manege"){
 panelIconImg.src="image/travail.svg";
 }else{
 panelIconImg.src="image/paddock.svg";
 }
-
 }
 
 function loadData(){
-
 fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(d=>{
-
 DATA=d;
 localStorage.setItem("statuts",JSON.stringify(d));
 renderIcons(d);
-
 });
-
 }
 
 function renderIcons(data){
-
 data.forEach(e=>{
 const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
 const el=document.getElementById("icon-"+e.espace);
 if(el && icon) el.src=icon;
 });
-
 }
 
 const cache=localStorage.getItem("statuts");
@@ -489,6 +448,7 @@ const e=DATA.find(x=>x.espace===espace);
 if(!e) return;
 
 panelTitle.innerText=e.espace;
+
 statut.innerText=e.statut_auto;
 info.innerText=e.info||"Aucune info";
 
@@ -502,11 +462,15 @@ if(e.statut_auto==="hors-service") color="gray";
 
 haloCircle.style.stroke=color;
 
-/* restart animation */
+/* animation halo */
 
-haloCircle.style.animation="none";
-haloCircle.offsetHeight;
-haloCircle.style.animation="haloFill .9s ease forwards";
+haloCircle.style.transition="none";
+haloCircle.style.strokeDashoffset="188";
+
+setTimeout(()=>{
+haloCircle.style.transition="stroke-dashoffset 0.9s ease";
+haloCircle.style.strokeDashoffset="0";
+},50);
 
 /* horaires */
 
