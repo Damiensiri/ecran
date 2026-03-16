@@ -180,13 +180,12 @@ content:"";
 position:absolute;
 inset:-3px;
 border-radius:50%;
-padding:1.5px;
+padding:2px;
 
 background:conic-gradient(
-transparent 0deg,
-var(--haloColor) 20deg,
-var(--haloColor) 200deg,
-transparent 220deg
+var(--haloColor) 0deg,
+var(--haloColor) 0deg,
+transparent 0deg
 );
 
 -webkit-mask:
@@ -194,7 +193,7 @@ radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2
 mask:
 radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
 
-animation:haloSpin .9s ease forwards;
+animation:haloFill .8s ease forwards;
 
 pointer-events:none;
 }
@@ -275,10 +274,27 @@ height:30px;
   
 @keyframes haloSpin{
 from{
-transform:translateX(-50%) rotate(0deg);
+transform:rotate(0deg);
 }
 to{
-transform:translateX(-50%) rotate(360deg);
+transform:rotate(360deg);
+}
+}
+
+@keyframes haloFill{
+from{
+background:conic-gradient(
+var(--haloColor) 0deg,
+var(--haloColor) 0deg,
+transparent 0deg
+);
+}
+to{
+background:conic-gradient(
+var(--haloColor) 0deg,
+var(--haloColor) 360deg,
+transparent 360deg
+);
 }
 }
   
