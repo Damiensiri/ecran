@@ -9,8 +9,6 @@
 
 <style>
 
-/* ================= BASE ================= */
-
 body{
 margin:0;
 background:#f4f4f4;
@@ -19,17 +17,18 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-/* ================= ANIMATION ================= */
+/* PAGE */
 
 .page{
 min-height:100vh;
 transform:translateX(100%);
 transition:transform .35s ease;
 }
+
 .page.active{transform:translateX(0);}
 .page.exit{transform:translateX(100%);}
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 header{
 position:relative;
@@ -64,7 +63,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ================= PLAN ================= */
+/* PLAN */
 
 #mapWrapper{
 position:relative;
@@ -74,10 +73,9 @@ padding:10px;
 #map{
 width:100%;
 border-radius:20px;
-transition:filter .3s ease,box-shadow .3s ease;
 }
 
-/* ================= BOUTONS ================= */
+/* BOUTONS */
 
 .plan-btn{
 position:absolute;
@@ -97,15 +95,13 @@ height:26px;
 object-fit:contain;
 }
 
-/* positions */
-
 #btn-carriere{top:20%;left:25%;}
 #btn-beudot{top:20%;left:55%;}
 #btn-manege{top:35%;left:38%;}
-#btn-grande{top:38%;left:69%;}
+#btn-grande-voie{top:38%;left:69%;}
 #btn-maison{top:55%;left:60%;}
 
-/* ================= LEGENDE ================= */
+/* LEGENDE */
 
 .legend{
 padding:20px;
@@ -121,7 +117,7 @@ margin-bottom:15px;
 
 .legend-item img{width:22px;}
 
-/* ================= PANEL ================= */
+/* PANEL */
 
 #panel{
 position:fixed;
@@ -139,17 +135,17 @@ box-sizing:border-box;
 
 #panel.active{transform:translateY(0);}
 
-/* ===== cercle Disney ===== */
+/* CERCLE */
 
 #panelIcon{
 position:absolute;
 top:-32px;
 left:50%;
-transform:translateX(-50%) scale(0.7);
+transform:translateX(-50%) scale(.7);
 width:64px;
 height:64px;
 border-radius:50%;
-background:#ffffff;
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -167,7 +163,7 @@ position:absolute;
 inset:-4px;
 border-radius:50%;
 border:4px solid transparent;
-animation:spinRing 6s linear infinite;
+animation:spinRing 4s linear infinite;
 }
 
 @keyframes spinRing{
@@ -180,14 +176,25 @@ width:30px;
 height:30px;
 }
 
-/* couleurs anneau */
+/* COULEURS ANNEAU */
 
-.ring-open::before{border-color:green;}
-.ring-prevision::before{border-color:#E88B00;}
-.ring-ferme::before{border-color:red;}
-.ring-hors::before{border-color:gray;}
+.ring-open::before{
+border-top-color:green;
+}
 
-/* ================= PANEL CONTENT ================= */
+.ring-prevision::before{
+border-top-color:#E88B00;
+}
+
+.ring-ferme::before{
+border-top-color:red;
+}
+
+.ring-hors::before{
+border-top-color:gray;
+}
+
+/* PANEL CONTENT */
 
 #panelHeader{
 display:flex;
@@ -257,7 +264,7 @@ font-weight:600;
 cursor:pointer;
 }
 
-/* ================= DARK MODE ================= */
+/* DARK MODE */
 
 @media(prefers-color-scheme:dark){
 
@@ -290,15 +297,6 @@ background:#1c1f26;
 .value{color:#e5e5e5;}
 .legend{color:#ddd;}
 
-#map{
-filter:brightness(.92) contrast(.95);
-box-shadow:0 30px 70px rgba(0,0,0,0.8);
-}
-
-#reserveBox{
-background:#c87400;
-}
-
 }
 
 </style>
@@ -316,13 +314,15 @@ background:#c87400;
 </header>
 
 <div id="mapWrapper">
+
 <img id="map" src="image/plan.png">
 
 <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
 <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
 <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
-<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
+<div class="plan-btn" id="btn-grande-voie" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
 <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
+
 </div>
 
 <div class="legend">
@@ -381,14 +381,6 @@ document.getElementById("page").classList.add("active");
 });
 
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
-const RESERVE_URL="planningpaddock.html";
-
-const ICONS={
-"ouvert":"image/ouvert.png",
-"ferme":"image/ferme.png",
-"prevision":"image/prevision.png",
-"hors-service":"image/horsservice.png"
-};
 
 let DATA=[];
 
@@ -400,53 +392,38 @@ const liberte=document.getElementById("liberte");
 const longe=document.getElementById("longe");
 const optionsRow=document.getElementById("optionsRow");
 const reserveBox=document.getElementById("reserveBox");
-const closePanel=document.getElementById("closePanel");
 const panel=document.getElementById("panel");
 const panelIcon=document.getElementById("panelIcon");
 const panelIconImg=document.getElementById("panelIconImg");
 
-function formatTitle(t){
-const map={
-"carriere":"Carrière",
-"manege":"Manège",
-"maison":"Maison",
-"grande-voie":"Grande voie",
-"beudot":"Beudot"
-};
-return map[t]||t;
+function loadData(){
+
+fetch(SHEET_URL+"&t="+Date.now())
+.then(r=>r.json())
+.then(d=>{
+DATA=d;
+renderIcons(d);
+});
+
 }
 
 function renderIcons(data){
+
 data.forEach(e=>{
-const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
 const el=document.getElementById("icon-"+e.espace);
-if(el && icon) el.src=icon;
-});
-}
+if(!el)return;
 
-function loadData(){
+const icon={
+ouvert:"image/ouvert.png",
+ferme:"image/ferme.png",
+prevision:"image/prevision.png",
+"hors-service":"image/horsservice.png"
+}[e.statut_auto];
 
-fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
-.then(r=>r.json())
-.then(d=>{
-
-DATA=d;
-
-localStorage.setItem("statuts",JSON.stringify(d));
-
-renderIcons(d);
+if(icon)el.src=icon;
 
 });
 
-}
-
-const cache=localStorage.getItem("statuts");
-
-if(cache){
-try{
-DATA=JSON.parse(cache);
-renderIcons(DATA);
-}catch(e){}
 }
 
 loadData();
@@ -455,13 +432,13 @@ setInterval(loadData,10000);
 function openSpace(espace){
 
 const e=DATA.find(x=>x.espace===espace);
-if(!e) return;
+if(!e)return;
 
-panelTitle.innerText=formatTitle(e.espace);
+panelTitle.innerText=e.espace;
 
 panelIcon.classList.remove("ring-open","ring-prevision","ring-ferme","ring-hors");
 
-if(e.espace==="carriere"||e.espace==="manege"){
+if(espace==="carriere"||espace==="manege"){
 panelIconImg.src="image/travail.svg";
 }else{
 panelIconImg.src="image/paddock.svg";
@@ -491,45 +468,11 @@ statut.style.color="gray";
 panelIcon.classList.add("ring-hors");
 }
 
-const special=e.horaire_special && String(e.horaire_special).trim()!=="";
-horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
-
-if(special){
-horaire.style.color="#E88B00";
-horaire.style.fontWeight="600";
-}else{
-horaire.style.color="";
-horaire.style.fontWeight="500";
-}
-
-info.innerText=e.info||"Aucune info";
-
-let show=false;
-
-if(e.liberte){
-liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
-show=true;
-}
-
-if(e.longe){
-longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
-show=true;
-}
-
-optionsRow.style.display=show?"block":"none";
-
-if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
-(e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
-reserveBox.style.display="block";
-}else{
-reserveBox.style.display="none";
-}
-
 panel.classList.add("active");
 
 }
 
-closePanel.onclick=()=>panel.classList.remove("active");
+document.getElementById("closePanel").onclick=()=>panel.classList.remove("active");
 
 function goBack(){
 const page=document.getElementById("page");
