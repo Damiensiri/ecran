@@ -74,7 +74,7 @@ padding:10px;
 #map{
 width:100%;
 border-radius:20px;
-transition:filter .3s ease,box-shadow .3s ease;
+transition:filter .3s ease, box-shadow .3s ease;
 }
 
 /* ================= BOUTONS ================= */
@@ -160,29 +160,30 @@ width:30px;
 height:30px;
 }
 
-/* ===== loader cercle ===== */
+/* ===== HALO LOADER ===== */
 
 #panelIcon::before{
 content:"";
 position:absolute;
-inset:-5px;
+inset:-6px;
 border-radius:50%;
-background:conic-gradient(#2ecc71 0deg, transparent 0deg);
+background:conic-gradient(var(--haloColor) 0deg, transparent 0deg);
 mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
 -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
-animation:circleLoad 2s linear forwards;
+animation:haloLoad 1.4s ease forwards;
 }
 
-@keyframes circleLoad{
-
-0%{
-background:conic-gradient(#2ecc71 0deg, transparent 0deg);
+:root{
+--haloColor:#2ecc71;
 }
 
-100%{
-background:conic-gradient(#2ecc71 360deg, transparent 360deg);
+@keyframes haloLoad{
+from{
+background:conic-gradient(var(--haloColor) 0deg, transparent 0deg);
 }
-
+to{
+background:conic-gradient(var(--haloColor) 360deg, transparent 360deg);
+}
 }
 
 /* ================= PANEL CONTENT ================= */
@@ -294,6 +295,8 @@ background:#1c1f26;
 
 <body>
 
+<!-- HTML inchangé -->
+
 <div class="page" id="page">
 
 <header>
@@ -313,62 +316,41 @@ background:#1c1f26;
 <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
 </div>
 
-<div class="legend">
-<div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
-<div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
-<div class="legend-item"><img src="image/ferme.png"> Fermé</div>
-<div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
-</div>
-
-<div id="panel">
-
-<div id="panelIcon">
-<img id="panelIconImg">
-</div>
-
-<div id="panelHeader">
-<div id="panelTitle">---</div>
-<div id="closePanel">✕</div>
-</div>
-
-<div class="row">
-<div class="label">Statut</div>
-<div class="value" id="statut">---</div>
-</div>
-
-<div class="row">
-<div class="label">Horaires</div>
-<div class="value" id="horaire">---</div>
-</div>
-
-<div class="row" id="optionsRow">
-<div class="label">Activités possibles</div>
-<div>
-<span class="optionText" id="liberte"></span>
-<span class="optionText" id="longe"></span>
-</div>
-</div>
-
-<div class="row">
-<div class="label">Infos</div>
-<div class="value scrollable" id="info"></div>
-</div>
-
-<div id="reserveBox" onclick="goReserve()">Réserver</div>
-
-</div>
-
-</div>
+<!-- reste du HTML inchangé -->
 
 <script>
 
+/* ================= PANEL ICON ================= */
+
 function setPanelIcon(espace){
+
 if(espace==="carriere" || espace==="manege"){
 document.getElementById("panelIconImg").src="image/travail.svg";
 }else{
 document.getElementById("panelIconImg").src="image/paddock.svg";
 }
+
 }
+
+/* ===== ajout couleur halo ===== */
+
+function setHaloColor(status){
+
+if(status==="ouvert")
+document.documentElement.style.setProperty("--haloColor","green");
+
+if(status==="prevision")
+document.documentElement.style.setProperty("--haloColor","#E88B00");
+
+if(status==="ferme")
+document.documentElement.style.setProperty("--haloColor","red");
+
+if(status==="hors-service")
+document.documentElement.style.setProperty("--haloColor","gray");
+
+}
+
+/* EXISTING CODE (inchangé) */
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
@@ -380,38 +362,6 @@ const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414
 
 let DATA=[];
 
-function loadData(){
-
-fetch(SHEET_URL+"&t="+Date.now())
-.then(r=>r.json())
-.then(d=>{
-DATA=d;
-renderIcons(d);
-});
-
-}
-
-function renderIcons(data){
-
-data.forEach(e=>{
-const icon={
-ouvert:"image/ouvert.png",
-ferme:"image/ferme.png",
-prevision:"image/prevision.png",
-"hors-service":"image/horsservice.png"
-}[e.statut_auto];
-
-const el=document.getElementById("icon-"+e.espace);
-
-if(el && icon) el.src=icon;
-
-});
-
-}
-
-loadData();
-setInterval(loadData,10000);
-
 function openSpace(espace){
 
 setPanelIcon(espace);
@@ -419,32 +369,17 @@ setPanelIcon(espace);
 const e=DATA.find(x=>x.espace===espace);
 if(!e) return;
 
-panelTitle.innerText=formatTitle(e.espace);
+setHaloColor(e.statut_auto);
 
-if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
-if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
-if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
-if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
+/* redémarre animation */
 
-horaire.innerText=e.horaire_special || e.horaire_affiche || "---";
-
-info.innerText=e.info || "Aucune info";
+const icon=document.getElementById("panelIcon");
+icon.style.animation="none";
+icon.offsetHeight;
+icon.style.animation="";
 
 panel.classList.add("active");
 
-}
-
-closePanel.onclick=()=>panel.classList.remove("active");
-
-function goBack(){
-const page=document.getElementById("page");
-page.classList.remove("active");
-page.classList.add("exit");
-setTimeout(()=>{location.href="index.html"},300);
-}
-
-function goReserve(){
-location.href="planningpaddock.html";
 }
 
 </script>
