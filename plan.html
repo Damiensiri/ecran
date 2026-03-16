@@ -21,6 +21,15 @@ transition:background .3s ease,color .3s ease;
 
 :root{
 --haloColor:#2ecc71;
+--haloAngle:0deg;
+}
+
+/* nécessaire pour animer les degrés */
+
+@property --haloAngle{
+syntax:"<angle>";
+initial-value:0deg;
+inherits:false;
 }
 
 /* ================= ANIMATION ================= */
@@ -193,8 +202,8 @@ inset:-3px;
 border-radius:50%;
 
 background:conic-gradient(
-var(--haloColor) 0deg,
-transparent 0deg
+var(--haloColor) var(--haloAngle),
+transparent var(--haloAngle)
 );
 
 -webkit-mask:
@@ -203,7 +212,7 @@ radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3
 mask:
 radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
 
-animation:haloFill .8s ease forwards;
+animation:haloFill 1s ease forwards;
 
 pointer-events:none;
 }
@@ -217,18 +226,12 @@ height:30px;
 
 @keyframes haloFill{
 
-0%{
-background:conic-gradient(
-var(--haloColor) 0deg,
-transparent 0deg
-);
+from{
+--haloAngle:0deg;
 }
 
-100%{
-background:conic-gradient(
-var(--haloColor) 360deg,
-transparent 360deg
-);
+to{
+--haloAngle:360deg;
 }
 
 }
@@ -448,15 +451,13 @@ document.getElementById("panelIconImg").src="image/paddock.svg";
 
 }
 
-/* ================= PAGE LOAD ================= */
+/* ================= EXISTING CODE ================= */
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
 });
-
-/* ================= DATA ================= */
 
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 
@@ -469,9 +470,6 @@ const ICONS={
 
 let DATA=[];
 
-/* ================= ELEMENTS ================= */
-
-const panel=document.getElementById("panel");
 const panelTitle=document.getElementById("panelTitle");
 const statut=document.getElementById("statut");
 const horaire=document.getElementById("horaire");
@@ -481,8 +479,7 @@ const longe=document.getElementById("longe");
 const optionsRow=document.getElementById("optionsRow");
 const reserveBox=document.getElementById("reserveBox");
 const closePanel=document.getElementById("closePanel");
-
-/* ================= TITLE ================= */
+const panel=document.getElementById("panel");
 
 function formatTitle(t){
 
@@ -498,14 +495,11 @@ return map[t]||t;
 
 }
 
-/* ================= ICONS ================= */
-
 function renderIcons(data){
 
 data.forEach(e=>{
 
 const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
-
 const el=document.getElementById("icon-"+e.espace);
 
 if(el && icon) el.src=icon;
@@ -514,8 +508,6 @@ if(el && icon) el.src=icon;
 
 }
 
-/* ================= LOAD DATA ================= */
-
 function loadData(){
 
 fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
@@ -523,9 +515,7 @@ fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(d=>{
 
 DATA=d;
-
 localStorage.setItem("statuts",JSON.stringify(d));
-
 renderIcons(d);
 
 });
@@ -535,34 +525,23 @@ renderIcons(d);
 const cache=localStorage.getItem("statuts");
 
 if(cache){
-
 try{
-
 DATA=JSON.parse(cache);
-
 renderIcons(DATA);
-
 }catch(e){}
-
 }
 
 loadData();
-
 setInterval(loadData,10000);
-
-/* ================= OPEN SPACE ================= */
 
 function openSpace(espace){
 
 setPanelIcon(espace);
 
 const e=DATA.find(x=>x.espace===espace);
-
 if(!e) return;
 
 panelTitle.innerText=formatTitle(e.espace);
-
-/* statut + couleur */
 
 if(e.statut_auto==="ouvert"){
 statut.innerText="Ouvert";
@@ -588,10 +567,7 @@ statut.style.color="gray";
 document.documentElement.style.setProperty('--haloColor','gray');
 }
 
-/* horaires */
-
 const special=e.horaire_special && String(e.horaire_special).trim()!=="";
-
 horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
 
 if(special){
@@ -602,11 +578,7 @@ horaire.style.color="";
 horaire.style.fontWeight="500";
 }
 
-/* infos */
-
 info.innerText=e.info||"Aucune info";
-
-/* options */
 
 let show=false;
 
@@ -622,49 +594,28 @@ show=true;
 
 optionsRow.style.display=show?"block":"none";
 
-/* bouton réserver */
-
 if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
 (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
-
 reserveBox.style.display="block";
-
 }else{
-
 reserveBox.style.display="none";
-
 }
 
 panel.classList.add("active");
 
 }
 
-/* ================= CLOSE PANEL ================= */
-
 closePanel.onclick=()=>panel.classList.remove("active");
 
-/* ================= NAV ================= */
-
 function goBack(){
-
 const page=document.getElementById("page");
-
 page.classList.remove("active");
-
 page.classList.add("exit");
-
-setTimeout(()=>{
-
-location.href="index.html";
-
-},300);
-
+setTimeout(()=>{location.href="index.html";},300);
 }
 
 function goReserve(){
-
 location.href="planningpaddock.html";
-
 }
 
 </script>
