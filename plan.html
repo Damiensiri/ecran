@@ -180,20 +180,18 @@ content:"";
 position:absolute;
 inset:-3px;
 border-radius:50%;
-padding:2px;
 
 background:conic-gradient(
-var(--haloColor) 0deg,
 var(--haloColor) 0deg,
 transparent 0deg
 );
 
 -webkit-mask:
-radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
 mask:
-radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
 
-animation:haloFill .8s ease forwards;
+animation:haloFill 0.8s ease forwards;
 
 pointer-events:none;
 }
@@ -270,15 +268,6 @@ height:30px;
   text-align:center;
   font-weight:600;
   cursor:pointer;
-}
-  
-@keyframes haloSpin{
-from{
-transform:rotate(0deg);
-}
-to{
-transform:rotate(360deg);
-}
 }
 
 @keyframes haloFill{
@@ -585,15 +574,6 @@ if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
   reserveBox.style.display="block";
 }else{
   reserveBox.style.display="none";
-}
-
-const halo = document.getElementById("panelIcon");
-
-halo.style.animation="none";
-halo.offsetHeight;
-halo.style.animation="haloSpin .9s ease forwards";
-
-panel.classList.add("active");
 }
 
 closePanel.onclick=()=>panel.classList.remove("active");
