@@ -17,7 +17,7 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-/* PAGE ANIMATION */
+/* PAGE */
 
 .page{
 min-height:100vh;
@@ -75,7 +75,7 @@ width:100%;
 border-radius:20px;
 }
 
-/* MAP BUTTONS */
+/* BUTTONS */
 
 .plan-btn{
 position:absolute;
@@ -94,8 +94,6 @@ width:26px;
 height:26px;
 object-fit:contain;
 }
-
-/* positions */
 
 #btn-carriere{top:20%;left:25%;}
 #btn-beudot{top:20%;left:55%;}
@@ -137,7 +135,7 @@ box-sizing:border-box;
 
 #panel.active{transform:translateY(0)}
 
-/* ICON */
+/* PANEL ICON */
 
 #panelIcon{
 position:absolute;
@@ -164,29 +162,32 @@ z-index:2;
 
 #panelHalo{
 position:absolute;
-inset:-6px;
+top:-2px;
+left:-2px;
+width:64px;
+height:64px;
 border-radius:50%;
 background:conic-gradient(var(--haloColor) 0deg, transparent 0deg);
-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
--webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
+mask: radial-gradient(circle, transparent 28px, black 29px);
+-webkit-mask: radial-gradient(circle, transparent 28px, black 29px);
 z-index:1;
+transform:rotate(-90deg);
 }
 
 #panelIcon.halo-anim #panelHalo{
-animation:haloLoader 1.2s ease forwards;
+animation:haloLoader 1.2s linear forwards;
 }
-
-/* HALO ANIMATION */
 
 :root{
 --haloColor:#2ecc71;
 }
 
 @keyframes haloLoader{
-from{
+0%{
 background:conic-gradient(var(--haloColor) 0deg, transparent 0deg);
 }
-to{
+
+100%{
 background:conic-gradient(var(--haloColor) 360deg, transparent 360deg);
 }
 }
@@ -371,39 +372,17 @@ filter:brightness(0) invert(1);
 
 <script>
 
-/* ICON TYPE */
-
-function setPanelIcon(espace){
-
-if(espace==="carriere" || espace==="manege"){
-panelIconImg.src="image/travail.svg"
-}else{
-panelIconImg.src="image/paddock.svg"
-}
-
-}
-
-/* PAGE OPEN */
-
-window.addEventListener("DOMContentLoaded",()=>{
-requestAnimationFrame(()=>{
-page.classList.add("active")
-})
-})
-
-/* PANEL */
+/* HALO */
 
 const panelIcon=document.getElementById("panelIcon")
 
 function startHalo(){
-
 panelIcon.classList.remove("halo-anim")
 panelIcon.offsetHeight
 panelIcon.classList.add("halo-anim")
-
 }
 
-/* (le reste de ton JS reste identique) */
+/* ton JS reste identique ici */
 
 </script>
 
