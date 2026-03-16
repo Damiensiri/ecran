@@ -9,26 +9,27 @@
 
 <style>
 
+/* ================= BASE ================= */
+
 body{
 margin:0;
 background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 color:#000;
-transition:.3s;
+transition:background .3s ease,color .3s ease;
 }
 
-/* PAGE */
+/* ================= ANIMATION ================= */
 
 .page{
 min-height:100vh;
 transform:translateX(100%);
-transition:.35s;
+transition:transform .35s ease;
 }
-
 .page.active{transform:translateX(0);}
 .page.exit{transform:translateX(100%);}
 
-/* HEADER */
+/* ================= HEADER ================= */
 
 header{
 position:relative;
@@ -63,7 +64,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* PLAN */
+/* ================= PLAN ================= */
 
 #mapWrapper{
 position:relative;
@@ -73,9 +74,10 @@ padding:10px;
 #map{
 width:100%;
 border-radius:20px;
+transition:filter .3s ease,box-shadow .3s ease;
 }
 
-/* BOUTONS */
+/* ================= BOUTONS ================= */
 
 .plan-btn{
 position:absolute;
@@ -92,17 +94,17 @@ cursor:pointer;
 .plan-btn img{
 width:26px;
 height:26px;
+object-fit:contain;
 }
 
 /* positions */
-
 #btn-carriere{top:20%;left:25%;}
 #btn-beudot{top:20%;left:55%;}
 #btn-manege{top:35%;left:38%;}
-#btn-grande-voie{top:38%;left:69%;}
+#btn-grande{top:38%;left:69%;}
 #btn-maison{top:55%;left:60%;}
 
-/* LEGENDE */
+/* ================= LEGENDE ================= */
 
 .legend{
 padding:20px;
@@ -118,7 +120,7 @@ margin-bottom:15px;
 
 .legend-item img{width:22px;}
 
-/* PANEL */
+/* ================= PANEL ================= */
 
 #panel{
 position:fixed;
@@ -126,7 +128,7 @@ left:0;
 bottom:0;
 width:100%;
 height:50%;
-background:white;
+background:#ffffff;
 border-radius:20px 20px 0 0;
 transform:translateY(100%);
 transition:.3s;
@@ -136,75 +138,59 @@ box-sizing:border-box;
 
 #panel.active{transform:translateY(0);}
 
-/* CERCLE */
+/* ===== cercle disney ===== */
 
 #panelIcon{
 position:absolute;
-top:-32px;
+top:-30px;
 left:50%;
-transform:translateX(-50%) scale(.7);
-width:64px;
-height:64px;
+transform:translateX(-50%);
+width:60px;
+height:60px;
 border-radius:50%;
-background:white;
+background:#ffffff;
 display:flex;
 align-items:center;
 justify-content:center;
-box-shadow:0 10px 25px rgba(0,0,0,0.35);
-transition:.35s cubic-bezier(.34,1.56,.64,1);
-}
-
-#panel.active #panelIcon{
-transform:translateX(-50%) scale(1);
+box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 #panelIcon img{
 width:30px;
+height:30px;
 }
 
-/* ARC */
+/* ===== loader cercle ===== */
 
 #panelIcon::before{
 content:"";
 position:absolute;
 inset:-5px;
 border-radius:50%;
-background:conic-gradient(green 0deg 70deg, transparent 70deg 360deg);
+background:conic-gradient(#2ecc71 0deg, transparent 0deg);
 mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
 -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), black calc(100% - 4px));
-animation:spin 3s linear infinite;
+animation:circleLoad 2s linear forwards;
 }
 
-@keyframes spin{
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
+@keyframes circleLoad{
+
+0%{
+background:conic-gradient(#2ecc71 0deg, transparent 0deg);
 }
 
-/* COULEURS */
-
-.ring-open::before{
-background:conic-gradient(green 0deg 70deg, transparent 70deg 360deg);
+100%{
+background:conic-gradient(#2ecc71 360deg, transparent 360deg);
 }
 
-.ring-prevision::before{
-background:conic-gradient(#E88B00 0deg 70deg, transparent 70deg 360deg);
 }
 
-.ring-ferme::before{
-background:conic-gradient(red 0deg 70deg, transparent 70deg 360deg);
-}
-
-.ring-hors::before{
-background:conic-gradient(gray 0deg 70deg, transparent 70deg 360deg);
-}
-
-/* PANEL */
+/* ================= PANEL CONTENT ================= */
 
 #panelHeader{
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-top:20px;
 }
 
 #panelTitle{
@@ -234,30 +220,72 @@ font-size:18px;
 font-weight:700;
 }
 
-/* DARK MODE */
+#horaire{
+font-size:14px;
+font-weight:500;
+}
+
+.optionText{
+font-size:13px;
+margin-right:15px;
+}
+
+#info{
+margin-top:8px;
+line-height:1.7;
+font-size:14px;
+font-weight:550;
+}
+
+.scrollable{
+max-height:160px;
+overflow-y:auto;
+}
+
+#reserveBox{
+display:none;
+margin-top:20px;
+background:#E88B00;
+color:white;
+padding:12px;
+border-radius:12px;
+text-align:center;
+font-weight:600;
+cursor:pointer;
+}
+
+/* ================= DARK MODE ================= */
 
 @media(prefers-color-scheme:dark){
 
 body{
 background:#0f1115;
-color:white;
+color:#ffffff;
+}
+
+header h1{color:#ffffff;}
+
+#backBtn{
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
+#backBtn img{
+filter:brightness(0) invert(1);
 }
 
 #panel{
 background:#1c1f26;
+box-shadow:0 25px 60px rgba(0,0,0,0.75);
 }
 
 #panelIcon{
 background:#1c1f26;
 }
 
-#backBtn{
-background:#1c1f26;
-}
-
-#backBtn img{
-filter:brightness(0) invert(1);
-}
+.label{color:#9aa0a6;}
+.value{color:#e5e5e5;}
+.legend{color:#ddd;}
 
 }
 
@@ -276,20 +304,18 @@ filter:brightness(0) invert(1);
 </header>
 
 <div id="mapWrapper">
-
 <img id="map" src="image/plan.png">
 
 <div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
 <div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
 <div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
-<div class="plan-btn" id="btn-grande-voie" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
+<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
 <div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
-
 </div>
 
 <div class="legend">
 <div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
-<div class="legend-item"><img src="image/prevision.png"> Prévision</div>
+<div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
 <div class="legend-item"><img src="image/ferme.png"> Fermé</div>
 <div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
 </div>
@@ -310,11 +336,39 @@ filter:brightness(0) invert(1);
 <div class="value" id="statut">---</div>
 </div>
 
+<div class="row">
+<div class="label">Horaires</div>
+<div class="value" id="horaire">---</div>
+</div>
+
+<div class="row" id="optionsRow">
+<div class="label">Activités possibles</div>
+<div>
+<span class="optionText" id="liberte"></span>
+<span class="optionText" id="longe"></span>
+</div>
+</div>
+
+<div class="row">
+<div class="label">Infos</div>
+<div class="value scrollable" id="info"></div>
+</div>
+
+<div id="reserveBox" onclick="goReserve()">Réserver</div>
+
 </div>
 
 </div>
 
 <script>
+
+function setPanelIcon(espace){
+if(espace==="carriere" || espace==="manege"){
+document.getElementById("panelIconImg").src="image/travail.svg";
+}else{
+document.getElementById("panelIconImg").src="image/paddock.svg";
+}
+}
 
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
@@ -326,18 +380,31 @@ const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414
 
 let DATA=[];
 
-const panel=document.getElementById("panel");
-const statut=document.getElementById("statut");
-const panelIcon=document.getElementById("panelIcon");
-const panelIconImg=document.getElementById("panelIconImg");
-const panelTitle=document.getElementById("panelTitle");
-
 function loadData(){
 
-fetch(SHEET_URL)
+fetch(SHEET_URL+"&t="+Date.now())
 .then(r=>r.json())
 .then(d=>{
 DATA=d;
+renderIcons(d);
+});
+
+}
+
+function renderIcons(data){
+
+data.forEach(e=>{
+const icon={
+ouvert:"image/ouvert.png",
+ferme:"image/ferme.png",
+prevision:"image/prevision.png",
+"hors-service":"image/horsservice.png"
+}[e.statut_auto];
+
+const el=document.getElementById("icon-"+e.espace);
+
+if(el && icon) el.src=icon;
+
 });
 
 }
@@ -347,50 +414,37 @@ setInterval(loadData,10000);
 
 function openSpace(espace){
 
+setPanelIcon(espace);
+
 const e=DATA.find(x=>x.espace===espace);
-if(!e)return;
+if(!e) return;
 
-panelTitle.innerText=e.espace;
+panelTitle.innerText=formatTitle(e.espace);
 
-panelIcon.classList.remove("ring-open","ring-prevision","ring-ferme","ring-hors");
+if(e.statut_auto==="ouvert"){statut.innerText="Ouvert";statut.style.color="green";}
+if(e.statut_auto==="prevision"){statut.innerText="Ouverture prévue";statut.style.color="#E88B00";}
+if(e.statut_auto==="ferme"){statut.innerText="Fermé";statut.style.color="red";}
+if(e.statut_auto==="hors-service"){statut.innerText="Hors service";statut.style.color="gray";}
 
-if(espace==="carriere"||espace==="manege"){
-panelIconImg.src="image/travail.svg";
-}else{
-panelIconImg.src="image/paddock.svg";
-}
+horaire.innerText=e.horaire_special || e.horaire_affiche || "---";
 
-if(e.statut_auto==="ouvert"){
-statut.innerText="Ouvert";
-panelIcon.classList.add("ring-open");
-}
-
-if(e.statut_auto==="prevision"){
-statut.innerText="Prévision";
-panelIcon.classList.add("ring-prevision");
-}
-
-if(e.statut_auto==="ferme"){
-statut.innerText="Fermé";
-panelIcon.classList.add("ring-ferme");
-}
-
-if(e.statut_auto==="hors-service"){
-statut.innerText="Hors service";
-panelIcon.classList.add("ring-hors");
-}
+info.innerText=e.info || "Aucune info";
 
 panel.classList.add("active");
 
 }
 
-document.getElementById("closePanel").onclick=()=>panel.classList.remove("active");
+closePanel.onclick=()=>panel.classList.remove("active");
 
 function goBack(){
 const page=document.getElementById("page");
 page.classList.remove("active");
 page.classList.add("exit");
 setTimeout(()=>{location.href="index.html"},300);
+}
+
+function goReserve(){
+location.href="planningpaddock.html";
 }
 
 </script>
