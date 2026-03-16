@@ -9,20 +9,21 @@
 
 <style>
 
-/* BASE */
+/* ================= BASE ================= */
 
 body{
 margin:0;
 background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 color:#000;
+transition:background .3s ease,color .3s ease;
 }
 
 :root{
 --haloColor:#2ecc71;
 }
 
-/* PAGE ANIMATION */
+/* ================= ANIMATION ================= */
 
 .page{
 min-height:100vh;
@@ -34,7 +35,11 @@ transition:transform .35s ease;
 transform:translateX(0);
 }
 
-/* HEADER */
+.page.exit{
+transform:translateX(100%);
+}
+
+/* ================= HEADER ================= */
 
 header{
 position:relative;
@@ -71,7 +76,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* PLAN */
+/* ================= PLAN ================= */
 
 #mapWrapper{
 position:relative;
@@ -81,9 +86,10 @@ padding:10px;
 #map{
 width:100%;
 border-radius:20px;
+transition:filter .3s ease, box-shadow .3s ease;
 }
 
-/* BOUTONS */
+/* ================= BOUTONS ================= */
 
 .plan-btn{
 position:absolute;
@@ -99,6 +105,8 @@ cursor:pointer;
 
 .plan-btn img{
 width:26px;
+height:26px;
+object-fit:contain;
 }
 
 /* positions */
@@ -109,7 +117,7 @@ width:26px;
 #btn-grande{top:38%;left:69%;}
 #btn-maison{top:55%;left:60%;}
 
-/* LEGENDE */
+/* ================= LEGENDE ================= */
 
 .legend{
 padding:20px;
@@ -127,7 +135,7 @@ margin-bottom:15px;
 width:22px;
 }
 
-/* PANEL */
+/* ================= PANEL ================= */
 
 #panel{
 position:fixed;
@@ -135,7 +143,7 @@ left:0;
 bottom:0;
 width:100%;
 height:50%;
-background:white;
+background:#ffffff;
 border-radius:20px 20px 0 0;
 
 transform:translateY(110%);
@@ -152,7 +160,7 @@ transform:translateY(0);
 opacity:1;
 }
 
-/* ICON CERCLE */
+/* ===== cercle disney ===== */
 
 #panelIcon{
 position:absolute;
@@ -162,7 +170,7 @@ transform:translateX(-50%);
 width:60px;
 height:60px;
 border-radius:50%;
-background:white;
+background:#ffffff;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -176,7 +184,7 @@ transition:opacity .25s ease .15s;
 opacity:1;
 }
 
-/* HALO */
+/* halo loader */
 
 #panelIcon::before{
 content:"";
@@ -191,28 +199,41 @@ transparent 0deg
 
 -webkit-mask:
 radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
+
 mask:
 radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
 
 animation:haloFill .8s ease forwards;
+
+pointer-events:none;
 }
 
 #panelIcon img{
 width:30px;
+height:30px;
 }
 
-/* HALO ANIMATION */
+/* animation halo */
 
 @keyframes haloFill{
+
 0%{
-background:conic-gradient(var(--haloColor) 0deg, transparent 0deg);
-}
-100%{
-background:conic-gradient(var(--haloColor) 360deg, transparent 360deg);
-}
+background:conic-gradient(
+var(--haloColor) 0deg,
+transparent 0deg
+);
 }
 
-/* PANEL CONTENT */
+100%{
+background:conic-gradient(
+var(--haloColor) 360deg,
+transparent 360deg
+);
+}
+
+}
+
+/* ================= PANEL CONTENT ================= */
 
 #panelHeader{
 display:flex;
@@ -249,6 +270,28 @@ font-size:18px;
 font-weight:700;
 }
 
+#horaire{
+font-size:14px;
+font-weight:500;
+}
+
+.optionText{
+font-size:13px;
+margin-right:15px;
+}
+
+#info{
+margin-top:8px;
+line-height:1.7;
+font-size:14px;
+font-weight:550;
+}
+
+.scrollable{
+max-height:160px;
+overflow-y:auto;
+}
+
 #reserveBox{
 display:none;
 margin-top:20px;
@@ -259,6 +302,63 @@ border-radius:12px;
 text-align:center;
 font-weight:600;
 cursor:pointer;
+}
+
+/* ================= DARK MODE ================= */
+
+@media (prefers-color-scheme: dark){
+
+body{
+background:#0f1115;
+color:#ffffff;
+}
+
+header h1{
+color:#ffffff;
+}
+
+#backBtn{
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
+#backBtn img{
+filter:brightness(0) invert(1);
+}
+
+#panel{
+background:#1c1f26;
+box-shadow:0 25px 60px rgba(0,0,0,0.75);
+}
+
+#panelIcon{
+background:#1c1f26;
+}
+
+.label{
+color:#9aa0a6;
+}
+
+.value{
+color:#e5e5e5;
+}
+
+.legend{
+color:#ddd;
+}
+
+#map{
+filter:brightness(0.92) contrast(0.95);
+box-shadow:
+0 30px 70px rgba(0,0,0,0.8),
+0 0 0 1px rgba(255,255,255,0.04);
+}
+
+#reserveBox{
+background:#c87400;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
 }
 
 </style>
@@ -279,46 +379,19 @@ cursor:pointer;
 
 <img id="map" src="image/plan.png">
 
-<div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')">
-<img id="icon-carriere">
-</div>
-
-<div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')">
-<img id="icon-beudot">
-</div>
-
-<div class="plan-btn" id="btn-manege" onclick="openSpace('manege')">
-<img id="icon-manege">
-</div>
-
-<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')">
-<img id="icon-grande-voie">
-</div>
-
-<div class="plan-btn" id="btn-maison" onclick="openSpace('maison')">
-<img id="icon-maison">
-</div>
+<div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
+<div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
+<div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
+<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
+<div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
 
 </div>
 
 <div class="legend">
-
-<div class="legend-item">
-<img src="image/ouvert.png"> Ouvert
-</div>
-
-<div class="legend-item">
-<img src="image/prevision.png"> Prévision d'ouverture
-</div>
-
-<div class="legend-item">
-<img src="image/ferme.png"> Fermé
-</div>
-
-<div class="legend-item">
-<img src="image/horsservice.png"> Hors service
-</div>
-
+<div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
+<div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
+<div class="legend-item"><img src="image/ferme.png"> Fermé</div>
+<div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
 </div>
 
 <div id="panel">
@@ -342,14 +415,20 @@ cursor:pointer;
 <div class="value" id="horaire">---</div>
 </div>
 
-<div class="row">
-<div class="label">Infos</div>
-<div class="value" id="info"></div>
+<div class="row" id="optionsRow">
+<div class="label">Activités possibles</div>
+<div>
+<span class="optionText" id="liberte"></span>
+<span class="optionText" id="longe"></span>
+</div>
 </div>
 
-<div id="reserveBox" onclick="goReserve()">
-Réserver
+<div class="row">
+<div class="label">Infos</div>
+<div class="value scrollable" id="info"></div>
 </div>
+
+<div id="reserveBox" onclick="goReserve()">Réserver</div>
 
 </div>
 
@@ -357,94 +436,235 @@ Réserver
 
 <script>
 
+/* ================= PANEL ICON ================= */
+
+function setPanelIcon(espace){
+
+if(espace==="carriere" || espace==="manege"){
+document.getElementById("panelIconImg").src="image/travail.svg";
+}else{
+document.getElementById("panelIconImg").src="image/paddock.svg";
+}
+
+}
+
+/* ================= PAGE LOAD ================= */
+
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
 });
 
+/* ================= DATA ================= */
+
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
 
+const ICONS={
+"ouvert":"image/ouvert.png",
+"ferme":"image/ferme.png",
+"prevision":"image/prevision.png",
+"hors-service":"image/horsservice.png"
+};
+
 let DATA=[];
+
+/* ================= ELEMENTS ================= */
 
 const panel=document.getElementById("panel");
 const panelTitle=document.getElementById("panelTitle");
 const statut=document.getElementById("statut");
 const horaire=document.getElementById("horaire");
 const info=document.getElementById("info");
+const liberte=document.getElementById("liberte");
+const longe=document.getElementById("longe");
+const optionsRow=document.getElementById("optionsRow");
+const reserveBox=document.getElementById("reserveBox");
+const closePanel=document.getElementById("closePanel");
 
-function setPanelIcon(espace){
+/* ================= TITLE ================= */
 
-if(espace==="carriere"||espace==="manege"){
-panelIconImg.src="image/travail.svg";
-}else{
-panelIconImg.src="image/paddock.svg";
+function formatTitle(t){
+
+const map={
+"carriere":"Carrière",
+"manege":"Manège",
+"maison":"Maison",
+"grande-voie":"Grande voie",
+"beudot":"Beudot"
+};
+
+return map[t]||t;
+
 }
 
-}
-
-function loadData(){
-
-fetch(SHEET_URL+"&t="+Date.now())
-.then(r=>r.json())
-.then(d=>{
-DATA=d;
-renderIcons(d);
-});
-
-}
+/* ================= ICONS ================= */
 
 function renderIcons(data){
 
 data.forEach(e=>{
 
+const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
+
 const el=document.getElementById("icon-"+e.espace);
 
-if(!el) return;
-
-if(e.statut_auto==="ouvert") el.src="image/ouvert.png";
-if(e.statut_auto==="ferme") el.src="image/ferme.png";
-if(e.statut_auto==="prevision") el.src="image/prevision.png";
-if(e.statut_auto==="hors-service") el.src="image/horsservice.png";
+if(el && icon) el.src=icon;
 
 });
 
 }
 
+/* ================= LOAD DATA ================= */
+
+function loadData(){
+
+fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
+.then(r=>r.json())
+.then(d=>{
+
+DATA=d;
+
+localStorage.setItem("statuts",JSON.stringify(d));
+
+renderIcons(d);
+
+});
+
+}
+
+const cache=localStorage.getItem("statuts");
+
+if(cache){
+
+try{
+
+DATA=JSON.parse(cache);
+
+renderIcons(DATA);
+
+}catch(e){}
+
+}
+
 loadData();
+
 setInterval(loadData,10000);
+
+/* ================= OPEN SPACE ================= */
 
 function openSpace(espace){
 
 setPanelIcon(espace);
 
 const e=DATA.find(x=>x.espace===espace);
+
 if(!e) return;
 
-panelTitle.innerText=e.espace;
+panelTitle.innerText=formatTitle(e.espace);
 
-statut.innerText=e.statut_auto;
+/* statut + couleur */
+
+if(e.statut_auto==="ouvert"){
+statut.innerText="Ouvert";
+statut.style.color="green";
+document.documentElement.style.setProperty('--haloColor','green');
+}
+
+if(e.statut_auto==="prevision"){
+statut.innerText="Ouverture prévue";
+statut.style.color="#E88B00";
+document.documentElement.style.setProperty('--haloColor','#E88B00');
+}
+
+if(e.statut_auto==="ferme"){
+statut.innerText="Fermé";
+statut.style.color="red";
+document.documentElement.style.setProperty('--haloColor','red');
+}
+
+if(e.statut_auto==="hors-service"){
+statut.innerText="Hors service";
+statut.style.color="gray";
+document.documentElement.style.setProperty('--haloColor','gray');
+}
+
+/* horaires */
+
+const special=e.horaire_special && String(e.horaire_special).trim()!=="";
+
+horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
+
+if(special){
+horaire.style.color="#E88B00";
+horaire.style.fontWeight="600";
+}else{
+horaire.style.color="";
+horaire.style.fontWeight="500";
+}
+
+/* infos */
 
 info.innerText=e.info||"Aucune info";
 
-document.documentElement.style.setProperty('--haloColor',
-e.statut_auto==="ferme"?"red":
-e.statut_auto==="prevision"?"#E88B00":
-e.statut_auto==="hors-service"?"gray":"green"
-);
+/* options */
+
+let show=false;
+
+if(e.liberte){
+liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
+show=true;
+}
+
+if(e.longe){
+longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
+show=true;
+}
+
+optionsRow.style.display=show?"block":"none";
+
+/* bouton réserver */
+
+if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
+(e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
+
+reserveBox.style.display="block";
+
+}else{
+
+reserveBox.style.display="none";
+
+}
 
 panel.classList.add("active");
 
 }
 
+/* ================= CLOSE PANEL ================= */
+
 closePanel.onclick=()=>panel.classList.remove("active");
 
+/* ================= NAV ================= */
+
 function goBack(){
+
+const page=document.getElementById("page");
+
+page.classList.remove("active");
+
+page.classList.add("exit");
+
+setTimeout(()=>{
+
 location.href="index.html";
+
+},300);
+
 }
 
 function goReserve(){
+
 location.href="planningpaddock.html";
+
 }
 
 </script>
