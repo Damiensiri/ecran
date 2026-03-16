@@ -9,8 +9,6 @@
 
 <style>
 
-/* ================= BASE ================= */
-
 body{
 margin:0;
 background:#f4f4f4;
@@ -19,20 +17,7 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-:root{
---haloColor:#2ecc71;
---haloAngle:0deg;
-}
-
-/* nécessaire pour animer les degrés */
-
-@property --haloAngle{
-syntax:"<angle>";
-initial-value:0deg;
-inherits:false;
-}
-
-/* ================= ANIMATION ================= */
+/* PAGE */
 
 .page{
 min-height:100vh;
@@ -48,7 +33,7 @@ transform:translateX(0);
 transform:translateX(100%);
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 header{
 position:relative;
@@ -85,7 +70,7 @@ font-size:18px;
 font-weight:700;
 }
 
-/* ================= PLAN ================= */
+/* PLAN */
 
 #mapWrapper{
 position:relative;
@@ -95,10 +80,9 @@ padding:10px;
 #map{
 width:100%;
 border-radius:20px;
-transition:filter .3s ease, box-shadow .3s ease;
 }
 
-/* ================= BOUTONS ================= */
+/* BOUTONS */
 
 .plan-btn{
 position:absolute;
@@ -114,8 +98,6 @@ cursor:pointer;
 
 .plan-btn img{
 width:26px;
-height:26px;
-object-fit:contain;
 }
 
 /* positions */
@@ -126,7 +108,7 @@ object-fit:contain;
 #btn-grande{top:38%;left:69%;}
 #btn-maison{top:55%;left:60%;}
 
-/* ================= LEGENDE ================= */
+/* LEGENDE */
 
 .legend{
 padding:20px;
@@ -144,7 +126,7 @@ margin-bottom:15px;
 width:22px;
 }
 
-/* ================= PANEL ================= */
+/* PANEL */
 
 #panel{
 position:fixed;
@@ -152,7 +134,7 @@ left:0;
 bottom:0;
 width:100%;
 height:50%;
-background:#ffffff;
+background:white;
 border-radius:20px 20px 0 0;
 
 transform:translateY(110%);
@@ -169,7 +151,7 @@ transform:translateY(0);
 opacity:1;
 }
 
-/* ===== cercle disney ===== */
+/* CERCLE */
 
 #panelIcon{
 position:absolute;
@@ -179,64 +161,43 @@ transform:translateX(-50%);
 width:60px;
 height:60px;
 border-radius:50%;
-background:#ffffff;
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
 box-shadow:0 8px 25px rgba(0,0,0,0.25);
-
-opacity:0;
-transition:opacity .25s ease .15s;
-}
-
-#panel.active #panelIcon{
-opacity:1;
-}
-
-/* halo loader */
-
-#panelIcon::before{
-content:"";
-position:absolute;
-inset:-3px;
-border-radius:50%;
-
-background:conic-gradient(
-var(--haloColor) var(--haloAngle),
-transparent var(--haloAngle)
-);
-
--webkit-mask:
-radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
-
-mask:
-radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 3px));
-
-animation:haloFill 1s ease forwards;
-
-pointer-events:none;
 }
 
 #panelIcon img{
 width:30px;
-height:30px;
+position:absolute;
 }
 
-/* animation halo */
+/* HALO SVG */
+
+.halo{
+position:absolute;
+width:66px;
+height:66px;
+transform:rotate(-90deg);
+}
+
+.halo circle{
+fill:none;
+stroke-width:3;
+stroke-linecap:round;
+stroke-dasharray:188;
+stroke-dashoffset:188;
+animation:haloFill .9s ease forwards;
+}
 
 @keyframes haloFill{
-
-from{
---haloAngle:0deg;
-}
-
 to{
---haloAngle:360deg;
+stroke-dashoffset:0;
+}
 }
 
-}
-
-/* ================= PANEL CONTENT ================= */
+/* PANEL CONTENT */
 
 #panelHeader{
 display:flex;
@@ -307,17 +268,17 @@ font-weight:600;
 cursor:pointer;
 }
 
-/* ================= DARK MODE ================= */
+/* DARK MODE */
 
 @media (prefers-color-scheme: dark){
 
 body{
 background:#0f1115;
-color:#ffffff;
+color:white;
 }
 
 header h1{
-color:#ffffff;
+color:white;
 }
 
 #backBtn{
@@ -400,7 +361,13 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 <div id="panel">
 
 <div id="panelIcon">
+
+<svg class="halo">
+<circle id="haloCircle" cx="33" cy="33" r="30"/>
+</svg>
+
 <img id="panelIconImg">
+
 </div>
 
 <div id="panelHeader">
@@ -439,20 +406,6 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 
 <script>
 
-/* ================= PANEL ICON ================= */
-
-function setPanelIcon(espace){
-
-if(espace==="carriere" || espace==="manege"){
-document.getElementById("panelIconImg").src="image/travail.svg";
-}else{
-document.getElementById("panelIconImg").src="image/paddock.svg";
-}
-
-}
-
-/* ================= EXISTING CODE ================= */
-
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
@@ -470,6 +423,7 @@ const ICONS={
 
 let DATA=[];
 
+const panel=document.getElementById("panel");
 const panelTitle=document.getElementById("panelTitle");
 const statut=document.getElementById("statut");
 const horaire=document.getElementById("horaire");
@@ -479,32 +433,15 @@ const longe=document.getElementById("longe");
 const optionsRow=document.getElementById("optionsRow");
 const reserveBox=document.getElementById("reserveBox");
 const closePanel=document.getElementById("closePanel");
-const panel=document.getElementById("panel");
+const haloCircle=document.getElementById("haloCircle");
 
-function formatTitle(t){
+function setPanelIcon(espace){
 
-const map={
-"carriere":"Carrière",
-"manege":"Manège",
-"maison":"Maison",
-"grande-voie":"Grande voie",
-"beudot":"Beudot"
-};
-
-return map[t]||t;
-
+if(espace==="carriere" || espace==="manege"){
+panelIconImg.src="image/travail.svg";
+}else{
+panelIconImg.src="image/paddock.svg";
 }
-
-function renderIcons(data){
-
-data.forEach(e=>{
-
-const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
-const el=document.getElementById("icon-"+e.espace);
-
-if(el && icon) el.src=icon;
-
-});
 
 }
 
@@ -518,6 +455,16 @@ DATA=d;
 localStorage.setItem("statuts",JSON.stringify(d));
 renderIcons(d);
 
+});
+
+}
+
+function renderIcons(data){
+
+data.forEach(e=>{
+const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
+const el=document.getElementById("icon-"+e.espace);
+if(el && icon) el.src=icon;
 });
 
 }
@@ -541,44 +488,31 @@ setPanelIcon(espace);
 const e=DATA.find(x=>x.espace===espace);
 if(!e) return;
 
-panelTitle.innerText=formatTitle(e.espace);
-
-if(e.statut_auto==="ouvert"){
-statut.innerText="Ouvert";
-statut.style.color="green";
-document.documentElement.style.setProperty('--haloColor','green');
-}
-
-if(e.statut_auto==="prevision"){
-statut.innerText="Ouverture prévue";
-statut.style.color="#E88B00";
-document.documentElement.style.setProperty('--haloColor','#E88B00');
-}
-
-if(e.statut_auto==="ferme"){
-statut.innerText="Fermé";
-statut.style.color="red";
-document.documentElement.style.setProperty('--haloColor','red');
-}
-
-if(e.statut_auto==="hors-service"){
-statut.innerText="Hors service";
-statut.style.color="gray";
-document.documentElement.style.setProperty('--haloColor','gray');
-}
-
-const special=e.horaire_special && String(e.horaire_special).trim()!=="";
-horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
-
-if(special){
-horaire.style.color="#E88B00";
-horaire.style.fontWeight="600";
-}else{
-horaire.style.color="";
-horaire.style.fontWeight="500";
-}
-
+panelTitle.innerText=e.espace;
+statut.innerText=e.statut_auto;
 info.innerText=e.info||"Aucune info";
+
+/* couleur halo */
+
+let color="green";
+
+if(e.statut_auto==="ferme") color="red";
+if(e.statut_auto==="prevision") color="#E88B00";
+if(e.statut_auto==="hors-service") color="gray";
+
+haloCircle.style.stroke=color;
+
+/* restart animation */
+
+haloCircle.style.animation="none";
+haloCircle.offsetHeight;
+haloCircle.style.animation="haloFill .9s ease forwards";
+
+/* horaires */
+
+horaire.innerText=e.horaire_affiche||"---";
+
+/* options */
 
 let show=false;
 
@@ -593,6 +527,8 @@ show=true;
 }
 
 optionsRow.style.display=show?"block":"none";
+
+/* réservation */
 
 if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
 (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
