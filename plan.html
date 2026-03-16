@@ -19,7 +19,7 @@ color:#000;
 transition:background .3s ease,color .3s ease;
 }
 
-/* ================= ANIMATION PAGE ================= */
+/* ================= ANIMATION ================= */
 
 .page{
 min-height:100vh;
@@ -132,16 +132,14 @@ height:50%;
 background:#ffffff;
 border-radius:20px 20px 0 0;
 transform:translateY(100%);
-transition:0.3s;
+transition:.3s;
 padding:20px;
 box-sizing:border-box;
 }
 
-#panel.active{
-transform:translateY(0);
-}
+#panel.active{transform:translateY(0);}
 
-/* ================= CERCLE DISNEY ================= */
+/* ===== cercle Disney ===== */
 
 #panelIcon{
 position:absolute;
@@ -151,7 +149,7 @@ transform:translateX(-50%) scale(0.7);
 width:64px;
 height:64px;
 border-radius:50%;
-background:#1e2c88;
+background:#ffffff;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -163,11 +161,31 @@ transition:transform .35s cubic-bezier(.34,1.56,.64,1);
 transform:translateX(-50%) scale(1);
 }
 
-#panelIcon img{
-width:32px;
-height:32px;
-filter:brightness(0) invert(1);
+#panelIcon::before{
+content:"";
+position:absolute;
+inset:-4px;
+border-radius:50%;
+border:4px solid transparent;
+animation:spinRing 6s linear infinite;
 }
+
+@keyframes spinRing{
+from{transform:rotate(0deg);}
+to{transform:rotate(360deg);}
+}
+
+#panelIcon img{
+width:30px;
+height:30px;
+}
+
+/* couleurs anneau */
+
+.ring-open::before{border-color:green;}
+.ring-prevision::before{border-color:#E88B00;}
+.ring-ferme::before{border-color:red;}
+.ring-hors::before{border-color:gray;}
 
 /* ================= PANEL CONTENT ================= */
 
@@ -175,6 +193,7 @@ filter:brightness(0) invert(1);
 display:flex;
 justify-content:space-between;
 align-items:center;
+margin-top:20px;
 }
 
 #panelTitle{
@@ -240,14 +259,14 @@ cursor:pointer;
 
 /* ================= DARK MODE ================= */
 
-@media (prefers-color-scheme: dark){
+@media(prefers-color-scheme:dark){
 
 body{
 background:#0f1115;
-color:#ffffff;
+color:white;
 }
 
-header h1{color:#ffffff;}
+header h1{color:white;}
 
 #backBtn{
 background:#1c1f26;
@@ -272,15 +291,12 @@ background:#1c1f26;
 .legend{color:#ddd;}
 
 #map{
-filter:brightness(0.92) contrast(0.95);
-box-shadow:
-0 30px 70px rgba(0,0,0,0.8),
-0 0 0 1px rgba(255,255,255,0.04);
+filter:brightness(.92) contrast(.95);
+box-shadow:0 30px 70px rgba(0,0,0,0.8);
 }
 
 #reserveBox{
 background:#c87400;
-box-shadow:0 12px 30px rgba(0,0,0,0.6);
 }
 
 }
@@ -358,17 +374,14 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 
 <script>
 
-/* ================= ANIMATION PAGE ================= */
-
 window.addEventListener("DOMContentLoaded",()=>{
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
 });
 
-/* ================= API ================= */
-
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
+const RESERVE_URL="planningpaddock.html";
 
 const ICONS={
 "ouvert":"image/ouvert.png",
@@ -379,9 +392,6 @@ const ICONS={
 
 let DATA=[];
 
-/* ================= DOM ================= */
-
-const panel=document.getElementById("panel");
 const panelTitle=document.getElementById("panelTitle");
 const statut=document.getElementById("statut");
 const horaire=document.getElementById("horaire");
@@ -391,10 +401,9 @@ const longe=document.getElementById("longe");
 const optionsRow=document.getElementById("optionsRow");
 const reserveBox=document.getElementById("reserveBox");
 const closePanel=document.getElementById("closePanel");
+const panel=document.getElementById("panel");
 const panelIcon=document.getElementById("panelIcon");
 const panelIconImg=document.getElementById("panelIconImg");
-
-/* ================= TITRES ================= */
 
 function formatTitle(t){
 const map={
@@ -407,19 +416,13 @@ const map={
 return map[t]||t;
 }
 
-/* ================= ICONES PLAN ================= */
-
 function renderIcons(data){
-
 data.forEach(e=>{
 const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
 const el=document.getElementById("icon-"+e.espace);
 if(el && icon) el.src=icon;
 });
-
 }
-
-/* ================= LOAD DATA ================= */
 
 function loadData(){
 
@@ -449,8 +452,6 @@ renderIcons(DATA);
 loadData();
 setInterval(loadData,10000);
 
-/* ================= OUVERTURE ESPACE ================= */
-
 function openSpace(espace){
 
 const e=DATA.find(x=>x.espace===espace);
@@ -458,41 +459,37 @@ if(!e) return;
 
 panelTitle.innerText=formatTitle(e.espace);
 
-/* icône paddock / travail */
+panelIcon.classList.remove("ring-open","ring-prevision","ring-ferme","ring-hors");
 
-if(espace==="carriere"||espace==="manege"){
+if(e.espace==="carriere"||e.espace==="manege"){
 panelIconImg.src="image/travail.svg";
 }else{
 panelIconImg.src="image/paddock.svg";
 }
 
-/* statut */
-
 if(e.statut_auto==="ouvert"){
 statut.innerText="Ouvert";
 statut.style.color="green";
-panelIcon.style.background="green";
+panelIcon.classList.add("ring-open");
 }
 
 if(e.statut_auto==="prevision"){
 statut.innerText="Ouverture prévue";
 statut.style.color="#E88B00";
-panelIcon.style.background="#E88B00";
+panelIcon.classList.add("ring-prevision");
 }
 
 if(e.statut_auto==="ferme"){
 statut.innerText="Fermé";
 statut.style.color="red";
-panelIcon.style.background="red";
+panelIcon.classList.add("ring-ferme");
 }
 
 if(e.statut_auto==="hors-service"){
 statut.innerText="Hors service";
 statut.style.color="gray";
-panelIcon.style.background="gray";
+panelIcon.classList.add("ring-hors");
 }
-
-/* horaires */
 
 const special=e.horaire_special && String(e.horaire_special).trim()!=="";
 horaire.innerText=special?e.horaire_special:e.horaire_affiche||"---";
@@ -506,8 +503,6 @@ horaire.style.fontWeight="500";
 }
 
 info.innerText=e.info||"Aucune info";
-
-/* options */
 
 let show=false;
 
@@ -523,8 +518,6 @@ show=true;
 
 optionsRow.style.display=show?"block":"none";
 
-/* réservation */
-
 if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
 (e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
 reserveBox.style.display="block";
@@ -537,8 +530,6 @@ panel.classList.add("active");
 }
 
 closePanel.onclick=()=>panel.classList.remove("active");
-
-/* ================= NAV ================= */
 
 function goBack(){
 const page=document.getElementById("page");
