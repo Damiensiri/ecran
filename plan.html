@@ -169,10 +169,6 @@ animation:haloSpin .9s ease forwards;
 opacity:0;
 transition:opacity .25s ease .15s;
 }
-/* 👇 ajout */
-opacity:0;
-transition:opacity .25s ease .15s;
-}
 
 #panel.active #panelIcon{
 opacity:1;
@@ -278,10 +274,10 @@ height:30px;
   
 @keyframes haloSpin{
 from{
-transform:rotate(0deg);
+transform:translateX(-50%) rotate(0deg);
 }
 to{
-transform:rotate(360deg);
+transform:translateX(-50%) rotate(360deg);
 }
 }
   
