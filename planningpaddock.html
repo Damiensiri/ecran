@@ -421,25 +421,33 @@ durationSelect.addEventListener("change",updatePaddocks)
 
 async function loadData(){
 
-const r=await db.collection("reservations").get()
+function loadDataRealtime(){
 
-reservations=[]
+db.collection("reservations").onSnapshot(snapshot=>{
 
-r.forEach(doc=>{
-let data=doc.data()
-data.id=doc.id
+reservations = []
+
+snapshot.forEach(doc=>{
+let data = doc.data()
+data.id = doc.id
 reservations.push(data)
 })
 
-const h=await db.collection("horaires").get()
+generate()
 
-horaires={}
+})
 
-h.forEach(doc=>{
-horaires[doc.id]=doc.data()
+db.collection("horaires").onSnapshot(snapshot=>{
+
+horaires = {}
+
+snapshot.forEach(doc=>{
+horaires[doc.id] = doc.data()
 })
 
 generate()
+
+})
 
 }
 
@@ -808,18 +816,6 @@ loadData()
 })
 
 paddockSelect.onchange=generate
-
-// refresh planning toutes les 3 minutes
-setInterval(()=>{
-loadData()
-},180000)
-
-// refresh quand la page redevient visible
-document.addEventListener("visibilitychange", () => {
-if (!document.hidden) {
-loadData()
-}
-})
   
 </script>
 <div id="confirmSheet">
