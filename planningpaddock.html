@@ -419,8 +419,6 @@ generate()
 
 durationSelect.addEventListener("change",updatePaddocks)
 
-async function loadData(){
-
 function loadDataRealtime(){
 
 db.collection("reservations").onSnapshot(snapshot=>{
@@ -448,6 +446,8 @@ horaires[doc.id] = doc.data()
 generate()
 
 })
+
+}
 
 }
 
@@ -785,8 +785,6 @@ showSheet(
 "Heure : "+selected.time
 )
 
-loadData()
-
 }
 
 async function cancelReservation(id){
@@ -802,8 +800,6 @@ showSheet(
 "Le créneau a été libéré."
 )
 
-loadData()
-
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
@@ -811,7 +807,7 @@ window.addEventListener("DOMContentLoaded",()=>{
 initType()
 buildDays()
 updatePaddocks()
-loadData()
+loadDataRealtime()
 
 })
 
