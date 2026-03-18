@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- 🔥 ANTI ZOOM SAFARI -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 
 <title>Laverie</title>
 
@@ -83,6 +85,8 @@ padding-bottom:120px;
 display:grid;
 gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+position:relative; /* 🔥 FIX BOUTON */
+z-index:1;
 }
 
 .card{
@@ -90,6 +94,8 @@ background:white;
 border-radius:16px;
 overflow:hidden;
 box-shadow:0 8px 20px rgba(0,0,0,0.12);
+position:relative; /* 🔥 FIX BOUTON */
+z-index:2;
 }
 
 .imgBox{
@@ -147,6 +153,8 @@ border:none;
 padding:8px 12px;
 border-radius:10px;
 cursor:pointer;
+position:relative;
+z-index:5; /* 🔥 FIX FINAL */
 }
 
 /* PANIER */
@@ -215,11 +223,12 @@ padding:4px 8px;
 /* INPUT */
 #cartPanel input{
 width:100%;
-padding:10px;
+padding:12px;
 margin-bottom:10px;
 border-radius:8px;
 border:none;
 background:#f4f4f4;
+font-size:16px; /* 🔥 ANTI ZOOM iOS */
 }
 
 /* BOUTON COMMANDER */
@@ -232,6 +241,13 @@ font-weight:700;
 padding:16px;
 border-radius:16px;
 box-shadow:0 8px 20px rgba(0,0,0,0.25);
+transition:.2s;
+}
+
+/* 🔥 ANIMATION BOUTON */
+.checkoutBtn:active{
+transform:scale(0.95);
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* ANIMATIONS */
