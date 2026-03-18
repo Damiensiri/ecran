@@ -66,13 +66,15 @@ overflow:hidden;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 transition:transform .25s ease, opacity .25s ease;
 
-/* ✅ FIX iOS */
-pointer-events:none;
+/* 🔥 FIX FINAL */
+position:relative;
+z-index:0;
 transform-origin:top center;
 }
 
-#featured button{
-pointer-events:auto;
+#products{
+position:relative;
+z-index:2;
 }
 
 #featured img{
@@ -88,13 +90,14 @@ background:white;
 
 /* GRID */
 #products{
+position:relative;
+z-index:2;
+
 padding:10px;
 padding-bottom:120px;
 display:grid;
 gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-
-/* ✅ FIX BOUTON */
 align-items:start;
 }
 
