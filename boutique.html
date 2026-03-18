@@ -1,63 +1,15 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-
-<!-- ✅ ANTI ZOOM iOS -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-
-<title>Laverie</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- SEULE MODIF META -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
 <style>
 
-/* BASE */
-body{
-margin:0;
-font-family:'Montserrat',sans-serif;
-background:#f4f4f4;
-color:#000;
+/* AJOUT IMPORTANT INPUT (anti zoom) */
+#cartPanel input{
+font-size:16px;
 }
 
-/* HEADER */
-header{
-position:relative;
-height:70px;
-}
-
-#backBtn{
-position:absolute;
-left:15px;
-top:50%;
-transform:translateY(-50%);
-width:42px;
-height:42px;
-border-radius:50%;
-background:white;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 3px 8px rgba(0,0,0,0.15);
-cursor:pointer;
-}
-
-header h1{
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-margin:0;
-font-size:18px;
-}
-
-/* FEATURED 🔥 FIX SAFARI */
+/* FIX BOUTON FANTÔME */
 #featured{
-margin:10px;
-border-radius:18px;
-overflow:hidden;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
-
 pointer-events:none;
 transform-origin:top center;
 }
@@ -66,293 +18,35 @@ transform-origin:top center;
 pointer-events:auto;
 }
 
-#featured img{
-width:100%;
-height:180px;
-object-fit:cover;
-}
-
-#featuredContent{
-padding:16px;
-background:white;
-}
-
-/* GRID */
+/* GRID FIX */
 #products{
-padding:10px;
-padding-bottom:120px;
-display:grid;
-gap:16px;
-grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-align-items:start; /* 🔥 FIX BOUTON */
-}
-
-.card{
-background:white;
-border-radius:16px;
-overflow:hidden;
-box-shadow:0 8px 20px rgba(0,0,0,0.12);
-}
-
-.imgBox{
-height:140px;
-}
-
-.imgBox img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-.content{
-padding:14px;
-}
-
-.bottom{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-button{
-background:#181E3B;
-color:white;
-border:none;
-padding:8px 12px;
-border-radius:10px;
-cursor:pointer;
--webkit-tap-highlight-color:transparent;
-}
-
-/* PANIER */
-#cartBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#181E3B;
-color:white;
-padding:12px 16px;
-border-radius:30px;
-z-index:100;
-}
-
-#cartPanel{
-position:fixed;
-right:0;
-top:0;
-width:320px;
-height:100%;
-background:white;
-padding:20px;
-transform:translateX(100%);
-transition:.3s;
-z-index:200;
-}
-
-#cartPanel.open{
-transform:translateX(0);
-}
-
-/* INPUT anti zoom */
-#cartPanel input{
-width:100%;
-padding:12px;
-margin-bottom:10px;
-border-radius:8px;
-border:none;
-background:#f4f4f4;
-font-size:16px; /* 🔥 anti zoom */
-}
-
-/* BUTTON COMMANDER */
-.checkoutBtn{
-width:90%;
-margin:auto;
-padding:16px;
-border-radius:16px;
-font-weight:700;
-transition:.15s;
-}
-
-.checkoutBtn:active{
-transform:scale(.92);
-}
-
-/* FLY IMG */
-.flyImg{
-position:fixed;
-z-index:9999;
-pointer-events:none;
-transition:all .7s cubic-bezier(.2,.8,.2,1);
+align-items:start;
 }
 
 </style>
-</head>
-
-<body>
-
-<header>
-<div id="backBtn" onclick="location.href='index.html'">←</div>
-<h1>LAVERIE</h1>
-</header>
-
-<div id="featured"></div>
-<div id="products"></div>
-
-<button id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></button>
-
-<div id="cartPanel">
-
-<h2>Panier</h2>
-
-<div id="cartItems"></div>
-<p>Total : <b><span id="total">0</span> €</b></p>
-
-<input id="clientNom" placeholder="Nom *">
-<input id="clientPrenom" placeholder="Prénom *">
-<input id="clientEmail" placeholder="Email *">
-
-<button class="checkoutBtn" onclick="checkout()">Commander</button>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
 
-emailjs.init("03cdce-AcdCC03k_v")
+/* 🔥 FIX SCROLL SAFARI */
+const featured=document.getElementById("featured")
 
-const SHEET_URL="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/laverie"
+window.addEventListener("scroll",()=>{
 
-let cart = JSON.parse(localStorage.getItem("cart") || "[]")
-let products=[]
+if(!featured) return
 
-fetch(SHEET_URL)
-.then(r=>r.json())
-.then(data=>{
-products=data.filter(p=>p.actif==="TRUE")
-render()
-updateCart()
-})
+let scroll=window.scrollY
 
-function render(){
+let scale=1-(scroll/700)
+if(scale<0.85) scale=0.85
 
-products.forEach(p=>{
+let opacity=1-(scroll/500)
+if(opacity<0.35) opacity=0.35
 
-let card=document.createElement("div")
-card.className="card"
+/* 👇 LA LIGNE QUI CHANGE TOUT */
+featured.style.transform=`translateZ(0) scale(${scale})`
 
-card.innerHTML=`
-<div class="imgBox">
-<img src="${p.image}">
-</div>
-
-<div class="content">
-<b>${p.nom}</b><br>
-${p.prix} €
-
-<div class="bottom">
-<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
-</div>
-</div>
-`
-
-document.getElementById("products").appendChild(card)
+featured.style.opacity=opacity
 
 })
-
-}
-
-/* AJOUT PANIER + ANIMATION */
-function addCart(name,price,btn){
-
-let img = btn.closest(".card").querySelector("img")
-
-let rect = img.getBoundingClientRect()
-let cartRect = document.getElementById("cartBtn").getBoundingClientRect()
-
-let fly = img.cloneNode(true)
-fly.className="flyImg"
-
-fly.style.left=rect.left+"px"
-fly.style.top=rect.top+"px"
-fly.style.width=rect.width+"px"
-fly.style.height=rect.height+"px"
-
-document.body.appendChild(fly)
-
-setTimeout(()=>{
-fly.style.left=cartRect.left+"px"
-fly.style.top=cartRect.top+"px"
-fly.style.width="20px"
-fly.style.opacity="0"
-},10)
-
-setTimeout(()=>fly.remove(),700)
-
-let item=cart.find(i=>i.name===name)
-if(item){item.qty++}else{cart.push({name,price,qty:1})}
-
-updateCart()
-
-}
-
-/* PANIER */
-function updateCart(){
-
-localStorage.setItem("cart", JSON.stringify(cart))
-
-let count=cart.reduce((a,b)=>a+b.qty,0)
-document.getElementById("count").innerText=count
-
-let total=0
-cart.forEach(i=>total+=i.price*i.qty)
-
-document.getElementById("total").innerText=total
-
-}
-
-/* TOGGLE */
-function toggleCart(){
-document.getElementById("cartPanel").classList.toggle("open")
-}
-
-/* CHECKOUT */
-function checkout(){
-
-let nom=clientNom.value
-let prenom=clientPrenom.value
-let email=clientEmail.value
-
-if(!nom||!prenom||!email){
-alert("Remplis tout")
-return
-}
-
-let total=cart.reduce((a,b)=>a+b.price*b.qty,0)
-
-emailjs.send("service_mkpsbdf","template_ftv15rb",{nom,prenom,email,total})
-
-/* GOOGLE FORM DIRECT (FIABLE) */
-fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
-method:"POST",
-mode:"no-cors",
-body:new URLSearchParams({
-"entry.1196863567":nom,
-"entry.1084486832":prenom,
-"entry.322695866":email,
-"entry.1740027870":JSON.stringify(cart),
-"entry.99574245":total
-})
-})
-
-setTimeout(()=>{
-window.location.href="mes-commandes.html"
-},600)
-
-}
 
 </script>
-
-</body>
-</html>
