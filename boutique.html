@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- ✅ ANTI ZOOM iOS -->
+<!-- ✅ ANTI ZOOM -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 
 <title>Laverie</title>
@@ -65,6 +65,13 @@ border-radius:18px;
 overflow:hidden;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 transition:transform .25s ease, opacity .25s ease;
+
+/* 🔥 FIX BOUTON */
+pointer-events:none;
+}
+
+#featured button{
+pointer-events:auto;
 }
 
 #featured img{
@@ -86,23 +93,15 @@ display:grid;
 gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
 
-/* 🔥 FIX BOUTON DEFINITIF */
+/* 🔥 FIX DEFINITIF */
 align-items:start;
 }
 
-/* CARD */
 .card{
 background:white;
 border-radius:16px;
 overflow:hidden;
 box-shadow:0 8px 20px rgba(0,0,0,0.12);
-position:relative;
-}
-
-/* 🔥 SECURITE CLICK */
-.card *{
-position:relative;
-z-index:1;
 }
 
 .imgBox{
@@ -153,7 +152,6 @@ font-weight:700;
 font-size:18px;
 }
 
-/* BUTTON */
 button{
 background:#181E3B;
 color:white;
@@ -235,10 +233,10 @@ margin-bottom:10px;
 border-radius:8px;
 border:none;
 background:#f4f4f4;
-font-size:16px; /* 🔥 ANTI ZOOM */
+font-size:16px;
 }
 
-/* 🔥 BOUTON COMMANDER VERSION PRO */
+/* COMMANDER */
 .checkoutBtn{
 display:block;
 margin:20px auto 0 auto;
@@ -251,23 +249,12 @@ box-shadow:0 8px 20px rgba(0,0,0,0.25);
 transition:transform .15s ease, box-shadow .15s ease;
 }
 
-/* effet appui */
 .checkoutBtn:active{
-transform:scale(0.92);
+transform:scale(.92);
 box-shadow:0 3px 8px rgba(0,0,0,0.2);
 }
 
-/* ANIMATIONS */
-@keyframes cartPulse{
-0%{transform:scale(1)}
-40%{transform:scale(1.25)}
-100%{transform:scale(1)}
-}
-
-.pulse{
-animation:cartPulse .4s ease;
-}
-
+/* FLY IMG */
 .flyImg{
 position:fixed;
 z-index:9999;
@@ -311,6 +298,7 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 <button id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></button>
 
 <div id="cartPanel">
+
 <div style="display:flex;justify-content:space-between;align-items:center">
 <h2>Panier</h2>
 <button class="closeCart" onclick="toggleCart()">✕</button>
@@ -326,6 +314,7 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 <input id="clientEmail" placeholder="Email *">
 
 <button class="checkoutBtn" onclick="checkout()">Commander</button>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
@@ -349,18 +338,22 @@ updateCart()
 
 function render(){
 products.forEach(p=>{
+
 if(p.featured==="TRUE"){
 document.getElementById("featured").innerHTML=`
 <img src="${p.image}">
 <div id="featuredContent">
 <h2>${p.nom}</h2>
 <p>${p.description}</p>
-<b>${p.prix} €</b><br><br>
+<b>${p.prix} €</b>
+<br><br>
 <button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 </div>`
 }else{
+
 let card=document.createElement("div")
 card.className="card"
+
 card.innerHTML=`
 <div class="imgBox">
 <img src="${p.image}">
@@ -373,17 +366,44 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 <div class="price">${p.prix} €</div>
 <button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 </div>
-</div>`
+</div>
+`
+
 document.getElementById("products").appendChild(card)
+
 }
+
 })
 }
 
+/* 🔥 FLY TO CART */
 function addCart(name,price,btn){
-if(btn){
-let original=btn.innerText
-btn.innerText="✓ Ajouté"
-setTimeout(()=>{btn.innerText=original},1000)
+
+let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+
+if(img){
+let rect = img.getBoundingClientRect()
+let cartBtn = document.getElementById("cartBtn").getBoundingClientRect()
+
+let fly = img.cloneNode(true)
+fly.classList.add("flyImg")
+
+fly.style.left = rect.left+"px"
+fly.style.top = rect.top+"px"
+fly.style.width = rect.width+"px"
+fly.style.height = rect.height+"px"
+
+document.body.appendChild(fly)
+
+setTimeout(()=>{
+fly.style.left = cartBtn.left+"px"
+fly.style.top = cartBtn.top+"px"
+fly.style.width = "20px"
+fly.style.height = "20px"
+fly.style.opacity="0.2"
+},10)
+
+setTimeout(()=>fly.remove(),700)
 }
 
 let item=cart.find(i=>i.name===name)
@@ -392,8 +412,11 @@ if(item){item.qty++}else{cart.push({name,price,qty:1})}
 updateCart()
 }
 
+/* PANIER */
 function updateCart(){
+
 localStorage.setItem("cart", JSON.stringify(cart))
+
 let count=cart.reduce((a,b)=>a+b.qty,0)
 document.getElementById("count").innerText=count
 
@@ -401,6 +424,7 @@ let html=""
 let total=0
 
 cart.forEach((item,i)=>{
+
 html+=`
 <div class="cartItem">
 <div>${item.name}<br>${item.price}€</div>
@@ -409,12 +433,16 @@ html+=`
 ${item.qty}
 <button onclick="changeQty(${i},1)">+</button>
 </div>
-</div>`
+</div>
+`
+
 total+=item.price*item.qty
+
 })
 
 document.getElementById("cartItems").innerHTML=html
 document.getElementById("total").innerText=total
+
 }
 
 function changeQty(i,v){
@@ -427,6 +455,7 @@ function toggleCart(){
 document.getElementById("cartPanel").classList.toggle("open")
 }
 
+/* CHECKOUT */
 function checkout(){
 
 let nom=document.getElementById("clientNom").value.trim()
