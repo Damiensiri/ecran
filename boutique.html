@@ -614,7 +614,7 @@ total:total
 
 .then(()=>{
 
-/* 🔥 GOOGLE FORM (VERSION QUI MARCHE 100%) */
+/* 🔥 GOOGLE FORM (VERSION PADDOCK FIABLE) */
 
 let orderId = Date.now()
 let dateISO = new Date().toISOString()
@@ -623,27 +623,21 @@ let commandeText = cart.map(i =>
 `${i.name} x${i.qty} (${i.price}€)`
 ).join(" | ")
 
-let url = "https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse?"
-
-url += "entry.1196863567=" + encodeURIComponent(nom)
-url += "&entry.1084486832=" + encodeURIComponent(prenom)
-url += "&entry.322695866=" + encodeURIComponent(email)
-url += "&entry.1740027870=" + encodeURIComponent(commandeText)
-url += "&entry.99574245=" + encodeURIComponent(total)
-url += "&entry.1184215130=" + encodeURIComponent(orderId)
-url += "&entry.489600561=" + encodeURIComponent(dateISO)
-url += "&entry.1098731878=" + encodeURIComponent("En attente")
-url += "&entry.484692587="
-
-let iframe = document.createElement("iframe")
-iframe.style.display = "none"
-iframe.src = url
-
-document.body.appendChild(iframe)
-
-setTimeout(()=>{
-iframe.remove()
-},3000)
+fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
+method:"POST",
+mode:"no-cors",
+body:new URLSearchParams({
+"entry.1196863567":nom,
+"entry.1084486832":prenom,
+"entry.322695866":email,
+"entry.1740027870":commandeText,
+"entry.99574245":total,
+"entry.1184215130":orderId,
+"entry.489600561":dateISO,
+"entry.1098731878":"En attente",
+"entry.484692587":""
+})
+})
 
 /* ===== TON CODE ORIGINAL (INTOUCHÉ) ===== */
 
