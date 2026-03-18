@@ -1,15 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Laverie</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* BASE */
+
+body{
+margin:0;
+font-family:'Montserrat',sans-serif;
+background:#f4f4f4;
+color:#000;
+transition:.3s;
+}
+
+/* HEADER */
+
+header{
+position:relative;
+height:70px;
+}
+
+#backBtn{
+position:absolute;
+left:15px;
+top:50%;
+transform:translateY(-50%);
+width:42px;
+height:42px;
+border-radius:50%;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
+cursor:pointer;
+}
+
+#backBtn img{
+width:22px;
+height:22px;
+}
+
+header h1{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+margin:0;
+font-size:18px;
+font-weight:700;
+}
+
+/* FEATURED */
+
+#featured{
+margin:10px;
+border-radius:18px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+transition:transform .25s ease, opacity .25s ease;
+}
+
+#featured img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+#featuredContent{
+padding:16px;
+background:white;
+}
+
+/* GRID */
+
+#products{
+padding:10px;
+padding-bottom:120px;
+display:grid;
+gap:16px;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+}
+
+.card{
+background:white;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+.imgBox{
+height:140px;
+position:relative;
+}
+
+.imgBox img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.badge{
+position:absolute;
+top:10px;
+left:10px;
+background:#ff4757;
+color:white;
+padding:4px 10px;
+border-radius:20px;
+font-size:12px;
+}
+
+.content{
+padding:14px;
+}
+
+.title{
+font-weight:700;
+font-size:18px;
+}
+
+.desc{
+font-size:14px;
+opacity:.7;
+margin:6px 0;
+}
+
+.bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.price{
+font-weight:700;
+font-size:18px;
+}
+
+button{
+background:#181E3B;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:10px;
+cursor:pointer;
+}
+
+/* PANIER */
+
+#cartBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#181E3B;
+color:white;
+padding:12px 16px;
+border:none;
+border-radius:30px;
+box-shadow:0 8px 20px rgba(0,0,0,0.3);
+cursor:pointer;
+z-index:100;
+}
+
+#cartPanel{
+position:fixed;
+right:0;
+top:0;
+width:320px;
+height:100%;
+background:white;
+padding:20px;
+transform:translateX(100%);
+transition:transform .35s ease;
+overflow:auto;
+z-index:200;
+}
+
+#cartPanel.open{
+transform:translateX(0);
+}
+
+.closeCart{
+font-size:26px;
+width:46px;
+height:46px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#181E3B;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+.cartItem{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.qty{
+display:flex;
+gap:6px;
+}
+
+.qty button{
+padding:4px 8px;
+}
+
+/* INPUT */
+
+#cartPanel input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+background:#f4f4f4;
+}
+
+/* BOUTON COMMANDER */
+
+.checkoutBtn{
+display:block;
+margin:20px auto 0 auto;
+width:90%;
+font-size:18px;
+font-weight:700;
+padding:16px;
+border-radius:16px;
+box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* ANIMATIONS */
+
+@keyframes cartPulse{
+0%{transform:scale(1)}
+40%{transform:scale(1.25)}
+100%{transform:scale(1)}
+}
+
+.pulse{
+animation:cartPulse .4s ease;
+}
+
+.flyImg{
+position:fixed;
+z-index:9999;
+pointer-events:none;
+border-radius:12px;
+transition:all .7s cubic-bezier(.2,.8,.2,1);
+}
+
+/* DARK MODE */
+
+@media(prefers-color-scheme:dark){
+
+body{
+background:#0f1115;
+color:white;
+}
+
+.card{
+background:#1c1f26;
+}
+
+#featuredContent{
+background:#1c1f26;
+}
+
+#cartPanel{
+background:#1c1f26;
+}
+
+#cartPanel input{
+background:#252a33;
+color:white;
+}
+
+button{
+background:#2e43b8;
+}
+
+#cartBtn{
+background:#2e43b8;
+}
+
+.closeCart{
+background:#2e43b8;
+}
+
+#backBtn{
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+
+#backBtn img{
+filter:brightness(0) invert(1);
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div id="backBtn" onclick="location.href='index.html'">
+<img src="image/back.svg">
+</div>
+
+<h1>LAVERIE</h1>
+
+</header>
+
+<div id="featured"></div>
+<div id="products"></div>
+
+<button id="cartBtn" onclick="toggleCart()">
+🛒 <span id="count">0</span>
+</button>
+
+<div id="cartPanel">
+
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h2>Panier</h2>
+<button class="closeCart" onclick="toggleCart()">✕</button>
+</div>
+
+<div id="cartItems"></div>
+
+<p>Total : <b><span id="total">0</span> €</b></p>
+
+<hr>
+
+<input id="clientNom" placeholder="Nom *">
+<input id="clientPrenom" placeholder="Prénom *">
+<input id="clientEmail" placeholder="Email *">
+
+<button class="checkoutBtn" onclick="checkout()">Commander</button>
+
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
 
 emailjs.init("03cdce-AcdCC03k_v")
 
-const SHEET_URL="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/service"
+const SHEET_URL="https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/laverie"
 
 let cart = JSON.parse(localStorage.getItem("cart") || "[]")
 let products=[]
-
-/* ===== LOAD PRODUITS ===== */
 
 fetch(SHEET_URL)
 .then(r=>r.json())
@@ -24,11 +377,7 @@ updateCart()
 
 })
 
-/* ===== RENDER ===== */
-
 function render(){
-
-document.getElementById("products").innerHTML=""
 
 products.forEach(p=>{
 
@@ -90,7 +439,7 @@ document.getElementById("products").appendChild(card)
 
 }
 
-/* ===== ADD CART (AVEC ANIMATION 🔥) ===== */
+/* AJOUT PANIER */
 
 function addCart(name,price,btn){
 
@@ -103,7 +452,6 @@ setTimeout(()=>{
 btn.innerText=original
 },1000)
 
-/* 🔥 ANIMATION IMAGE */
 let img = btn.closest(".card, #featuredContent")?.querySelector("img")
 
 if(img){
@@ -139,7 +487,6 @@ fly.remove()
 
 }
 
-/* PANIER */
 let item=cart.find(i=>i.name===name)
 
 if(item){
@@ -151,6 +498,7 @@ cart.push({name,price,qty:1})
 updateCart()
 
 let cartBtn=document.getElementById("cartBtn")
+
 cartBtn.classList.add("pulse")
 
 setTimeout(()=>{
@@ -159,13 +507,14 @@ cartBtn.classList.remove("pulse")
 
 }
 
-/* ===== PANIER ===== */
+/* PANIER */
 
 function updateCart(){
 
 localStorage.setItem("cart", JSON.stringify(cart))
 
 let count=cart.reduce((a,b)=>a+b.qty,0)
+
 document.getElementById("count").innerText=count
 
 let html=""
@@ -174,14 +523,26 @@ let total=0
 cart.forEach((item,i)=>{
 
 html+=`
+
 <div class="cartItem">
-<div>${item.name}<br>${item.price}€</div>
+
+<div>
+${item.name}<br>
+${item.price}€
+</div>
+
 <div class="qty">
+
 <button onclick="changeQty(${i},-1)">-</button>
+
 ${item.qty}
+
 <button onclick="changeQty(${i},1)">+</button>
+
 </div>
+
 </div>
+
 `
 
 total+=item.price*item.qty
@@ -209,7 +570,7 @@ function toggleCart(){
 document.getElementById("cartPanel").classList.toggle("open")
 }
 
-/* ===== CHECKOUT ===== */
+/* CHECKOUT */
 
 function checkout(){
 
@@ -217,21 +578,49 @@ let nom=document.getElementById("clientNom").value.trim()
 let prenom=document.getElementById("clientPrenom").value.trim()
 let email=document.getElementById("clientEmail").value.trim()
 
-if(!nom || !prenom || !email || cart.length===0){
-alert("Champs requis ou panier vide")
+if(!nom || !prenom || !email){
+alert("Veuillez remplir Nom, Prénom et Email")
 return
 }
 
+let commande=""
+let total=0
+
+cart.forEach(item=>{
+
+let lineTotal=item.price*item.qty
+
+commande+=`
+<tr>
+<td>${item.name}</td>
+<td align="center">${item.qty}</td>
+<td align="right">${lineTotal} €</td>
+</tr>
+`
+
+total+=lineTotal
+
+})
+
+emailjs.send("service_mkpsbdf","template_ftv15rb",{
+nom:nom,
+prenom:prenom,
+email:email,
+commande:commande,
+total:total
+})
+
+.then(()=>{
+
+/* 🔥 AJOUT GOOGLE FORM */
+
 let orderId = Date.now()
 let dateISO = new Date().toISOString()
-
-let total=cart.reduce((a,b)=>a+b.price*b.qty,0)
 
 let commandeText = cart.map(i =>
 `${i.name} x${i.qty} (${i.price}€)`
 ).join(" | ")
 
-/* 🔥 GOOGLE FORM */
 fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
 method:"POST",
 mode:"no-cors",
@@ -248,24 +637,14 @@ body:new URLSearchParams({
 })
 })
 
-/* 🔥 EMAIL */
-emailjs.send("service_mkpsbdf","template_ftv15rb",{
-nom:nom,
-prenom:prenom,
-email:email,
-commande:commandeText,
-total:total
-})
-
-.then(()=>{
+/* ===== TON CODE ===== */
 
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
 
 orders.push({
-id: orderId,
-date: dateISO,
+date:new Date().toLocaleString(),
 items:[...cart],
-total: total
+total:total
 })
 
 localStorage.setItem("orders", JSON.stringify(orders))
@@ -280,10 +659,34 @@ document.getElementById("clientEmail").value=""
 window.location.href="mes-commandes.html"
 
 })
-.catch(()=>{
-alert("Commande enregistrée mais mail KO")
-})
 
 }
 
+/* ANIMATION SCROLL */
+
+const featured=document.getElementById("featured")
+
+window.addEventListener("scroll",()=>{
+
+if(!featured) return
+
+let scroll=window.scrollY
+
+let scale=1-(scroll/700)
+
+if(scale<0.85) scale=0.85
+
+featured.style.transform="scale("+scale+")"
+
+let opacity=1-(scroll/500)
+
+if(opacity<0.35) opacity=0.35
+
+featured.style.opacity=opacity
+
+})
+
 </script>
+
+</body>
+</html>
