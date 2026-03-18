@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- 🔥 ANTI ZOOM SAFARI -->
+<!-- ✅ ANTI ZOOM iOS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 
 <title>Laverie</title>
@@ -85,17 +85,24 @@ padding-bottom:120px;
 display:grid;
 gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-position:relative; /* 🔥 FIX BOUTON */
-z-index:1;
+
+/* 🔥 FIX BOUTON DEFINITIF */
+align-items:start;
 }
 
+/* CARD */
 .card{
 background:white;
 border-radius:16px;
 overflow:hidden;
 box-shadow:0 8px 20px rgba(0,0,0,0.12);
-position:relative; /* 🔥 FIX BOUTON */
-z-index:2;
+position:relative;
+}
+
+/* 🔥 SECURITE CLICK */
+.card *{
+position:relative;
+z-index:1;
 }
 
 .imgBox{
@@ -146,6 +153,7 @@ font-weight:700;
 font-size:18px;
 }
 
+/* BUTTON */
 button{
 background:#181E3B;
 color:white;
@@ -153,8 +161,7 @@ border:none;
 padding:8px 12px;
 border-radius:10px;
 cursor:pointer;
-position:relative;
-z-index:5; /* 🔥 FIX FINAL */
+-webkit-tap-highlight-color: transparent;
 }
 
 /* PANIER */
@@ -228,10 +235,10 @@ margin-bottom:10px;
 border-radius:8px;
 border:none;
 background:#f4f4f4;
-font-size:16px; /* 🔥 ANTI ZOOM iOS */
+font-size:16px; /* 🔥 ANTI ZOOM */
 }
 
-/* BOUTON COMMANDER */
+/* 🔥 BOUTON COMMANDER VERSION PRO */
 .checkoutBtn{
 display:block;
 margin:20px auto 0 auto;
@@ -241,13 +248,13 @@ font-weight:700;
 padding:16px;
 border-radius:16px;
 box-shadow:0 8px 20px rgba(0,0,0,0.25);
-transition:.2s;
+transition:transform .15s ease, box-shadow .15s ease;
 }
 
-/* 🔥 ANIMATION BOUTON */
+/* effet appui */
 .checkoutBtn:active{
-transform:scale(0.95);
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
+transform:scale(0.92);
+box-shadow:0 3px 8px rgba(0,0,0,0.2);
 }
 
 /* ANIMATIONS */
