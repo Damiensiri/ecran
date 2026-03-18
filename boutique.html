@@ -614,15 +614,54 @@ total:total
 
 .then(()=>{
 
+// 🔥 AJOUT GOOGLE FORM ICI
+let commandeText = cart.map(i =>
+`${i.name} x${i.qty} (${i.price}€)`
+).join(" | ")
+
+fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
+method:"POST",
+mode:"no-cors",
+body:new URLSearchParams({
+
+"entry.1196863567": nom,
+"entry.1084486832": prenom,
+"entry.322695866": email,
+"entry.1740027870": commandeText,
+"entry.99574245": total,
+"entry.1184215130": orderId,
+"entry.489600561": dateISO,
+
+"entry.1098731878": "En attente",
+"entry.484692587": ""
+
+})
+})
+// 💾 sauvegarde locale
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
 
 orders.push({
-date:new Date().toLocaleString(),
+id: orderId,
+date: dateISO,
 items:[...cart],
-total:total
+total: total
 })
 
 localStorage.setItem("orders", JSON.stringify(orders))
+
+// reset panier
+cart=[]
+updateCart()
+
+// reset champs
+document.getElementById("clientNom").value=""
+document.getElementById("clientPrenom").value=""
+document.getElementById("clientEmail").value=""
+
+// redirection
+window.location.href="mes-commandes.html"
+
+})
 
 cart=[]
 updateCart()
