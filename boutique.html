@@ -585,11 +585,13 @@ alert("Veuillez remplir Nom, Prénom et Email")
 return
 }
 
+let orderId = Date.now()
+let dateISO = new Date().toISOString()
+
 let commande=""
 let total=0
 
 cart.forEach(item=>{
-
 let lineTotal=item.price*item.qty
 
 commande+=`
@@ -601,7 +603,6 @@ commande+=`
 `
 
 total+=lineTotal
-
 })
 
 emailjs.send("service_mkpsbdf","template_ftv15rb",{
@@ -614,7 +615,6 @@ total:total
 
 .then(()=>{
 
-// 🔥 AJOUT GOOGLE FORM ICI
 let commandeText = cart.map(i =>
 `${i.name} x${i.qty} (${i.price}€)`
 ).join(" | ")
@@ -637,7 +637,7 @@ body:new URLSearchParams({
 
 })
 })
-// 💾 sauvegarde locale
+
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
 
 orders.push({
@@ -648,20 +648,6 @@ total: total
 })
 
 localStorage.setItem("orders", JSON.stringify(orders))
-
-// reset panier
-cart=[]
-updateCart()
-
-// reset champs
-document.getElementById("clientNom").value=""
-document.getElementById("clientPrenom").value=""
-document.getElementById("clientEmail").value=""
-
-// redirection
-window.location.href="mes-commandes.html"
-
-})
 
 cart=[]
 updateCart()
@@ -675,7 +661,6 @@ window.location.href="mes-commandes.html"
 })
 
 }
-
 /* ANIMATION SCROLL */
 
 const featured=document.getElementById("featured")
