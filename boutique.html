@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- ✅ ANTI ZOOM -->
+<!-- ✅ ANTI ZOOM iOS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 
 <title>Laverie</title>
@@ -18,7 +18,6 @@ margin:0;
 font-family:'Montserrat',sans-serif;
 background:#f4f4f4;
 color:#000;
-transition:.3s;
 }
 
 /* HEADER */
@@ -43,11 +42,6 @@ box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
 }
 
-#backBtn img{
-width:22px;
-height:22px;
-}
-
 header h1{
 position:absolute;
 left:50%;
@@ -55,19 +49,17 @@ top:50%;
 transform:translate(-50%,-50%);
 margin:0;
 font-size:18px;
-font-weight:700;
 }
 
-/* FEATURED */
+/* FEATURED 🔥 FIX SAFARI */
 #featured{
 margin:10px;
 border-radius:18px;
 overflow:hidden;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
-transition:transform .25s ease, opacity .25s ease;
 
-/* 🔥 FIX BOUTON */
 pointer-events:none;
+transform-origin:top center;
 }
 
 #featured button{
@@ -92,9 +84,7 @@ padding-bottom:120px;
 display:grid;
 gap:16px;
 grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-
-/* 🔥 FIX DEFINITIF */
-align-items:start;
+align-items:start; /* 🔥 FIX BOUTON */
 }
 
 .card{
@@ -106,7 +96,6 @@ box-shadow:0 8px 20px rgba(0,0,0,0.12);
 
 .imgBox{
 height:140px;
-position:relative;
 }
 
 .imgBox img{
@@ -115,41 +104,14 @@ height:100%;
 object-fit:cover;
 }
 
-.badge{
-position:absolute;
-top:10px;
-left:10px;
-background:#ff4757;
-color:white;
-padding:4px 10px;
-border-radius:20px;
-font-size:12px;
-}
-
 .content{
 padding:14px;
-}
-
-.title{
-font-weight:700;
-font-size:18px;
-}
-
-.desc{
-font-size:14px;
-opacity:.7;
-margin:6px 0;
 }
 
 .bottom{
 display:flex;
 justify-content:space-between;
 align-items:center;
-}
-
-.price{
-font-weight:700;
-font-size:18px;
 }
 
 button{
@@ -159,7 +121,7 @@ border:none;
 padding:8px 12px;
 border-radius:10px;
 cursor:pointer;
--webkit-tap-highlight-color: transparent;
+-webkit-tap-highlight-color:transparent;
 }
 
 /* PANIER */
@@ -170,10 +132,7 @@ right:20px;
 background:#181E3B;
 color:white;
 padding:12px 16px;
-border:none;
 border-radius:30px;
-box-shadow:0 8px 20px rgba(0,0,0,0.3);
-cursor:pointer;
 z-index:100;
 }
 
@@ -186,8 +145,7 @@ height:100%;
 background:white;
 padding:20px;
 transform:translateX(100%);
-transition:transform .35s ease;
-overflow:auto;
+transition:.3s;
 z-index:200;
 }
 
@@ -195,37 +153,7 @@ z-index:200;
 transform:translateX(0);
 }
 
-.closeCart{
-font-size:26px;
-width:46px;
-height:46px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#181E3B;
-color:white;
-border:none;
-cursor:pointer;
-}
-
-.cartItem{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:10px;
-}
-
-.qty{
-display:flex;
-gap:6px;
-}
-
-.qty button{
-padding:4px 8px;
-}
-
-/* INPUT */
+/* INPUT anti zoom */
 #cartPanel input{
 width:100%;
 padding:12px;
@@ -233,25 +161,21 @@ margin-bottom:10px;
 border-radius:8px;
 border:none;
 background:#f4f4f4;
-font-size:16px;
+font-size:16px; /* 🔥 anti zoom */
 }
 
-/* COMMANDER */
+/* BUTTON COMMANDER */
 .checkoutBtn{
-display:block;
-margin:20px auto 0 auto;
 width:90%;
-font-size:18px;
-font-weight:700;
+margin:auto;
 padding:16px;
 border-radius:16px;
-box-shadow:0 8px 20px rgba(0,0,0,0.25);
-transition:transform .15s ease, box-shadow .15s ease;
+font-weight:700;
+transition:.15s;
 }
 
 .checkoutBtn:active{
 transform:scale(.92);
-box-shadow:0 3px 8px rgba(0,0,0,0.2);
 }
 
 /* FLY IMG */
@@ -259,36 +183,16 @@ box-shadow:0 3px 8px rgba(0,0,0,0.2);
 position:fixed;
 z-index:9999;
 pointer-events:none;
-border-radius:12px;
 transition:all .7s cubic-bezier(.2,.8,.2,1);
 }
 
-/* DARK MODE */
-@media(prefers-color-scheme:dark){
-body{background:#0f1115;color:white;}
-.card{background:#1c1f26;}
-#featuredContent{background:#1c1f26;}
-#cartPanel{background:#1c1f26;}
-#cartPanel input{background:#252a33;color:white;}
-button{background:#2e43b8;}
-#cartBtn{background:#2e43b8;}
-.closeCart{background:#2e43b8;}
-
-#backBtn{
-background:#1c1f26;
-box-shadow:0 12px 30px rgba(0,0,0,0.6);
-}
-#backBtn img{filter:brightness(0) invert(1);}
-}
 </style>
 </head>
 
 <body>
 
 <header>
-<div id="backBtn" onclick="location.href='index.html'">
-<img src="image/back.svg">
-</div>
+<div id="backBtn" onclick="location.href='index.html'">←</div>
 <h1>LAVERIE</h1>
 </header>
 
@@ -299,15 +203,10 @@ box-shadow:0 12px 30px rgba(0,0,0,0.6);
 
 <div id="cartPanel">
 
-<div style="display:flex;justify-content:space-between;align-items:center">
 <h2>Panier</h2>
-<button class="closeCart" onclick="toggleCart()">✕</button>
-</div>
 
 <div id="cartItems"></div>
 <p>Total : <b><span id="total">0</span> €</b></p>
-
-<hr>
 
 <input id="clientNom" placeholder="Nom *">
 <input id="clientPrenom" placeholder="Prénom *">
@@ -331,25 +230,14 @@ let products=[]
 fetch(SHEET_URL)
 .then(r=>r.json())
 .then(data=>{
-products=data.filter(p=>p.actif==="TRUE").sort((a,b)=>Number(a.rang)-Number(b.rang))
+products=data.filter(p=>p.actif==="TRUE")
 render()
 updateCart()
 })
 
 function render(){
-products.forEach(p=>{
 
-if(p.featured==="TRUE"){
-document.getElementById("featured").innerHTML=`
-<img src="${p.image}">
-<div id="featuredContent">
-<h2>${p.nom}</h2>
-<p>${p.description}</p>
-<b>${p.prix} €</b>
-<br><br>
-<button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
-</div>`
-}else{
+products.forEach(p=>{
 
 let card=document.createElement("div")
 card.className="card"
@@ -357,13 +245,13 @@ card.className="card"
 card.innerHTML=`
 <div class="imgBox">
 <img src="${p.image}">
-${p.badge?`<div class="badge">${p.badge}</div>`:""}
 </div>
+
 <div class="content">
-<div class="title">${p.nom}</div>
-<div class="desc">${p.description}</div>
+<b>${p.nom}</b><br>
+${p.prix} €
+
 <div class="bottom">
-<div class="price">${p.prix} €</div>
 <button onclick="addCart('${p.nom}',${p.prix},this)">Ajouter</button>
 </div>
 </div>
@@ -371,45 +259,42 @@ ${p.badge?`<div class="badge">${p.badge}</div>`:""}
 
 document.getElementById("products").appendChild(card)
 
-}
-
 })
+
 }
 
-/* 🔥 FLY TO CART */
+/* AJOUT PANIER + ANIMATION */
 function addCart(name,price,btn){
 
-let img = btn.closest(".card, #featuredContent")?.querySelector("img")
+let img = btn.closest(".card").querySelector("img")
 
-if(img){
 let rect = img.getBoundingClientRect()
-let cartBtn = document.getElementById("cartBtn").getBoundingClientRect()
+let cartRect = document.getElementById("cartBtn").getBoundingClientRect()
 
 let fly = img.cloneNode(true)
-fly.classList.add("flyImg")
+fly.className="flyImg"
 
-fly.style.left = rect.left+"px"
-fly.style.top = rect.top+"px"
-fly.style.width = rect.width+"px"
-fly.style.height = rect.height+"px"
+fly.style.left=rect.left+"px"
+fly.style.top=rect.top+"px"
+fly.style.width=rect.width+"px"
+fly.style.height=rect.height+"px"
 
 document.body.appendChild(fly)
 
 setTimeout(()=>{
-fly.style.left = cartBtn.left+"px"
-fly.style.top = cartBtn.top+"px"
-fly.style.width = "20px"
-fly.style.height = "20px"
-fly.style.opacity="0.2"
+fly.style.left=cartRect.left+"px"
+fly.style.top=cartRect.top+"px"
+fly.style.width="20px"
+fly.style.opacity="0"
 },10)
 
 setTimeout(()=>fly.remove(),700)
-}
 
 let item=cart.find(i=>i.name===name)
 if(item){item.qty++}else{cart.push({name,price,qty:1})}
 
 updateCart()
+
 }
 
 /* PANIER */
@@ -420,37 +305,14 @@ localStorage.setItem("cart", JSON.stringify(cart))
 let count=cart.reduce((a,b)=>a+b.qty,0)
 document.getElementById("count").innerText=count
 
-let html=""
 let total=0
+cart.forEach(i=>total+=i.price*i.qty)
 
-cart.forEach((item,i)=>{
-
-html+=`
-<div class="cartItem">
-<div>${item.name}<br>${item.price}€</div>
-<div class="qty">
-<button onclick="changeQty(${i},-1)">-</button>
-${item.qty}
-<button onclick="changeQty(${i},1)">+</button>
-</div>
-</div>
-`
-
-total+=item.price*item.qty
-
-})
-
-document.getElementById("cartItems").innerHTML=html
 document.getElementById("total").innerText=total
 
 }
 
-function changeQty(i,v){
-cart[i].qty+=v
-if(cart[i].qty<=0){cart.splice(i,1)}
-updateCart()
-}
-
+/* TOGGLE */
 function toggleCart(){
 document.getElementById("cartPanel").classList.toggle("open")
 }
@@ -458,28 +320,20 @@ document.getElementById("cartPanel").classList.toggle("open")
 /* CHECKOUT */
 function checkout(){
 
-let nom=document.getElementById("clientNom").value.trim()
-let prenom=document.getElementById("clientPrenom").value.trim()
-let email=document.getElementById("clientEmail").value.trim()
+let nom=clientNom.value
+let prenom=clientPrenom.value
+let email=clientEmail.value
 
-if(!nom || !prenom || !email){
-alert("Veuillez remplir Nom, Prénom et Email")
+if(!nom||!prenom||!email){
+alert("Remplis tout")
 return
 }
 
-let total=cart.reduce((a,b)=>a+(b.price*b.qty),0)
+let total=cart.reduce((a,b)=>a+b.price*b.qty,0)
 
 emailjs.send("service_mkpsbdf","template_ftv15rb",{nom,prenom,email,total})
 
-.then(()=>{
-
-let orderId = Date.now()
-let dateISO = new Date().toISOString()
-
-let commandeText = cart.map(i =>
-`${i.name} x${i.qty} (${i.price}€)`
-).join(" | ")
-
+/* GOOGLE FORM DIRECT (FIABLE) */
 fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
 method:"POST",
 mode:"no-cors",
@@ -487,22 +341,17 @@ body:new URLSearchParams({
 "entry.1196863567":nom,
 "entry.1084486832":prenom,
 "entry.322695866":email,
-"entry.1740027870":commandeText,
-"entry.99574245":total,
-"entry.1184215130":orderId,
-"entry.489600561":dateISO,
-"entry.1098731878":"En attente",
-"entry.484692587":""
+"entry.1740027870":JSON.stringify(cart),
+"entry.99574245":total
 })
 })
 
 setTimeout(()=>{
 window.location.href="mes-commandes.html"
-},700)
-
-})
+},600)
 
 }
+
 </script>
 
 </body>
