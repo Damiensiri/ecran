@@ -494,6 +494,19 @@ let commandeText = cart.map(i =>
 `${i.name} x${i.qty} (${i.price}€)`
 ).join(" | ")
 
+/* 🔥 AJOUT ICI (LOCAL STORAGE) */
+let orders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+orders.push({
+id:orderId,
+date:new Date().toLocaleString(),
+items:[...cart],
+total:total
+})
+
+localStorage.setItem("orders", JSON.stringify(orders))
+
+/* GOOGLE FORM */
 fetch("https://docs.google.com/forms/d/e/1FAIpQLSd7FyCadHVREHz5A_Y3tGIANItJppc-xx2hEtopxd90lU50Hw/formResponse",{
 method:"POST",
 mode:"no-cors",
