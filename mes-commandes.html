@@ -196,13 +196,12 @@ items+=`
 let statut="En attente"
 
 let found = sheetData.find(s=>{
-return Math.abs(new Date(s["date"]).getTime() - new Date(order.date).getTime()) < 60000
+return Math.abs(new Date(s["DateISO"]).getTime() - new Date(order.date).getTime()) < 60000
 })
 
-if(found && found["statut"]){
-statut = found["statut"]
+if(found && s["Statut"]){
+statut = found["Statut"]
 }
-
 /* ===== COULEUR ===== */
 
 let color="#aaa"
