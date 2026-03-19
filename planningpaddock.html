@@ -695,10 +695,17 @@ return
 }
 
 emailjs.send("service_mkpsbdf","template_0qhjhhg",{
-type: "demande",
-jour:selectedDate,
-prenom:name,
-email:email
+title: "📩 Demande de mise au paddock",
+message: `
+📅 <strong>Jour :</strong> ${selectedDate}<br><br>
+
+<span style="color:#e67e22;font-weight:600;">
+⏳ En attente de confirmation
+</span>
+`,
+prenom: name,
+email: email
+})
 
 }).then(()=>{
 
@@ -779,16 +786,19 @@ let email = document.getElementById("email").value
 if(email && email.includes("@")){
 
 emailjs.send("service_mkpsbdf","template_0qhjhhg",{
-type: "reservation",
-jour:selected.date,
-heure:selected.time,
-prenom:name,
-paddock:selected.paddock,
-email:email
-}).catch(()=>{
-console.log("Email non envoyé")
-})
+title: "✅ Réservation confirmée",
+message: `
+📍 <strong>Paddock :</strong> ${selected.paddock}<br>
+📅 <strong>Jour :</strong> ${selected.date}<br>
+⏰ <strong>Heure :</strong> ${selected.time}<br><br>
 
+<span style="color:#2ecc71;font-weight:600;">
+✔️ Créneau réservé avec succès
+</span>
+`,
+prenom: name,
+email: email
+})
 }
 
 // 👉 TOUJOURS exécuté (important)
