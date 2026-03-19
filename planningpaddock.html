@@ -695,7 +695,7 @@ return
 }
 
 emailjs.send("service_mkpsbdf","template_0qhjhhg",{
-
+type: "demande",
 jour:selectedDate,
 prenom:name,
 email:email
@@ -761,7 +761,7 @@ return
 
 }
 
-const doc=await db.collection("reservations").add({
+const doc = await db.collection("reservations").add({
 
 name:name,
 email:document.getElementById("email").value,
@@ -772,6 +772,26 @@ duration:selected.duration
 
 })
 
+// 👉 ENVOI EMAIL ICI
+let email = document.getElementById("email").value
+
+// 👉 envoi mail si email valide
+if(email && email.includes("@")){
+
+emailjs.send("service_mkpsbdf","template_0qhjhhg",{
+type: "reservation",
+jour:selected.date,
+heure:selected.time,
+prenom:name,
+paddock:selected.paddock,
+email:email
+}).catch(()=>{
+console.log("Email non envoyé")
+})
+
+}
+
+// 👉 TOUJOURS exécuté (important)
 myReservations.push(doc.id)
 
 localStorage.setItem("myReservations",JSON.stringify(myReservations))
@@ -784,6 +804,7 @@ showSheet(
 )
 
 }
+
 
 async function cancelReservation(id){
 
