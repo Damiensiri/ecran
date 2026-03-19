@@ -98,6 +98,11 @@ margin-top:10px;
 font-weight:700;
 }
 
+.status{
+margin-top:10px;
+font-weight:700;
+}
+
 .empty{
 opacity:.6;
 margin-top:20px;
@@ -153,9 +158,17 @@ location.href="index.html"
 
 }
 
-/* ===== CODE ORIGINAL ===== */
+/* ===== CONFIG ===== */
+
+const SHEET_URL = "https://opensheet.elk.sh/1ka6djXZhsDBbF77OVgH5wjqQwLpMUUPbMl1RD_rssXI/Réponses%20au%20formulaire%201"
+  
+/* ===== LOAD ===== */
 
 let orders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+fetch(SHEET_URL)
+.then(r=>r.json())
+.then(sheetData=>{
 
 let html=""
 
@@ -170,15 +183,35 @@ orders.reverse().forEach(order=>{
 let items=""
 
 order.items.forEach(i=>{
-
 items+=`
 <div class="item">
 <div>${i.name} x${i.qty}</div>
 <div>${i.price*i.qty} €</div>
 </div>
 `
-
 })
+
+/* ===== MATCH STATUT ===== */
+
+let statut="En attente"
+
+let found = sheetData.find(s=>{
+return Math.abs(new Date(s["date"]).getTime() - new Date(order.date).getTime()) < 60000
+})
+
+if(found && found["statut"]){
+statut = found["statut"]
+}
+
+/* ===== COULEUR ===== */
+
+let color="#aaa"
+
+if(statut==="Validée") color="#2ecc71"
+if(statut==="Refusée") color="#e74c3c"
+if(statut==="Prête") color="#f1c40f"
+
+/* ===== HTML ===== */
 
 html+=`
 <div class="order">
@@ -191,6 +224,10 @@ ${items}
 Total : ${order.total} €
 </div>
 
+<div class="status" style="color:${color}">
+Statut : ${statut}
+</div>
+
 </div>
 `
 
@@ -199,6 +236,8 @@ Total : ${order.total} €
 }
 
 document.getElementById("orders").innerHTML=html
+
+})
 
 </script>
 
