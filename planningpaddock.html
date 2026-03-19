@@ -687,7 +687,7 @@ return
 }
 
 let name=document.getElementById("name").value.trim()
-let email=document.getElementById("email").value
+let email=document.getElementById("email").value.trim()
 
 if(!name){
 alert("Prénom obligatoire")
@@ -797,8 +797,9 @@ message: `
 `,
 prenom: name,
 email: email
+}).catch(()=>{
+console.log("Email non envoyé")
 })
-}
 
 // 👉 TOUJOURS exécuté (important)
 myReservations.push(doc.id)
