@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Centre Équestre</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+font-family:'Montserrat',sans-serif;
+background:#0f1115;
+color:white;
+overflow-x:hidden;
+}
+
+/* HERO */
+
+.hero{
+height:100vh;
+background:url('https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80') center/cover;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+top:0;left:0;right:0;bottom:0;
+background:rgba(0,0,0,0.5);
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+}
+
+.hero h1{
+font-size:3rem;
+margin-bottom:20px;
+}
+
+.hero button{
+padding:15px 30px;
+border:none;
+background:#d4af37;
+color:black;
+font-weight:bold;
+border-radius:30px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.hero button:hover{
+transform:scale(1.05);
+}
+
+/* LIVE BLOCK */
+
+.live{
+display:flex;
+justify-content:center;
+gap:20px;
+padding:60px 20px;
+flex-wrap:wrap;
+}
+
+.card{
+background:#1c1f2b;
+padding:20px;
+border-radius:15px;
+width:200px;
+text-align:center;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card h2{
+font-size:2rem;
+color:#d4af37;
+}
+
+/* NAV GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:40px;
+}
+
+.grid-item{
+height:250px;
+background-size:cover;
+background-position:center;
+border-radius:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:1.5rem;
+font-weight:bold;
+position:relative;
+overflow:hidden;
+cursor:pointer;
+}
+
+.grid-item::after{
+content:"";
+position:absolute;
+top:0;left:0;right:0;bottom:0;
+background:rgba(0,0,0,0.4);
+}
+
+.grid-item span{
+position:relative;
+z-index:2;
+}
+
+/* IFRAME */
+
+.section{
+padding:60px 20px;
+text-align:center;
+}
+
+.iframe-container{
+max-width:900px;
+margin:auto;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 10px 40px rgba(0,0,0,0.5);
+position:relative;
+}
+
+iframe{
+width:100%;
+height:600px;
+border:none;
+transform:translateY(-120px);
+}
+
+/* EMOTION */
+
+.emotion{
+padding:80px 20px;
+text-align:center;
+font-size:1.5rem;
+line-height:1.6;
+}
+
+/* CTA */
+
+.cta{
+padding:60px;
+text-align:center;
+}
+
+.cta button{
+padding:20px 40px;
+font-size:1.2rem;
+background:#d4af37;
+border:none;
+border-radius:40px;
+cursor:pointer;
+}
+
+/* SCROLL ANIMATION */
+
+.fade{
+opacity:0;
+transform:translateY(40px);
+transition:1s;
+}
+
+.fade.visible{
+opacity:1;
+transform:translateY(0);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Vivez l’expérience équestre</h1>
+    <button>Réserver</button>
+  </div>
+</section>
+
+<!-- LIVE -->
+
+<section class="live fade">
+  <div class="card">
+    <h2>3/5</h2>
+    <p>Paddocks ouverts</p>
+  </div>
+  <div class="card">
+    <h2>2</h2>
+    <p>Activités aujourd’hui</p>
+  </div>
+  <div class="card">
+    <h2>OK</h2>
+    <p>Conditions</p>
+  </div>
+</section>
+
+<!-- GRID -->
+
+<section class="grid fade">
+  <div class="grid-item" style="background-image:url('https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80')">
+    <span>Cours</span>
+  </div>
+  <div class="grid-item" style="background-image:url('https://images.unsplash.com/photo-1599058917212-d750089bc07b?q=80')">
+    <span>Poney Club</span>
+  </div>
+  <div class="grid-item" style="background-image:url('https://images.unsplash.com/photo-1508179522353-11ba468c4a1c?q=80')">
+    <span>Compétition</span>
+  </div>
+  <div class="grid-item" style="background-image:url('https://images.unsplash.com/photo-1509023464722-18d996393ca8?q=80')">
+    <span>Installations</span>
+  </div>
+</section>
+
+<!-- IFRAME -->
+
+<section class="section fade">
+  <h2 style="margin-bottom:20px;">Réserver en ligne</h2>
+
+  <div class="iframe-container">
+    <iframe src="https://ce-grand-rang.cavasoft.fr"></iframe>
+  </div>
+
+  <br>
+
+  <a href="https://ce-grand-rang.cavasoft.fr" target="_blank">
+    <button>Ouvrir en plein écran</button>
+  </a>
+</section>
+
+<!-- EMOTION -->
+
+<section class="emotion fade">
+  <p>
+    Un lieu, une passion, une connexion unique entre le cavalier et le cheval.
+  </p>
+</section>
+
+<!-- CTA -->
+
+<section class="cta fade">
+  <button>Réserver maintenant</button>
+</section>
+
+<script>
+const faders = document.querySelectorAll('.fade');
+
+window.addEventListener('scroll', () => {
+  const triggerBottom = window.innerHeight * 0.85;
+
+  faders.forEach(el => {
+    const boxTop = el.getBoundingClientRect().top;
+
+    if(boxTop < triggerBottom){
+      el.classList.add('visible');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
