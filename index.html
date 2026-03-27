@@ -533,27 +533,6 @@ badge.style.display="none";
 updateBell();
 setInterval(updateBell,60000);
 
-let tapCount = 0;
-let tapTimer = null;
-
-const target = document.querySelector("header"); // zone à taper
-
-target.addEventListener("click", () => {
-
-  tapCount++;
-
-  // reset timer à chaque tap
-  clearTimeout(tapTimer);
-
-  tapTimer = setTimeout(() => {
-    tapCount = 0;
-  }, 1000); // 1 seconde pour faire les 5 taps
-
-  if (tapCount === 5) {
-    window.location.href = "test.html";
-  }
-
-});
 </script>
 
 </body>
