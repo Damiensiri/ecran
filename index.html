@@ -68,6 +68,16 @@ align-items:center;
 justify-content:center;
 }
 
+header{
+transition:all 0.25s ease;
+}
+
+header.shrink{
+height:55px;
+background:rgba(244,244,244,0.95);
+backdrop-filter:blur(10px);
+}
+
 .header-left{
 position:absolute;
 left:12px;
@@ -437,6 +447,25 @@ badge.style.display="none";
 updateBell();
 setInterval(updateBell,60000);
 
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const scroll = document.querySelector(".scroll");
+  const header = document.querySelector("header");
+
+  scroll.addEventListener("scroll", () => {
+
+    if(scroll.scrollTop > 30){
+      header.classList.add("shrink");
+    } else {
+      header.classList.remove("shrink");
+    }
+
+  });
+
+});
 </script>
 
 </body>
