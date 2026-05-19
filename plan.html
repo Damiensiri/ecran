@@ -5,21 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plan interactif</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
-*{
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent;
-}
-
 body{
 margin:0;
-background:#f4f6fb;
+background:#f4f4f4;
 font-family:'Montserrat',sans-serif;
 color:#000;
-overflow-x:hidden;
 transition:background .3s ease,color .3s ease;
 }
 
@@ -31,97 +25,69 @@ transform:translateX(100%);
 transition:transform .35s ease;
 }
 
-.page.active{
-transform:translateX(0);
-}
-
-.page.exit{
-transform:translateX(100%);
-}
+.page.active{ transform:translateX(0); }
+.page.exit{ transform:translateX(100%); }
 
 /* HEADER */
 
 header{
 position:relative;
-height:76px;
-padding-top:8px;
+height:70px;
 }
 
 #backBtn{
 position:absolute;
-left:18px;
+left:15px;
 top:50%;
-
 transform:translateY(-50%);
-
-width:46px;
-height:46px;
-
+width:42px;
+height:42px;
 border-radius:50%;
-
-background:rgba(255,255,255,0.82);
-
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
-
-backdrop-filter:blur(16px);
--webkit-backdrop-filter:blur(16px);
-
-border:1px solid rgba(255,255,255,0.45);
-
-box-shadow:
-0 8px 22px rgba(0,0,0,0.08),
-inset 0 1px 1px rgba(255,255,255,0.7);
-
+box-shadow:0 3px 8px rgba(0,0,0,0.15);
 cursor:pointer;
-
-transition:all .2s ease;
 }
 
-#backBtn:active{
-transform:translateY(-50%) scale(.94);
-}
-
-#backBtn img{
-width:22px;
-}
+#backBtn img{ width:22px; }
 
 header h1{
 position:absolute;
 left:50%;
 top:50%;
-
 transform:translate(-50%,-50%);
-
 margin:0;
-
 font-size:18px;
 font-weight:700;
-letter-spacing:.5px;
 }
 
-/* MAP */
+/* PLAN */
 
 #mapWrapper{
 position:relative;
-padding:20px;
+padding:18px;
 }
 
 #map{
 width:100%;
-display:block;
+border-radius:20px;
+}
 
+/* BOUTONS */
+
+#map{
 border-radius:30px;
 
 box-shadow:
 0 20px 60px rgba(0,0,0,0.14);
 }
 
-/* PREMIUM MINI BUTTONS */
-
 .plan-btn{
 position:absolute;
+
+z-index:5;
 
 width:42px;
 height:42px;
@@ -206,88 +172,46 @@ transform:translateY(0px);
 
 /* positions */
 
-#btn-carriere{
-top:20%;
-left:25%;
-}
+#btn-carriere{top:20%;left:25%;}
+#btn-beudot{top:20%;left:55%;}
+#btn-manege{top:35%;left:38%;}
+#btn-grande{top:38%;left:69%;}
+#btn-maison{top:55%;left:60%;}
 
-#btn-beudot{
-top:20%;
-left:55%;
-}
-
-#btn-manege{
-top:35%;
-left:38%;
-}
-
-#btn-grande{
-top:38%;
-left:69%;
-}
-
-#btn-maison{
-top:55%;
-left:60%;
-}
-
-/* LEGEND */
+/* LEGENDE */
 
 .legend{
-padding:4px 22px 30px;
+padding:20px;
 font-size:15px;
 }
 
 .legend-item{
 display:flex;
 align-items:center;
-gap:12px;
-
-margin-bottom:16px;
-
-font-weight:500;
+gap:10px;
+margin-bottom:15px;
 }
 
-.legend-item img{
-width:22px;
-}
+.legend-item img{ width:22px; }
 
 /* PANEL */
 
 #panel{
 position:fixed;
-
 left:0;
 bottom:0;
-
 width:100%;
 height:50%;
-
-background:
-linear-gradient(
-180deg,
-rgba(255,255,255,0.95),
-rgba(255,255,255,0.90)
-);
-
-backdrop-filter:blur(24px);
--webkit-backdrop-filter:blur(24px);
-
-border-radius:28px 28px 0 0;
+background:white;
+border-radius:20px 20px 0 0;
 
 transform:translateY(110%);
 opacity:0;
 
-transition:
-transform .35s ease,
-opacity .2s ease;
+transition:transform .35s ease, opacity .2s ease;
 
-padding:24px;
-
+padding:20px;
 box-sizing:border-box;
-
-box-shadow:
-0 -20px 50px rgba(0,0,0,0.12);
 }
 
 #panel.active{
@@ -295,36 +219,21 @@ transform:translateY(0);
 opacity:1;
 }
 
-/* PANEL ICON */
+/* CERCLE */
 
 #panelIcon{
 position:absolute;
-
-top:-32px;
+top:-30px;
 left:50%;
-
 transform:translateX(-50%);
-
-width:66px;
-height:66px;
-
+width:60px;
+height:60px;
 border-radius:50%;
-
-background:
-linear-gradient(
-145deg,
-rgba(255,255,255,0.95),
-rgba(255,255,255,0.82)
-);
-
+background:white;
 display:flex;
 align-items:center;
 justify-content:center;
-
-backdrop-filter:blur(18px);
-
-box-shadow:
-0 12px 35px rgba(0,0,0,0.18);
+box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 #panelIcon img{
@@ -333,12 +242,12 @@ position:absolute;
 z-index:2;
 }
 
-/* HALO */
+/* HALO SVG */
 
 .halo{
 position:absolute;
-width:74px;
-height:74px;
+width:66px;
+height:66px;
 transform:rotate(-90deg);
 }
 
@@ -350,48 +259,34 @@ stroke-dasharray:188;
 stroke-dashoffset:188;
 }
 
-/* CONTENT */
+/* PANEL CONTENT */
 
 #panelHeader{
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-top:8px;
 }
 
 #panelTitle{
-font-size:22px;
+font-size:20px;
 font-weight:700;
 }
 
 #closePanel{
-font-size:24px;
+font-size:22px;
 cursor:pointer;
-opacity:.7;
-transition:opacity .2s ease;
 }
 
-#closePanel:hover{
-opacity:1;
-}
-
-.row{
-margin-top:16px;
-}
+.row{ margin-top:14px; }
 
 .label{
 font-size:12px;
-font-weight:700;
-letter-spacing:.4px;
-text-transform:uppercase;
-color:#8b8b8b;
-margin-bottom:6px;
+color:#888;
 }
 
 .value{
 font-size:14px;
 font-weight:500;
-line-height:1.7;
 }
 
 #statut{
@@ -401,17 +296,17 @@ font-weight:700;
 
 #horaire{
 font-size:14px;
-font-weight:600;
+font-weight:500;
 }
 
 .optionText{
 font-size:13px;
-margin-right:16px;
+margin-right:15px;
 }
 
 #info{
-margin-top:6px;
-line-height:1.8;
+margin-top:8px;
+line-height:1.7;
 font-size:14px;
 font-weight:550;
 }
@@ -419,46 +314,18 @@ font-weight:550;
 .scrollable{
 max-height:160px;
 overflow-y:auto;
-padding-right:6px;
 }
-
-/* BUTTON */
 
 #reserveBox{
 display:none;
-
-margin-top:24px;
-
-background:
-linear-gradient(
-135deg,
-#2563EB,
-#4F46E5
-);
-
+margin-top:20px;
+background:#E88B00;
 color:white;
-
-padding:15px;
-
-border-radius:18px;
-
+padding:12px;
+border-radius:12px;
 text-align:center;
-font-weight:700;
-
+font-weight:600;
 cursor:pointer;
-
-box-shadow:
-0 14px 35px rgba(37,99,235,0.30);
-
-transition:all .2s ease;
-}
-
-#reserveBox:hover{
-transform:translateY(-2px);
-}
-
-#reserveBox:active{
-transform:scale(.98);
 }
 
 /* DARK MODE */
@@ -466,90 +333,40 @@ transform:scale(.98);
 @media (prefers-color-scheme: dark){
 
 body{
-background:#0d1016;
+background:#0f1115;
 color:white;
 }
 
-header h1{
-color:white;
-}
+header h1{ color:white; }
 
 #backBtn{
-background:rgba(24,28,36,0.76);
-
-border:1px solid rgba(255,255,255,0.08);
-
-box-shadow:
-0 10px 28px rgba(0,0,0,0.45);
+background:#1c1f26;
+box-shadow:0 12px 30px rgba(0,0,0,0.6);
 }
 
 #backBtn img{
 filter:brightness(0) invert(1);
 }
 
-#map{
-filter:
-brightness(.93)
-contrast(.98);
-
-box-shadow:
-0 24px 70px rgba(0,0,0,0.55);
-}
-
-.plan-btn{
-background:rgba(28,32,40,0.72);
-
-border:1px solid rgba(255,255,255,0.06);
-
-box-shadow:
-0 10px 24px rgba(0,0,0,0.45),
-inset 0 1px 1px rgba(255,255,255,0.05);
-}
-
-.plan-btn:hover{
-background:rgba(38,43,52,0.88);
-}
-
 #panel{
-background:
-linear-gradient(
-180deg,
-rgba(24,28,36,0.96),
-rgba(24,28,36,0.92)
-);
-
-box-shadow:
-0 -20px 50px rgba(0,0,0,0.5);
+background:#1c1f26;
+box-shadow:0 25px 60px rgba(0,0,0,0.75);
 }
 
 #panelIcon{
-background:
-linear-gradient(
-145deg,
-rgba(38,43,52,0.95),
-rgba(24,28,36,0.88)
-);
+background:#1c1f26;
 }
 
-.label{
-color:#9da3ae;
-}
+.label{ color:#9aa0a6; }
+.value{ color:#e5e5e5; }
+.legend{ color:#ddd; }
 
-.value{
-color:#ececec;
-}
-
-.legend{
-color:#ddd;
+#map{
+filter:brightness(0.92) contrast(0.95);
 }
 
 #reserveBox{
-background:
-linear-gradient(
-135deg,
-#2563EB,
-#4338CA
-);
+background:#c87400;
 }
 
 }
@@ -562,63 +379,29 @@ linear-gradient(
 <div class="page" id="page">
 
 <header>
-
 <div id="backBtn" onclick="goBack()">
 <img src="image/back.svg">
 </div>
-
 <h1>PLAN INTERACTIF</h1>
-
 </header>
 
 <div id="mapWrapper">
 
 <img id="map" src="image/plan.png">
 
-<div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')">
-<img id="icon-carriere">
-</div>
-
-<div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')">
-<img id="icon-beudot">
-</div>
-
-<div class="plan-btn" id="btn-manege" onclick="openSpace('manege')">
-<img id="icon-manege">
-</div>
-
-<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')">
-<img id="icon-grande-voie">
-</div>
-
-<div class="plan-btn" id="btn-maison" onclick="openSpace('maison')">
-<img id="icon-maison">
-</div>
+<div class="plan-btn" id="btn-carriere" onclick="openSpace('carriere')"><img id="icon-carriere"></div>
+<div class="plan-btn" id="btn-beudot" onclick="openSpace('beudot')"><img id="icon-beudot"></div>
+<div class="plan-btn" id="btn-manege" onclick="openSpace('manege')"><img id="icon-manege"></div>
+<div class="plan-btn" id="btn-grande" onclick="openSpace('grande-voie')"><img id="icon-grande-voie"></div>
+<div class="plan-btn" id="btn-maison" onclick="openSpace('maison')"><img id="icon-maison"></div>
 
 </div>
 
 <div class="legend">
-
-<div class="legend-item">
-<img src="image/ouvert.png">
-Ouvert
-</div>
-
-<div class="legend-item">
-<img src="image/prevision.png">
-Prévision d'ouverture
-</div>
-
-<div class="legend-item">
-<img src="image/ferme.png">
-Fermé
-</div>
-
-<div class="legend-item">
-<img src="image/horsservice.png">
-Hors service
-</div>
-
+<div class="legend-item"><img src="image/ouvert.png"> Ouvert</div>
+<div class="legend-item"><img src="image/prevision.png"> Prévision d'ouverture</div>
+<div class="legend-item"><img src="image/ferme.png"> Fermé</div>
+<div class="legend-item"><img src="image/horsservice.png"> Hors service</div>
 </div>
 
 <div id="panel">
@@ -634,51 +417,34 @@ Hors service
 </div>
 
 <div id="panelHeader">
-
 <div id="panelTitle">---</div>
-
 <div id="closePanel">✕</div>
-
 </div>
 
 <div class="row">
-
 <div class="label">Statut</div>
-
 <div class="value" id="statut">---</div>
-
 </div>
 
 <div class="row">
-
 <div class="label">Horaires</div>
-
 <div class="value" id="horaire">---</div>
-
 </div>
 
 <div class="row" id="optionsRow">
-
 <div class="label">Activités possibles</div>
-
 <div>
 <span class="optionText" id="liberte"></span>
 <span class="optionText" id="longe"></span>
 </div>
-
 </div>
 
 <div class="row">
-
 <div class="label">Infos</div>
-
 <div class="value scrollable" id="info"></div>
-
 </div>
 
-<div id="reserveBox" onclick="goReserve()">
-Réserver
-</div>
+<div id="reserveBox" onclick="goReserve()">Réserver</div>
 
 </div>
 
@@ -687,11 +453,9 @@ Réserver
 <script>
 
 window.addEventListener("DOMContentLoaded",()=>{
-
 requestAnimationFrame(()=>{
 document.getElementById("page").classList.add("active");
 });
-
 });
 
 const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
@@ -719,61 +483,41 @@ const haloCircle=document.getElementById("haloCircle");
 const panelIconImg=document.getElementById("panelIconImg");
 
 function setPanelIcon(espace){
-
 if(espace==="carriere" || espace==="manege"){
 panelIconImg.src="image/travail.svg";
 }else{
 panelIconImg.src="image/paddock.svg";
 }
-
 }
 
 function loadData(){
-
 fetch(SHEET_URL+"&t="+Date.now(),{cache:"no-store"})
 .then(r=>r.json())
 .then(d=>{
-
 DATA=d;
-
 localStorage.setItem("statuts",JSON.stringify(d));
-
 renderIcons(d);
-
 });
-
 }
 
 function renderIcons(data){
-
 data.forEach(e=>{
-
 const icon=ICONS[(e.statut_auto||"").toLowerCase().trim()];
-
 const el=document.getElementById("icon-"+e.espace);
-
 if(el && icon) el.src=icon;
-
 });
-
 }
 
 const cache=localStorage.getItem("statuts");
 
 if(cache){
-
 try{
-
 DATA=JSON.parse(cache);
-
 renderIcons(DATA);
-
 }catch(e){}
-
 }
 
 loadData();
-
 setInterval(loadData,10000);
 
 function openSpace(espace){
@@ -781,7 +525,6 @@ function openSpace(espace){
 setPanelIcon(espace);
 
 const e=DATA.find(x=>x.espace===espace);
-
 if(!e) return;
 
 panelTitle.innerText=formatTitle(e.espace);
@@ -819,10 +562,9 @@ if(e.statut_auto==="hors-service"){
 statut.innerText="Hors service";
 statut.style.color="gray";
 }
-
 info.innerText=e.info||"Aucune info";
 
-/* halo */
+/* couleur halo */
 
 let color="green";
 
@@ -832,59 +574,43 @@ if(e.statut_auto==="hors-service") color="gray";
 
 haloCircle.style.stroke=color;
 
-/* animation */
+/* animation halo */
 
 haloCircle.style.transition="none";
 haloCircle.style.strokeDashoffset="188";
 
 setTimeout(()=>{
-
 haloCircle.style.transition="stroke-dashoffset 0.9s ease";
 haloCircle.style.strokeDashoffset="0";
-
 },50);
 
 /* horaires */
 
 if(e.horaire_special && e.horaire_special.trim() !== ""){
-
-horaire.innerHTML=`<span style="color:#E88B00;font-weight:700">${e.horaire_special}</span>`;
-
+horaire.innerHTML = `<span style="color:#E88B00;font-weight:700">${e.horaire_special}</span>`;
 }else{
-
-horaire.innerText=e.horaire_affiche||"---";
-
+horaire.innerText = e.horaire_affiche||"---";
 }
-
 /* options */
 
 let show=false;
 
 if(e.liberte){
-
 liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
-
 show=true;
-
 }
 
 if(e.longe){
-
 longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
-
 show=true;
-
 }
 
 optionsRow.style.display=show?"block":"none";
 
 /* réservation */
 
-if(
-(espace==="maison"||espace==="grande-voie"||espace==="beudot")
-&&
-(e.statut_auto==="ouvert"||e.statut_auto==="prevision")
-){
+if((espace==="maison"||espace==="grande-voie"||espace==="beudot") &&
+(e.statut_auto==="ouvert"||e.statut_auto==="prevision")){
 reserveBox.style.display="block";
 }else{
 reserveBox.style.display="none";
@@ -897,16 +623,10 @@ panel.classList.add("active");
 closePanel.onclick=()=>panel.classList.remove("active");
 
 function goBack(){
-
 const page=document.getElementById("page");
-
 page.classList.remove("active");
 page.classList.add("exit");
-
-setTimeout(()=>{
-location.href="index.html";
-},300);
-
+setTimeout(()=>{location.href="index.html";},300);
 }
 
 function goReserve(){
