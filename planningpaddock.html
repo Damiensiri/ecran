@@ -111,6 +111,67 @@ display:block;
 animation:stepIn 0.22s ease;
 }
 
+.stepShell{
+margin-top:14px;
+padding:14px;
+border-radius:14px;
+background:#f4f4f4;
+}
+
+.stepShell.locked{
+opacity:0.58;
+}
+
+.stepShell.visible{
+background:white;
+box-shadow:0 4px 14px rgba(0,0,0,0.05);
+}
+
+.stepHead{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+font-size:13px;
+font-weight:700;
+}
+
+.stepNumber{
+width:26px;
+height:26px;
+border-radius:50%;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+background:#181E3B;
+color:white;
+font-size:12px;
+flex:0 0 auto;
+}
+
+.stepTitle{
+display:flex;
+align-items:center;
+gap:9px;
+min-width:0;
+}
+
+.stepHint{
+font-size:12px;
+font-weight:600;
+color:#999;
+text-align:right;
+}
+
+.stepBody{
+display:none;
+margin-top:14px;
+}
+
+.stepShell.visible .stepBody{
+display:block;
+}
+
 @keyframes stepIn{
 from{
 opacity:0;
@@ -308,6 +369,15 @@ background:#1c1f26;
 background:#252a33;
 }
 
+.stepShell{
+background:#252a33;
+}
+
+.stepShell.visible{
+background:#1c1f26;
+box-shadow:0 4px 14px rgba(0,0,0,0.16);
+}
+
 .freeText,
 .reservedText,
 .mineText,
@@ -471,7 +541,12 @@ padding-right:8px;
 <option value="mise">Demande mise au paddock (+5€)</option>
 </select>
 
-<div id="stepOptions" class="progressStep">
+<div id="stepOptions" class="stepShell locked">
+<div class="stepHead">
+<div class="stepTitle"><span class="stepNumber">1</span><span>Options</span></div>
+<div class="stepHint">Après le type</div>
+</div>
+<div class="stepBody">
 <div id="blocDuration">
 <label>Durée</label>
 <select id="duration">
@@ -486,22 +561,41 @@ padding-right:8px;
 <select id="paddock"></select>
 </div>
 </div>
+</div>
 
-<div id="stepDay" class="progressStep">
+<div id="stepDay" class="stepShell locked">
+<div class="stepHead">
+<div class="stepTitle"><span class="stepNumber">2</span><span>Jour</span></div>
+<div class="stepHint">Après les options</div>
+</div>
+<div class="stepBody">
 <label>Jour</label>
 <div id="days"></div>
 </div>
+</div>
 
-<div id="stepDetails" class="progressStep">
+<div id="stepPlanning" class="stepShell locked">
+<div class="stepHead">
+<div class="stepTitle"><span class="stepNumber">3</span><span>Créneau</span></div>
+<div class="stepHint">Après le jour</div>
+</div>
+<div class="stepBody">
+<div id="planning"></div>
+</div>
+</div>
+
+<div id="stepDetails" class="stepShell locked">
+<div class="stepHead">
+<div class="stepTitle"><span class="stepNumber">4</span><span>Coordonnées</span></div>
+<div class="stepHint">Après le créneau</div>
+</div>
+<div class="stepBody">
 <label>Prénom</label>
 <input id="name">
 
 <label>Email (optionnel)</label>
 <input id="email">
 </div>
-
-<div id="stepPlanning" class="progressStep">
-<div id="planning"></div>
 </div>
 
 <div id="stepButton" class="progressStep">
@@ -593,13 +687,19 @@ const paddockSelect=document.getElementById("paddock")
 
 function showStep(id){
 
-document.getElementById(id).classList.add("visible")
+const step=document.getElementById(id)
+
+step.classList.add("visible")
+step.classList.remove("locked")
 
 }
 
 function hideStep(id){
 
-document.getElementById(id).classList.remove("visible")
+const step=document.getElementById(id)
+
+step.classList.remove("visible")
+step.classList.add("locked")
 
 }
 
@@ -628,6 +728,45 @@ hideStep("stepDetails")
 hideStep("stepButton")
 document.querySelectorAll(".row").forEach(r=>r.classList.remove("selected"))
 document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
+
+}
+
+function resetAfterPaddockChange(){
+
+selected=null
+hideStep("stepDetails")
+hideStep("stepButton")
+document.querySelectorAll(".row").forEach(r=>{
+r.style.display="flex"
+r.classList.remove("selected")
+})
+
+const changeBtn=document.getElementById("changeSlotBtn")
+
+if(changeBtn){
+changeBtn.remove()
+}
+
+if(!paddockSelect.value){
+
+selectedDate=null
+document.querySelectorAll(".dayBtn").forEach(b=>b.classList.remove("active"))
+document.getElementById("planning").innerHTML=""
+hideStep("stepPlanning")
+return
+
+}
+
+if(selectedDate){
+
+showStep("stepPlanning")
+generate()
+
+}else{
+
+hideStep("stepPlanning")
+
+}
 
 }
 
@@ -1221,9 +1360,8 @@ loadDataRealtime()
 
 paddockSelect.onchange=()=>{
 
-resetAfterOptionChange()
 showDayIfOptionsReady()
-generate()
+resetAfterPaddockChange()
 
 }
   
