@@ -592,23 +592,19 @@ cart.forEach(item=>{
 
 let lineTotal=item.price*item.qty
 
-commande+=`
-<tr>
-<td>${item.name}</td>
-<td align="center">${item.qty}</td>
-<td align="right">${lineTotal} €</td>
-</tr>
-`
+commande += `${item.name} x${item.qty} = ${lineTotal} €\n`
 
 total+=lineTotal
 
 })
 
-alert(
-"Articles : " + cart.length +
-"\nTotal : " + total +
-"\nCommande : " + commande
-)
+emailjs.send("service_mkpsbdf","template_ftv15rb",{
+nom:nom,
+prenom:prenom,
+email:email,
+commande:commande,
+total:total
+})
 
 .then(()=>{
 
