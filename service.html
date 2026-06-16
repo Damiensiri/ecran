@@ -604,13 +604,11 @@ total+=lineTotal
 
 })
 
-emailjs.send("service_mkpsbdf","template_ftv15rb",{
-nom:nom,
-prenom:prenom,
-email:email,
-commande:commande,
-total:total
-})
+alert(
+"Articles : " + cart.length +
+"\nTotal : " + total +
+"\nCommande : " + commande
+)
 
 .then(()=>{
 
