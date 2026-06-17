@@ -136,6 +136,23 @@ font-size:13px;
 font-weight:700;
 }
 
+.mineText{color:#2980b9;}
+
+.shortText{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-width:72px;
+min-height:28px;
+padding:5px 10px;
+border-radius:999px;
+font-size:12px;
+font-weight:700;
+text-align:center;
+background:#f4f4f4;
+color:#f39c12;
+}
+
 .stepNumber{
 width:26px;
 height:26px;
@@ -1104,6 +1121,28 @@ if(slotStart < resEnd && slotEnd > resStart){
 }
 
 })
+let oneHourPossible = false
+
+if(conflict && duration === 90){
+
+    let slotStart = hour + (minutes / 60)
+    let slotEnd = slotStart + 1
+
+    oneHourPossible = !reservations.some(r=>{
+
+        if(r.date!==selectedDate) return false
+        if(r.paddock!==paddock) return false
+
+        let [rh,rm]=r.time.split(":").map(Number)
+
+        let resStart = rh + (rm/60)
+        let resEnd = resStart + (r.duration/60)
+
+        return slotStart < resEnd && slotEnd > resStart
+
+    })
+
+}
 
 let row=document.createElement("div")
 
@@ -1140,12 +1179,16 @@ row.className="row"
 
 if(adminMode){
 
-row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
-row.onclick=()=>cancelReservation(docId)
+    row.innerHTML=`<div>${time}</div><div class="reservedText">${reserverName}</div>`
+    row.onclick=()=>cancelReservation(docId)
+
+}else if(oneHourPossible){
+
+    row.innerHTML=`<div>${time}</div><div class="shortText">Libre 1h</div>`
 
 }else{
 
-row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
+    row.innerHTML=`<div>${time}</div><div class="reservedText">réservé</div>`
 
 }
 
