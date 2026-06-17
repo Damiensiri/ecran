@@ -1268,6 +1268,35 @@ return
 
 }
 
+// ← ICI
+
+let slotStart = parseInt(selected.time.split(":")[0]) +
+                parseInt(selected.time.split(":")[1]) / 60;
+
+let slotEnd = slotStart + (selected.duration / 60);
+
+const conflit = reservations.some(r => {
+
+    if(r.date !== selected.date) return false;
+    if(r.paddock !== selected.paddock) return false;
+
+    let [h,m] = r.time.split(":").map(Number);
+
+    let resStart = h + m/60;
+    let resEnd = resStart + (r.duration/60);
+
+    return slotStart < resEnd && slotEnd > resStart;
+
+});
+
+if(conflit){
+    alert("Ce créneau vient d'être réservé par un autre utilisateur.");
+    generate();
+    return;
+}
+
+// Puis seulement ici :
+
 const doc = await db.collection("reservations").add({
 
 name:name,
