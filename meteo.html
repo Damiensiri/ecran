@@ -721,6 +721,10 @@
       transform-origin: top center;
     }
 
+    .vigilance-mobile-link {
+      display: none;
+    }
+
     .forecast-card {
       padding-bottom: 18px;
     }
@@ -1165,6 +1169,27 @@
       92% { opacity: 0; }
     }
 
+    @media (max-width: 520px) {
+      .vigilance-widget-frame {
+        display: none;
+      }
+
+      .vigilance-mobile-link {
+        display: block;
+        width: calc(100% - 36px);
+        margin: 12px auto 0;
+        padding: 12px 14px;
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: var(--radius-md);
+        color: var(--text-main);
+        background: rgba(255,255,255,0.12);
+        font-size: 0.78rem;
+        font-weight: 720;
+        text-align: center;
+        text-decoration: none;
+      }
+    }
+
     @media (max-width: 380px) {
       .app-shell {
         padding-left: 14px;
@@ -1222,7 +1247,7 @@
         </svg>
       </button>
       <h1 class="screen-title">MÉTÉO</h1>
-      <div class="status-pill" id="dayStatus">...</div>
+      <span aria-hidden="true"></span>
     </header>
 
     <section class="hero" aria-labelledby="cityName">
@@ -1296,6 +1321,7 @@
             title="Vigilance Météo-France pour l'Aube">
           </iframe>
         </div>
+        <a class="vigilance-mobile-link" href="https://vigilance.meteofrance.fr/fr/aube" target="_blank" rel="noopener">Afficher les cartes officielles J0 et J1</a>
       </article>
 
       <article class="glass-card forecast-card" style="--delay: 280ms">
@@ -1329,7 +1355,7 @@
       </article>
     </section>
 
-    <p class="footer-note">Données météorologiques fournies par Open-Meteo. Interface optimisée pour un affichage mobile fluide avec un fond CSS fixe et des cartes défilantes.</p>
+    <p class="footer-note">Données météorologiques fourni par Open-météo</p>
   </main>
 
   <script>
@@ -1386,7 +1412,7 @@
     function cacheElements() {
       const ids = [
         "app", "temperature", "heroIcon", "cityName", "description", "summaryLine",
-        "localTime", "coordinates", "dayStatus", "updatedAt", "windSpeed",
+        "localTime", "coordinates", "updatedAt", "windSpeed",
         "windGust", "rainChance", "rainAmount",
         "dailyForecast", "hourlyForecast", "errorBox", "cloudField", "rainField",
         "snowField", "starField", "backButton"
@@ -1593,7 +1619,6 @@
       elements.summaryLine.textContent = buildSummaryLine(current.temperature_2m, current.wind_speed_10m, rainProbability);
       elements.localTime.textContent = formatLocalTime(current.time);
       elements.coordinates.textContent = WEATHER_CONFIG.latitude.toFixed(3) + ", " + WEATHER_CONFIG.longitude.toFixed(3);
-      elements.dayStatus.textContent = isDay ? "Jour" : "Nuit";
       elements.updatedAt.textContent = "Mis à jour " + formatShortTime(current.time);
       elements.windSpeed.textContent = roundNumber(current.wind_speed_10m);
       elements.windGust.textContent = roundNumber(current.wind_gusts_10m);
