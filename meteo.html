@@ -700,6 +700,7 @@
     .vigilance-widget-frame {
       width: 302px;
       max-width: calc(100% - 36px);
+      height: var(--widget-height, 122px);
       margin: 0 auto;
       overflow: hidden;
       border-radius: var(--radius-lg);
@@ -708,11 +709,16 @@
     }
 
     .vigilance-widget-frame iframe {
+      position: absolute;
+      top: 0;
+      left: 50%;
       display: block;
-      width: 100%;
-      max-width: 100%;
+      width: 302px;
+      max-width: none;
       height: 122px;
       border: 0;
+      transform: translateX(-50%) scale(var(--widget-scale, 1));
+      transform-origin: top center;
     }
 
     .forecast-card {
@@ -1373,6 +1379,7 @@
       cacheElements();
       initializeAnimations();
       initializeInteractions();
+      initializeVigilanceWidget();
       loadWeather();
     });
 
@@ -1399,6 +1406,25 @@
 
         window.location.href = "./";
       });
+    }
+
+    function initializeVigilanceWidget() {
+      const frame = document.querySelector(".vigilance-widget-frame");
+      if (!frame) return;
+
+      const resizeWidget = () => {
+        const scale = Math.min(1, frame.clientWidth / 302);
+        frame.style.setProperty("--widget-scale", scale.toFixed(4));
+        frame.style.setProperty("--widget-height", (122 * scale).toFixed(2) + "px");
+      };
+
+      resizeWidget();
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(resizeWidget).observe(frame);
+      } else {
+        window.addEventListener("resize", resizeWidget);
+      }
     }
 
     function initializeAnimations() {
