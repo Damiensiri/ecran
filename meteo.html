@@ -47,8 +47,6 @@
       --ambient-glow-2: rgba(112, 215, 255, 0.24);
       --status-bg: rgba(255, 255, 255, 0.18);
       --status-border: rgba(255, 255, 255, 0.28);
-      --vigilance: #31aa35;
-      --vigilance-rgb: 49, 170, 53;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -695,176 +693,26 @@
       letter-spacing: 0;
     }
 
-    .vigilance-card {
-      --vig-bg: rgba(var(--vigilance-rgb), 0.22);
-      --vig-border: rgba(var(--vigilance-rgb), 0.42);
-      --vig-glow: rgba(var(--vigilance-rgb), 0.24);
-      padding: 20px;
-      background:
-        radial-gradient(circle at 84% 18%, var(--vig-glow), transparent 34%),
-        linear-gradient(145deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)),
-        var(--glass);
+    .vigilance-widget-card {
+      padding-bottom: 18px;
     }
 
-    .vigilance-card::after {
-      content: "";
-      position: absolute;
-      inset: -35%;
-      z-index: 0;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(var(--vigilance-rgb), 0.22), transparent 32%),
-        conic-gradient(from 80deg, transparent, rgba(var(--vigilance-rgb), 0.16), transparent 38%);
-      opacity: 0.58;
-      transform: translate3d(0, 0, 0) rotate(0deg);
-      animation: vigilanceAura 16s linear infinite;
-      pointer-events: none;
-    }
-
-    .vigilance-card[data-vigilance-level="green"]::after {
-      animation-duration: 22s;
-      opacity: 0.38;
-    }
-
-    .vigilance-card[data-vigilance-level="yellow"] .vigilance-orb {
-      animation: vigilancePulse 3.8s ease-in-out infinite;
-    }
-
-    .vigilance-card[data-vigilance-level="orange"] .vigilance-orb {
-      animation: vigilancePulse 2.7s ease-in-out infinite;
-    }
-
-    .vigilance-card[data-vigilance-level="red"] .vigilance-orb {
-      animation: vigilanceAlert 1.9s ease-in-out infinite;
-    }
-
-    .vigilance-card[data-vigilance-level="red"]::after {
-      animation: vigilanceAura 9s linear infinite, vigilanceFlash 4.8s ease-in-out infinite;
-      opacity: 0.74;
-    }
-
-    .vigilance-content {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 16px;
-      align-items: center;
-      margin-top: 16px;
-      padding: 16px;
+    .vigilance-widget-frame {
+      margin: 0 18px;
+      overflow: hidden;
       border-radius: var(--radius-lg);
-      border: 1px solid var(--vig-border);
-      background: var(--vig-bg);
+      background: rgba(255,255,255,0.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
     }
 
-    .vigilance-orb {
-      position: relative;
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.82), transparent 26%),
-        linear-gradient(145deg, rgba(255,255,255,0.42), rgba(var(--vigilance-rgb), 0.82));
-      box-shadow:
-        0 16px 34px rgba(var(--vigilance-rgb), 0.32),
-        inset 0 1px 0 rgba(255,255,255,0.34);
+    .vigilance-widget-frame iframe {
+      display: block;
+      width: 302px;
+      max-width: 100%;
+      height: 122px;
+      margin: 0 auto;
+      border: 0;
     }
-
-    .vigilance-orb::after {
-      content: "";
-      position: absolute;
-      inset: 11px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.62);
-    }
-
-    .vigilance-title {
-      margin: 0;
-      color: var(--text-strong);
-      font-size: 1.14rem;
-      font-weight: 820;
-      letter-spacing: -0.025em;
-    }
-
-    .vigilance-text {
-      margin: 5px 0 0;
-      color: var(--text-soft);
-      font-size: 0.87rem;
-      font-weight: 620;
-      line-height: 1.38;
-    }
-
-    .vigilance-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .vigilance-meta-item {
-      min-height: 66px;
-      padding: 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
-    }
-
-    .vigilance-meta-label {
-      margin: 0 0 5px;
-      color: var(--text-muted);
-      font-size: 0.66rem;
-      font-weight: 820;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .vigilance-meta-value {
-      margin: 0;
-      color: var(--text-main);
-      font-size: 0.82rem;
-      font-weight: 720;
-      line-height: 1.3;
-    }
-
-    .vigilance-official {
-      margin: 14px 0 0;
-      padding: 14px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background:
-        radial-gradient(circle at 100% 0%, rgba(var(--vigilance-rgb), 0.16), transparent 36%),
-        linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.055));
-    }
-
-    .vigilance-official p {
-      margin: 0;
-      color: var(--text-soft);
-      font-size: 0.82rem;
-      font-weight: 620;
-      line-height: 1.45;
-    }
-
-    .vigilance-scale {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .scale-item {
-      height: 8px;
-      border-radius: 999px;
-      opacity: 0.34;
-      transition: opacity 240ms ease, transform 240ms ease;
-    }
-
-    .scale-item.active {
-      opacity: 1;
-      transform: scaleY(1.28);
-    }
-
-    .scale-green { background: #31aa35; }
-    .scale-yellow { background: #fff000; }
-    .scale-orange { background: #f18e00; }
-    .scale-red { background: #e1000f; }
 
     .forecast-card {
       padding-bottom: 18px;
@@ -903,11 +751,18 @@
     }
 
     .day-icon {
-      width: 68px;
+      position: relative;
+      width: 100%;
       height: 56px;
       margin: 10px auto 6px;
-      transform: scale(0.72);
-      transform-origin: center;
+    }
+
+    .day-icon .weather-icon {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) scale(0.72);
+      transform-origin: top center;
     }
 
     .day-temps {
@@ -985,11 +840,18 @@
     }
 
     .hour-icon {
-      width: 48px;
+      position: relative;
+      width: 100%;
       height: 40px;
-      transform: scale(0.5);
-      transform-origin: center;
       margin: -4px 0;
+    }
+
+    .hour-icon .weather-icon {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) scale(0.5);
+      transform-origin: top center;
     }
 
     .footer-note {
@@ -1263,52 +1125,6 @@
       95% { opacity: 0; }
     }
 
-    @keyframes vigilanceAura {
-      to { transform: translate3d(0, 0, 0) rotate(360deg); }
-    }
-
-    @keyframes vigilancePulse {
-      0%, 100% {
-        transform: translate3d(0, 0, 0) scale(1);
-        box-shadow:
-          0 16px 34px rgba(var(--vigilance-rgb), 0.32),
-          inset 0 1px 0 rgba(255,255,255,0.34);
-      }
-      50% {
-        transform: translate3d(0, -1px, 0) scale(1.055);
-        box-shadow:
-          0 20px 44px rgba(var(--vigilance-rgb), 0.44),
-          0 0 0 9px rgba(var(--vigilance-rgb), 0.10),
-          inset 0 1px 0 rgba(255,255,255,0.42);
-      }
-    }
-
-    @keyframes vigilanceAlert {
-      0%, 100% {
-        transform: translate3d(0, 0, 0) scale(1);
-        box-shadow:
-          0 16px 34px rgba(var(--vigilance-rgb), 0.36),
-          inset 0 1px 0 rgba(255,255,255,0.34);
-      }
-      42% {
-        transform: translate3d(0, -1px, 0) scale(1.075);
-        box-shadow:
-          0 22px 48px rgba(var(--vigilance-rgb), 0.54),
-          0 0 0 12px rgba(var(--vigilance-rgb), 0.14),
-          inset 0 1px 0 rgba(255,255,255,0.46);
-      }
-      54% {
-        transform: translate3d(0, 0, 0) scale(1.02);
-      }
-    }
-
-    @keyframes vigilanceFlash {
-      0%, 82%, 100% { opacity: 0.56; }
-      86% { opacity: 0.88; }
-      89% { opacity: 0.58; }
-      92% { opacity: 0.78; }
-    }
-
     @keyframes cardReveal {
       to { opacity: 1; transform: translate3d(0, 0, 0); }
     }
@@ -1453,51 +1269,25 @@
         </div>
       </article>
 
-      <article class="glass-card vigilance-card" id="vigilanceCard" data-vigilance-level="green" style="--delay: 180ms">
-        <div class="card-header" style="padding:0">
+      <article class="glass-card vigilance-widget-card" style="--delay: 180ms">
+        <div class="card-header">
           <p class="eyebrow">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 3 3.7 18.4a1.7 1.7 0 0 0 1.5 2.6h13.6a1.7 1.7 0 0 0 1.5-2.6L12 3Z"></path>
               <path d="M12 8v5"></path>
               <path d="M12 17h.01"></path>
             </svg>
-            Vigilance Aube
+            Vigilance Météo-France
           </p>
-          <span class="updated" id="vigilanceBadge">Vert</span>
         </div>
-        <div class="vigilance-content">
-          <div class="vigilance-orb" aria-hidden="true"></div>
-          <div>
-            <h3 class="vigilance-title" id="vigilanceTitle">Vigilance verte</h3>
-            <p class="vigilance-text" id="vigilanceText">Aucun phénomène dangereux particulier n'est signalé pour cette zone.</p>
-          </div>
-        </div>
-        <div class="vigilance-meta" aria-label="Détails de vigilance">
-          <div class="vigilance-meta-item">
-            <p class="vigilance-meta-label">Phénomène</p>
-            <p class="vigilance-meta-value" id="vigilancePhenomenon">Aucun phénomène significatif</p>
-          </div>
-          <div class="vigilance-meta-item">
-            <p class="vigilance-meta-label">Mise à jour</p>
-            <p class="vigilance-meta-value" id="vigilanceUpdatedAt">Source en attente</p>
-          </div>
-          <div class="vigilance-meta-item">
-            <p class="vigilance-meta-label">Début</p>
-            <p class="vigilance-meta-value" id="vigilanceStart">Non actif</p>
-          </div>
-          <div class="vigilance-meta-item">
-            <p class="vigilance-meta-label">Fin</p>
-            <p class="vigilance-meta-value" id="vigilanceEnd">Non actif</p>
-          </div>
-        </div>
-        <div class="vigilance-official" aria-live="polite">
-          <p id="vigilanceOfficialText">Surveillance Meteoalarm dédiée au département de l'Aube pour Brienne-le-Château.</p>
-        </div>
-        <div class="vigilance-scale" aria-label="Échelle de vigilance">
-          <span class="scale-item scale-green active" data-vigilance-step="green"></span>
-          <span class="scale-item scale-yellow" data-vigilance-step="yellow"></span>
-          <span class="scale-item scale-orange" data-vigilance-step="orange"></span>
-          <span class="scale-item scale-red" data-vigilance-step="red"></span>
+        <div class="vigilance-widget-frame">
+          <iframe
+            src="https://vigilance.meteofrance.fr/fr/widget-vigilance/vigilance-departement/10"
+            width="302"
+            height="122"
+            frameborder="0"
+            title="Vigilance Météo-France pour l'Aube">
+          </iframe>
         </div>
       </article>
 
@@ -1545,51 +1335,6 @@
       city: "Brienne-le-Château"
     };
 
-    const ALERT_CONFIG = {
-      department: "10",
-      departmentName: "Aube",
-      locationName: "Centre équestre de Brienne-le-Château",
-      sourceName: "Meteoalarm",
-      relayUrl: "",
-      sameOriginRelays: ["/api/vigilance?department=10", "/api/alerts?department=10"],
-      meteoalarmUrls: [
-        "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-france",
-        "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-cap-france",
-        "https://feeds.meteoalarm.org/api/v1/warnings/feeds-france"
-      ]
-    };
-
-    const VIGILANCE_LEVELS = {
-      green: {
-        label: "Vert",
-        title: "Vigilance verte",
-        text: "Aucun phénomène dangereux particulier n'est signalé pour cette zone.",
-        rgb: "49, 170, 53",
-        color: "#31aa35"
-      },
-      yellow: {
-        label: "Jaune",
-        title: "Vigilance jaune",
-        text: "Soyez attentif si vous pratiquez des activités sensibles aux conditions météo.",
-        rgb: "255, 240, 0",
-        color: "#fff000"
-      },
-      orange: {
-        label: "Orange",
-        title: "Vigilance orange",
-        text: "Des phénomènes dangereux sont possibles. Suivez les recommandations officielles.",
-        rgb: "241, 142, 0",
-        color: "#f18e00"
-      },
-      red: {
-        label: "Rouge",
-        title: "Vigilance rouge",
-        text: "Situation météo très dangereuse. Restez informé et appliquez les consignes de sécurité.",
-        rgb: "225, 0, 15",
-        color: "#e1000f"
-      }
-    };
-
     const WEATHER_LABELS = new Map([
       [0, "Ciel dégagé"],
       [1, "Principalement clair"],
@@ -1627,9 +1372,6 @@
       cacheElements();
       initializeAnimations();
       initializeInteractions();
-      initializeAlertBridge();
-      renderAlert(buildDefaultAlert());
-      loadAlerts();
       loadWeather();
     });
 
@@ -1639,9 +1381,7 @@
         "localTime", "coordinates", "dayStatus", "updatedAt", "windSpeed",
         "windGust", "rainChance", "rainAmount",
         "dailyForecast", "hourlyForecast", "errorBox", "cloudField", "rainField",
-        "snowField", "starField", "backButton", "vigilanceCard", "vigilanceBadge",
-        "vigilanceTitle", "vigilanceText", "vigilancePhenomenon", "vigilanceUpdatedAt",
-        "vigilanceStart", "vigilanceEnd", "vigilanceOfficialText"
+        "snowField", "starField", "backButton"
       ];
 
       ids.forEach((id) => {
@@ -1870,359 +1610,6 @@
       return "sun";
     }
 
-    function initializeAlertBridge() {
-      window.injectOfficialAlert = (officialAlert) => {
-        const normalized = normalizeAlert(officialAlert);
-        renderAlert(normalized);
-        return normalized;
-      };
-    }
-
-    async function loadAlerts() {
-      renderAlert(Object.assign(buildDefaultAlert(), {
-        updatedAt: "Synchronisation " + ALERT_CONFIG.sourceName,
-        officialText: "Recherche des alertes Meteoalarm actives pour le département 10 · Aube."
-      }));
-
-      try {
-        const response = await fetchFirstAvailableAlertSource();
-        const alerts = parseAlerts(response.body, response.contentType, response.source);
-        const selectedAlert = selectMostSevereAlert(alerts) || buildDefaultAlert({
-          updatedAt: "Aucune alerte active",
-          officialText: "Aucune alerte Meteoalarm active ne concerne actuellement le département 10 · Aube."
-        });
-
-        renderAlert(selectedAlert);
-      } catch (error) {
-        console.info("Alertes Meteoalarm indisponibles :", error.message);
-        renderAlert(buildDefaultAlert({
-          updatedAt: ALERT_CONFIG.sourceName + " indisponible",
-          officialText: "Les alertes Meteoalarm n'ont pas pu être chargées. La carte reste limitée au département 10 · Aube et prête à recevoir une source officielle compatible."
-        }));
-      }
-    }
-
-    async function fetchFirstAvailableAlertSource() {
-      let lastError = null;
-
-      for (const source of ALERT_CONFIG.sources) {
-        try {
-          const response = await fetch(source.url, {
-            method: "GET",
-            headers: {
-              "Accept": "application/atom+xml, application/rss+xml, application/xml, text/xml, application/json"
-            }
-          });
-
-          if (!response.ok) {
-            throw new Error("Réponse " + response.status + " pour " + source.name);
-          }
-
-          return {
-            body: await response.text(),
-            contentType: response.headers.get("content-type") || "",
-            source
-          };
-        } catch (error) {
-          lastError = error;
-        }
-      }
-
-      throw lastError || new Error("Aucune source Meteoalarm disponible.");
-    }
-
-    function parseAlerts(rawPayload, contentType, source) {
-      if (!rawPayload) return [];
-
-      const payload = rawPayload.trim();
-      const isJson = contentType.includes("json") || payload.startsWith("{") || payload.startsWith("[");
-      const parsedAlerts = isJson ? parseJsonAlerts(payload) : parseXmlAlerts(payload);
-
-      return parsedAlerts
-        .map((alert) => normalizeAlert(Object.assign({ sourceStatus: source ? source.name : ALERT_CONFIG.sourceName }, alert)))
-        .filter(isAlertForAube)
-        .filter(isAlertCurrentlyRelevant)
-        .sort((a, b) => getAlertSeverityRank(b.level) - getAlertSeverityRank(a.level));
-    }
-
-    function parseJsonAlerts(payload) {
-      const data = JSON.parse(payload);
-      const list = Array.isArray(data)
-        ? data
-        : data.features || data.alerts || data.items || data.warnings || data.events || [];
-
-      if (!Array.isArray(list) || list.length === 0) {
-        const looksLikeSingleAlert = data.level || data.niveau || data.severity || data.phenomenon || data.phenomene || data.bulletin || data.officialText;
-        return looksLikeSingleAlert ? [data] : [];
-      }
-
-      return list.map((item) => {
-        const properties = item.properties || item;
-        return {
-          level: properties.level || properties.severity || properties.awareness_level || properties.awarenessLevel || properties.color,
-          department: extractDepartmentCode(properties),
-          departmentName: properties.departmentName || properties.areaDesc || properties.area || properties.region || "",
-          phenomenon: properties.event || properties.awareness_type || properties.awarenessType || properties.type || properties.headline,
-          startsAt: properties.effective || properties.onset || properties.start || properties.startsAt,
-          endsAt: properties.expires || properties.end || properties.endsAt,
-          updatedAt: properties.sent || properties.updated || properties.published || properties.updateTime,
-          officialText: properties.description || properties.instruction || properties.summary || properties.headline || "",
-          sourceStatus: ALERT_CONFIG.sourceName
-        };
-      });
-    }
-
-    function parseXmlAlerts(payload) {
-      const xml = new DOMParser().parseFromString(payload, "application/xml");
-
-      if (xml.querySelector("parsererror")) {
-        throw new Error("Format Meteoalarm XML illisible.");
-      }
-
-      const capAlerts = getXmlElements(xml, "alert");
-      if (capAlerts.length > 0) {
-        return capAlerts.map(parseCapAlertNode);
-      }
-
-      const atomEntries = Array.from(xml.querySelectorAll("entry, item"));
-      return atomEntries.map(parseFeedAlertNode);
-    }
-
-    function parseCapAlertNode(node) {
-      const info = getXmlElements(node, "info")[0] || node;
-      const area = getXmlElements(info, "area")[0] || info;
-      const areaText = getXmlText(area, "areaDesc") + " " + getXmlElements(area, "geocode").map((geocode) => {
-        return getXmlText(geocode, "valueName") + " " + getXmlText(geocode, "value");
-      }).join(" ");
-
-      return {
-        level: getXmlText(info, "severity") || getXmlText(info, "awareness_level") || getXmlText(info, "awareness-level"),
-        department: extractDepartmentCode({ areaDesc: areaText }),
-        departmentName: getXmlText(area, "areaDesc"),
-        phenomenon: getXmlText(info, "event") || getXmlText(info, "headline"),
-        startsAt: getXmlText(info, "onset") || getXmlText(info, "effective"),
-        endsAt: getXmlText(info, "expires"),
-        updatedAt: getXmlText(node, "sent") || getXmlText(info, "effective"),
-        officialText: getXmlText(info, "description") || getXmlText(info, "instruction") || getXmlText(info, "headline"),
-        sourceStatus: ALERT_CONFIG.sourceName
-      };
-    }
-
-    function parseFeedAlertNode(node) {
-      const text = normalizeSpaces(node.textContent || "");
-      const title = getXmlText(node, "title");
-      const summary = getXmlText(node, "summary") || getXmlText(node, "description") || getXmlText(node, "content");
-      const combined = [title, summary, text].join(" ");
-
-      return {
-        level: detectVigilanceLevel(combined),
-        department: extractDepartmentCode({ areaDesc: combined }),
-        departmentName: detectDepartmentName(combined),
-        phenomenon: extractPhenomenon(combined),
-        startsAt: extractDateAfterLabel(combined, ["début", "onset", "effective", "from", "du"]),
-        endsAt: extractDateAfterLabel(combined, ["fin", "expires", "until", "jusqu", "au"]),
-        updatedAt: getXmlText(node, "updated") || getXmlText(node, "published") || extractDateAfterLabel(combined, ["mise à jour", "updated", "published"]),
-        officialText: cleanText(summary || title || text),
-        sourceStatus: ALERT_CONFIG.sourceName
-      };
-    }
-
-    function normalizeAlert(rawAlert) {
-      const data = rawAlert || {};
-      const level = detectVigilanceLevel(data.level || data.niveau || data.color || data.couleur || data.severity || data.officialText || data.bulletin);
-      const base = VIGILANCE_LEVELS[level];
-      const department = String(data.department || data.departement || extractDepartmentCode(data) || ALERT_CONFIG.department).padStart(2, "0");
-      const departmentName = cleanText(data.departmentName || data.nomDepartement || data.nomDuDepartement || detectDepartmentName(data.officialText || data.bulletin || "")) || ALERT_CONFIG.departmentName;
-      const phenomenon = cleanText(data.phenomenon || data.phenomene || data.event || data.type || data.risque) || defaultPhenomenon(level);
-      const officialText = cleanText(data.officialText || data.bulletin || data.texteOfficiel || data.description || data.text) || base.text;
-      const rawStartsAt = data.startsAt || data.debut || data.start || data.onset || data.effective || "";
-      const rawEndsAt = data.endsAt || data.fin || data.end || data.expires || "";
-      const rawUpdatedAt = data.updatedAt || data.dateMiseAJour || data.miseAJour || data.sent || data.updated || "";
-
-      return {
-        level,
-        niveau: level,
-        department,
-        departement: department,
-        departmentName,
-        nomDepartement: departmentName,
-        phenomenon,
-        phenomene: phenomenon,
-        startsAt: formatVigilanceDate(rawStartsAt) || (level === "green" ? "Non actif" : "Selon bulletin officiel"),
-        debut: formatVigilanceDate(rawStartsAt) || (level === "green" ? "Non actif" : "Selon bulletin officiel"),
-        endsAt: formatVigilanceDate(rawEndsAt) || (level === "green" ? "Non actif" : "Selon bulletin officiel"),
-        fin: formatVigilanceDate(rawEndsAt) || (level === "green" ? "Non actif" : "Selon bulletin officiel"),
-        updatedAt: formatVigilanceDate(rawUpdatedAt) || ALERT_CONFIG.sourceName,
-        dateMiseAJour: formatVigilanceDate(rawUpdatedAt) || ALERT_CONFIG.sourceName,
-        officialText,
-        bulletinOfficiel: officialText,
-        rawStartsAt,
-        rawEndsAt,
-        rawUpdatedAt,
-        title: data.title || base.title,
-        text: base.text,
-        sourceStatus: data.sourceStatus || ALERT_CONFIG.sourceName
-      };
-    }
-
-    function buildDefaultAlert(overrides) {
-      return normalizeAlert(Object.assign({
-        level: "green",
-        department: ALERT_CONFIG.department,
-        departmentName: ALERT_CONFIG.departmentName,
-        phenomenon: "Aucun phénomène significatif",
-        startsAt: "Non actif",
-        endsAt: "Non actif",
-        updatedAt: ALERT_CONFIG.sourceName,
-        officialText: "Aucune alerte active Meteoalarm ne concerne le département 10 · Aube pour le centre équestre de Brienne-le-Château.",
-        sourceStatus: "Aube · dép. 10"
-      }, overrides || {}));
-    }
-
-    function isAlertForAube(alert) {
-      const searchable = normalizeSpaces([
-        alert.department,
-        alert.departement,
-        alert.departmentName,
-        alert.nomDepartement,
-        alert.officialText,
-        alert.bulletinOfficiel
-      ].join(" ")).toLowerCase();
-
-      return alert.department === ALERT_CONFIG.department ||
-        alert.departement === ALERT_CONFIG.department ||
-        searchable.includes("aube") ||
-        searchable.includes("fr010") ||
-        searchable.includes("fr-10") ||
-        /\bdept(?:\.|artement)?\s*10\b/i.test(searchable) ||
-        /\bd[ée]partement\s*10\b/i.test(searchable);
-    }
-
-    function isAlertCurrentlyRelevant(alert) {
-      const now = Date.now();
-      const endTime = parseAlertDate(alert.rawEndsAt || alert.endsAt || alert.fin);
-
-      if (endTime && endTime < now) return false;
-      return true;
-    }
-
-    function selectMostSevereAlert(alerts) {
-      if (!Array.isArray(alerts) || alerts.length === 0) return null;
-      return alerts[0];
-    }
-
-    function getAlertSeverityRank(level) {
-      return { green: 0, yellow: 1, orange: 2, red: 3 }[level] || 0;
-    }
-
-    function parseAlertDate(value) {
-      if (!value || value === "Non actif" || value === "Selon bulletin officiel") return null;
-      if (value instanceof Date) return value.getTime();
-
-      const text = cleanText(String(value));
-      const parsed = Date.parse(text);
-
-      if (!Number.isNaN(parsed)) return parsed;
-      return null;
-    }
-
-    function extractDepartmentCode(source) {
-      const value = typeof source === "string" ? source : Object.values(source || {}).join(" ");
-      const text = normalizeSpaces(value);
-      const direct = String(source && (source.department || source.departement || source.areaCode || source.geocode || "") || "");
-      const match = (direct + " " + text).match(/\b(?:FR[-\s]?0?10|0?10|Aube)\b/i);
-
-      if (match && /aube|10/i.test(match[0])) return ALERT_CONFIG.department;
-      return "";
-    }
-
-    function detectDepartmentName(value) {
-      return normalizeSpaces(value).toLowerCase().includes("aube") ? ALERT_CONFIG.departmentName : "";
-    }
-
-    function getXmlText(parent, tagName) {
-      if (!parent) return "";
-      const direct = getXmlElements(parent, tagName)[0];
-      return direct ? cleanText(direct.textContent || "") : "";
-    }
-
-    function getXmlElements(parent, tagName) {
-      return Array.from(parent.getElementsByTagName("*")).filter((node) => {
-        return node.localName === tagName || node.nodeName === tagName;
-      });
-    }
-
-    function detectVigilanceLevel(value) {
-      const text = normalizeSpaces(String(value || "")).toLowerCase();
-
-      if (/(rouge|red|extreme|niveau\s*4|#e1000f)/i.test(text)) return "red";
-      if (/(orange|severe|niveau\s*3|#f18e00)/i.test(text)) return "orange";
-      if (/(jaune|yellow|moderate|minor|niveau\s*2|#fff000)/i.test(text)) return "yellow";
-      if (/(vert|verte|green|none|niveau\s*1|#31aa35)/i.test(text)) return "green";
-
-      return "green";
-    }
-
-    function extractPhenomenon(text) {
-      const cleaned = normalizeSpaces(text);
-      const known = [
-        "vent violent", "orages", "pluie-inondation", "inondation", "crues",
-        "neige-verglas", "canicule", "grand froid", "avalanches", "vagues-submersion"
-      ];
-
-      const found = known.find((item) => cleaned.toLowerCase().includes(item));
-      return found ? capitalizeWords(found) : "";
-    }
-
-    function extractDateAfterLabel(text, labels) {
-      const cleaned = normalizeSpaces(text);
-      const labelPattern = labels.join("|");
-      const match = cleaned.match(new RegExp("(?:" + labelPattern + ")[^0-9]*(\\d{1,2}[:h]\\d{2}|\\d{1,2}\\s+[a-zéû]+\\s+\\d{2,4}(?:\\s+à\\s+\\d{1,2}[:h]\\d{2})?)", "i"));
-      return match ? match[1] : "";
-    }
-
-    function formatVigilanceDate(value) {
-      if (!value) return "";
-      if (value instanceof Date) return formatDateTime(value);
-
-      const text = cleanText(String(value));
-      const parsed = Date.parse(text);
-
-      if (!Number.isNaN(parsed) && /[0-9]{4}-[0-9]{2}-[0-9]{2}|T/.test(text)) {
-        return formatDateTime(new Date(parsed));
-      }
-
-      return text;
-    }
-
-    function defaultPhenomenon(level) {
-      if (level === "green") return "Aucun phénomène significatif";
-      return "Phénomène météorologique surveillé";
-    }
-
-    function renderAlert(alert) {
-      const normalized = normalizeAlert(alert);
-      const key = VIGILANCE_LEVELS[normalized.level] ? normalized.level : "green";
-      const base = VIGILANCE_LEVELS[key];
-      const data = Object.assign({}, base, normalized);
-
-      document.documentElement.style.setProperty("--vigilance", data.color);
-      document.documentElement.style.setProperty("--vigilance-rgb", data.rgb);
-      elements.vigilanceCard.dataset.vigilanceLevel = key;
-      elements.vigilanceBadge.textContent = data.label;
-      elements.vigilanceTitle.textContent = data.title;
-      elements.vigilanceText.textContent = data.text;
-      elements.vigilancePhenomenon.textContent = data.phenomenon || defaultPhenomenon(key);
-      elements.vigilanceUpdatedAt.textContent = data.updatedAt || ALERT_CONFIG.sourceName;
-      elements.vigilanceStart.textContent = data.startsAt || "Selon bulletin officiel";
-      elements.vigilanceEnd.textContent = data.endsAt || "Selon bulletin officiel";
-      elements.vigilanceOfficialText.textContent = data.officialText || data.text;
-
-      document.querySelectorAll("[data-vigilance-step]").forEach((item) => {
-        item.classList.toggle("active", item.dataset.vigilanceStep === key);
-      });
-    }
-
     function renderDailyForecast(daily) {
       elements.dailyForecast.innerHTML = "";
 
@@ -2425,30 +1812,6 @@
         day: "2-digit",
         month: "short"
       }).format(new Date(value)).replace(".", "");
-    }
-
-    function formatDateTime(value) {
-      return new Intl.DateTimeFormat("fr-FR", {
-        timeZone: WEATHER_CONFIG.timezone,
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit"
-      }).format(value).replace(".", "");
-    }
-
-    function cleanText(value) {
-      return normalizeSpaces(value).replace(/\s+([,.])/g, "$1").trim();
-    }
-
-    function normalizeSpaces(value) {
-      return String(value || "").replace(/\s+/g, " ").trim();
-    }
-
-    function capitalizeWords(value) {
-      return normalizeSpaces(value).replace(/(^|\s|-)([a-zàâäéèêëîïôöùûüç])/g, (match, prefix, letter) => {
-        return prefix + letter.toUpperCase();
-      });
     }
 
     function updateMetaTheme(ambiance) {
