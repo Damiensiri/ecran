@@ -257,11 +257,25 @@ header{
   align-items:center;
   justify-content:center;
   transform:translateX(-50%);
-  border-bottom:1px solid rgba(255,255,255,.12);
-  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.09));
-  box-shadow:0 10px 32px rgba(26,70,120,.10);
-  backdrop-filter:blur(22px) saturate(1.28);
-  -webkit-backdrop-filter:blur(22px) saturate(1.28);
+  border-bottom:1px solid rgba(255,255,255,.045);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,255,255,.18),transparent 58%),
+    linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.025) 78%,transparent);
+  box-shadow:0 12px 36px rgba(26,70,120,.045);
+  backdrop-filter:blur(16px) saturate(1.12);
+  -webkit-backdrop-filter:blur(16px) saturate(1.12);
+}
+
+header::after{
+  content:"";
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:0;
+  height:1px;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+  opacity:.45;
 }
 
 .header-left{
@@ -361,18 +375,47 @@ header h1{
   max-width:calc(100% - 36px);
   min-height:30px;
   margin:0 auto 12px;
-  padding:7px 14px;
-  border:1px solid rgba(255,255,255,.16);
+  padding:8px 16px;
+  border:1px solid rgba(255,255,255,.30);
   border-radius:999px;
-  background:rgba(255,255,255,.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
-  color:var(--text-main);
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.30),rgba(255,255,255,.14));
+  box-shadow:0 12px 28px rgba(10,35,70,.16),inset 0 1px 0 rgba(255,255,255,.22);
+  color:#ffffff;
   font-size:12px;
   font-weight:700;
   text-align:center;
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+  text-shadow:0 1px 10px rgba(0,0,0,.20);
+  backdrop-filter:blur(18px) saturate(1.18);
+  -webkit-backdrop-filter:blur(18px) saturate(1.18);
   animation:contentReveal .75s .08s cubic-bezier(.2,.85,.24,1) both;
+}
+
+#opening-status[style*="#2e7d32"]{
+  border-color:rgba(185,255,212,.58);
+  color:#f8fff9 !important;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.30),transparent 42%),
+    linear-gradient(145deg,rgba(34,156,92,.94),rgba(21,113,70,.82));
+  box-shadow:0 14px 30px rgba(14,92,55,.28),inset 0 1px 0 rgba(255,255,255,.26);
+}
+
+#opening-status[style*="#c0392b"]{
+  border-color:rgba(255,205,198,.60);
+  color:#fffafa !important;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.28),transparent 42%),
+    linear-gradient(145deg,rgba(213,64,54,.95),rgba(157,34,43,.84));
+  box-shadow:0 14px 30px rgba(132,28,36,.27),inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+#opening-status[style*="#E88B00"]{
+  border-color:rgba(255,230,179,.66);
+  color:#fffdf8 !important;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.32),transparent 42%),
+    linear-gradient(145deg,rgba(237,151,35,.96),rgba(190,95,22,.86));
+  box-shadow:0 14px 30px rgba(154,83,18,.25),inset 0 1px 0 rgba(255,255,255,.25);
 }
 
 #alert-box{
@@ -469,11 +512,14 @@ header h1{
 .card img{
   position:relative;
   z-index:1;
-  width:38px;
-  height:38px;
-  margin-bottom:8px;
+  width:40px;
+  height:40px;
+  margin-bottom:9px;
   object-fit:contain;
-  filter:drop-shadow(0 9px 15px rgba(16,48,90,.18));
+  opacity:.98;
+  filter:
+    drop-shadow(0 2px 0 rgba(255,255,255,.18))
+    drop-shadow(0 10px 17px rgba(12,42,82,.24));
 }
 
 .card div{
@@ -533,10 +579,13 @@ header h1{
 }
 
 .list-btn img{
-  width:25px;
-  height:25px;
+  width:27px;
+  height:27px;
   object-fit:contain;
-  filter:drop-shadow(0 8px 14px rgba(16,48,90,.16));
+  opacity:.98;
+  filter:
+    drop-shadow(0 2px 0 rgba(255,255,255,.16))
+    drop-shadow(0 9px 15px rgba(12,42,82,.22));
 }
 
 @keyframes ambientBreath{
@@ -884,6 +933,14 @@ setInterval(updateBell,60000);
   const longitude=4.527;
   const timeZone="Europe/Paris";
   const radians=Math.PI/180;
+  const themeColors={
+    night:"#071328",
+    dawn:"#26385d",
+    morning:"#72caff",
+    day:"#5fc6ff",
+    golden:"#d58b65",
+    dusk:"#26375f"
+  };
 
   function localClock(date){
     const parts={};
@@ -915,15 +972,34 @@ setInterval(updateBell,60000);
   }
 
   function solarTimes(clock){
-    const declination=-23.44*Math.cos((2*Math.PI*(clock.dayOfYear+10))/365);
-    const hourAngle=Math.acos(-Math.tan(latitude*radians)*Math.tan(declination*radians))/radians;
-    const dayLength=(2*hourAngle)/15;
-    const solarNoon=12+clock.offsetHours-(longitude/15);
+    const gamma=(2*Math.PI/365)*(clock.dayOfYear-1);
+    const equationOfTime=229.18*(
+      .000075+
+      .001868*Math.cos(gamma)-
+      .032077*Math.sin(gamma)-
+      .014615*Math.cos(2*gamma)-
+      .040849*Math.sin(2*gamma)
+    );
+    const declination=
+      .006918-
+      .399912*Math.cos(gamma)+
+      .070257*Math.sin(gamma)-
+      .006758*Math.cos(2*gamma)+
+      .000907*Math.sin(2*gamma)-
+      .002697*Math.cos(3*gamma)+
+      .00148*Math.sin(3*gamma);
+    const zenith=90.833*radians;
+    const hourAngle=Math.acos(
+      (Math.cos(zenith)/(Math.cos(latitude*radians)*Math.cos(declination)))-
+      Math.tan(latitude*radians)*Math.tan(declination)
+    );
+    const solarNoon=720-4*longitude-equationOfTime+clock.offsetHours*60;
+    const daylightMinutes=(hourAngle/radians)*8;
 
     return{
-      sunrise:(solarNoon-dayLength/2)*60,
-      noon:solarNoon*60,
-      sunset:(solarNoon+dayLength/2)*60
+      sunrise:solarNoon-daylightMinutes/2,
+      noon:solarNoon,
+      sunset:solarNoon+daylightMinutes/2
     };
   }
 
@@ -948,6 +1024,9 @@ setInterval(updateBell,60000);
     document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
     document.body.dataset.sunrise=Math.round(times.sunrise);
     document.body.dataset.sunset=Math.round(times.sunset);
+
+    const themeMeta=document.querySelector('meta[name="theme-color"]');
+    if(themeMeta)themeMeta.setAttribute("content",themeColors[phase]||themeColors.day);
   }
 
   updateAmbiance();
