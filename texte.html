@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éditeur HTML</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f4f4;
+  padding:20px;
+}
+
+h1{
+  text-align:center;
+}
+
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+button{
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  background:#1c1f26;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.editor{
+  min-height:220px;
+  background:white;
+  border-radius:14px;
+  padding:15px;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+  outline:none;
+}
+
+.output{
+  margin-top:20px;
+}
+
+textarea{
+  width:100%;
+  min-height:220px;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+  font-family:monospace;
+  font-size:14px;
+  resize:vertical;
+}
+
+.copy{
+  margin-top:10px;
+  background:#2e7d32;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Éditeur de texte HTML</h1>
+
+<div class="toolbar">
+  <button onclick="format('bold')">Gras</button>
+  <button onclick="format('italic')">Italique</button>
+  <button onclick="format('underline')">Souligné</button>
+  <button onclick="format('insertUnorderedList')">Liste</button>
+  <button onclick="format('formatBlock','h2')">Titre</button>
+  <button onclick="format('formatBlock','p')">Texte normal</button>
+  <button onclick="addLink()">Lien</button>
+  <button onclick="clearEditor()">Effacer</button>
+</div>
+
+<div id="editor" class="editor" contenteditable="true" oninput="updateHTML()">
+  Écris ton texte ici...
+</div>
+
+<div class="output">
+  <h2>Code HTML prêt à copier</h2>
+  <textarea id="htmlOutput" readonly></textarea>
+  <button class="copy" onclick="copyHTML()">Copier le HTML</button>
+</div>
+
+<script>
+const editor = document.getElementById("editor");
+const htmlOutput = document.getElementById("htmlOutput");
+
+function format(command, value = null){
+  document.execCommand(command, false, value);
+  editor.focus();
+  updateHTML();
+}
+
+function addLink(){
+  const url = prompt("Adresse du lien :");
+  if(url){
+    document.execCommand("createLink", false, url);
+    updateHTML();
+  }
+}
+
+function updateHTML(){
+  htmlOutput.value = editor.innerHTML.trim();
+}
+
+function copyHTML(){
+  htmlOutput.select();
+  document.execCommand("copy");
+  alert("HTML copié !");
+}
+
+function clearEditor(){
+  if(confirm("Effacer le contenu ?")){
+    editor.innerHTML = "";
+    updateHTML();
+  }
+}
+
+updateHTML();
+</script>
+
+</body>
+</html>
