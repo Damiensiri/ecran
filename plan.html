@@ -545,12 +545,14 @@ left:50%;
 width:min(100%,520px);
 height:min(56%,540px);
 padding:0;
-color:var(--text-main);
-background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(255,255,255,.15));
-border:1px solid rgba(255,255,255,.28);
+color:rgba(255,255,255,.94);
+background:
+linear-gradient(160deg,rgba(29,64,92,.86),rgba(39,93,126,.74)),
+radial-gradient(circle at 46% 0%,rgba(255,255,255,.18),transparent 42%);
+border:1px solid rgba(255,255,255,.34);
 border-bottom:0;
 border-radius:34px 34px 0 0;
-box-shadow:0 -24px 70px rgba(8,31,62,.28),inset 0 1px 0 rgba(255,255,255,.28);
+box-shadow:0 -24px 70px rgba(8,31,62,.34),inset 0 1px 0 rgba(255,255,255,.30);
 backdrop-filter:blur(30px) saturate(160%);
 -webkit-backdrop-filter:blur(30px) saturate(160%);
 transform:translate(-50%,110%);
@@ -580,19 +582,20 @@ border-radius:34px 34px 0 0;
 }
 
 #panelHeader{margin-bottom:4px;}
-#panelTitle{color:var(--text-strong);letter-spacing:.02em;}
-#closePanel{color:var(--text-soft);padding:8px;line-height:1;}
+#panelTitle{color:rgba(255,255,255,.98);letter-spacing:.02em;text-shadow:0 2px 16px rgba(0,0,0,.26);}
+#closePanel{color:rgba(255,255,255,.88);padding:8px;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.22);}
 
 .row{
 margin-top:10px;
 padding:12px 14px;
 border:1px solid rgba(255,255,255,.16);
 border-radius:18px;
-background:rgba(255,255,255,.10);
+background:rgba(255,255,255,.14);
+box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
 }
 
-.label{color:var(--text-soft);letter-spacing:.08em;text-transform:uppercase;}
-.value,#horaire,#info{color:var(--text-main);}
+.label{color:rgba(255,255,255,.70);letter-spacing:.08em;text-transform:uppercase;}
+.value,#horaire,#info{color:rgba(255,255,255,.92);text-shadow:0 1px 10px rgba(0,0,0,.16);}
 #statut{font-size:17px;}
 #statut,.optionText span{
 text-shadow:0 1px 10px rgba(0,0,0,.20);
@@ -631,7 +634,7 @@ header h1{color:var(--text-strong);}
 #backBtn,#panelIcon{background:rgba(255,255,255,.18);}
 #panel{background:linear-gradient(160deg,rgba(22,40,65,.76),rgba(13,29,51,.64));}
 .label{color:var(--text-soft);}
-.value{color:var(--text-main);}
+.value,#horaire,#info{color:var(--text-main);}
 #map{filter:brightness(.96) contrast(.98);}
 .plan-btn{background:rgba(255,255,255,.68);}
 #reserveBox{background:linear-gradient(135deg,#f4a329,#c96d00);}
