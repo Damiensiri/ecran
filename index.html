@@ -96,9 +96,9 @@ cancelButton:"Plus tard"
   --glass-line:rgba(255,255,255,.25);
   --shadow-card:0 22px 60px rgba(10,35,70,.22);
   --shadow-soft:0 12px 32px rgba(10,35,70,.16);
-  --sky-top:#5fc6ff;
-  --sky-mid:#6ab9ff;
-  --sky-bottom:#d9f6ff;
+  --sky-top:#287fbd;
+  --sky-mid:#3f9fdd;
+  --sky-bottom:#8dcced;
   --solar-x:50%;
   --solar-y:20%;
   --solar-opacity:.42;
@@ -116,7 +116,7 @@ cancelButton:"Plus tard"
 html{
   width:100%;
   min-height:100%;
-  background:#67baff;
+  background:#2f8fce;
 }
 
 body{
@@ -139,51 +139,51 @@ body{
 }
 
 body[data-day-phase="night"]{
-  --sky-top:#071328;
-  --sky-mid:#132b52;
-  --sky-bottom:#315a83;
-  --celestial-glow:rgba(176,207,255,.28);
-  --solar-opacity:.28;
+  --sky-top:#061225;
+  --sky-mid:#102848;
+  --sky-bottom:#244d75;
+  --celestial-glow:rgba(176,207,255,.26);
+  --solar-opacity:.26;
 }
 
 body[data-day-phase="dawn"]{
-  --sky-top:#26385d;
-  --sky-mid:#92708d;
-  --sky-bottom:#f3ae83;
-  --celestial-glow:rgba(255,211,164,.42);
-  --solar-opacity:.40;
+  --sky-top:#1f3155;
+  --sky-mid:#705f84;
+  --sky-bottom:#c88a70;
+  --celestial-glow:rgba(255,211,164,.36);
+  --solar-opacity:.34;
 }
 
 body[data-day-phase="morning"]{
-  --sky-top:#72caff;
-  --sky-mid:#8fd4ff;
-  --sky-bottom:#e4f7ff;
-  --celestial-glow:rgba(255,239,174,.46);
-  --solar-opacity:.46;
+  --sky-top:#2c86c5;
+  --sky-mid:#45a6e4;
+  --sky-bottom:#9bd5f0;
+  --celestial-glow:rgba(255,239,174,.36);
+  --solar-opacity:.38;
 }
 
 body[data-day-phase="day"]{
-  --sky-top:#5fc6ff;
-  --sky-mid:#6ab9ff;
-  --sky-bottom:#d9f6ff;
-  --celestial-glow:rgba(255,241,184,.48);
-  --solar-opacity:.48;
+  --sky-top:#287fbd;
+  --sky-mid:#3f9fdd;
+  --sky-bottom:#8dcced;
+  --celestial-glow:rgba(255,241,184,.36);
+  --solar-opacity:.40;
 }
 
 body[data-day-phase="golden"]{
-  --sky-top:#4f9ed9;
-  --sky-mid:#e79975;
-  --sky-bottom:#ffd5a3;
-  --celestial-glow:rgba(255,210,133,.52);
-  --solar-opacity:.52;
+  --sky-top:#346f9e;
+  --sky-mid:#be7d66;
+  --sky-bottom:#e8b681;
+  --celestial-glow:rgba(255,210,133,.44);
+  --solar-opacity:.44;
 }
 
 body[data-day-phase="dusk"]{
-  --sky-top:#26375f;
-  --sky-mid:#775f87;
-  --sky-bottom:#d98e7c;
-  --celestial-glow:rgba(255,190,153,.34);
-  --solar-opacity:.34;
+  --sky-top:#1f3155;
+  --sky-mid:#5f547b;
+  --sky-bottom:#b77670;
+  --celestial-glow:rgba(255,190,153,.30);
+  --solar-opacity:.30;
 }
 
 body::before{
@@ -193,9 +193,9 @@ body::before{
   z-index:0;
   pointer-events:none;
   background:
-    radial-gradient(circle at 22% 12%,rgba(255,225,151,.36),transparent 32%),
-    radial-gradient(circle at 84% 20%,rgba(115,224,255,.28),transparent 34%),
-    radial-gradient(ellipse at 48% 88%,rgba(255,255,255,.18),transparent 38%),
+    radial-gradient(circle at 22% 12%,rgba(255,225,151,.22),transparent 32%),
+    radial-gradient(circle at 84% 20%,rgba(115,224,255,.16),transparent 34%),
+    radial-gradient(ellipse at 48% 88%,rgba(255,255,255,.10),transparent 38%),
     linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 48%,var(--sky-bottom) 100%);
   transform:translateZ(0);
   animation:ambientBreath 18s ease-in-out infinite alternate;
@@ -915,12 +915,12 @@ setInterval(updateBell,60000);
   const timeZone="Europe/Paris";
   const radians=Math.PI/180;
   const themeColors={
-    night:"#071328",
-    dawn:"#26385d",
-    morning:"#72caff",
-    day:"#5fc6ff",
-    golden:"#d58b65",
-    dusk:"#26375f"
+    night:"#061225",
+    dawn:"#1f3155",
+    morning:"#2c86c5",
+    day:"#287fbd",
+    golden:"#9b684f",
+    dusk:"#1f3155"
   };
 
   function localClock(date){
