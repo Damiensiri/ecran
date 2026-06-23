@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#6fb7ff">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Plan interactif</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -455,11 +456,11 @@ top:0;
 z-index:10;
 height:calc(70px + var(--safe-top));
 padding-top:var(--safe-top);
-border-bottom:1px solid rgba(255,255,255,.13);
-background:linear-gradient(180deg,rgba(82,137,191,.34),rgba(255,255,255,.08));
-box-shadow:0 10px 32px rgba(10,35,70,.10);
-backdrop-filter:blur(24px) saturate(145%);
--webkit-backdrop-filter:blur(24px) saturate(145%);
+border-bottom:0;
+background:transparent;
+box-shadow:none;
+backdrop-filter:none;
+-webkit-backdrop-filter:none;
 }
 
 header h1{
@@ -514,13 +515,15 @@ display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
 gap:10px;
 margin:0 18px 24px;
-padding:14px;
-color:var(--text-main);
-font-size:12px;
+padding:15px;
+color:rgba(255,255,255,.97);
+font-size:12.5px;
+font-weight:700;
+text-shadow:0 2px 12px rgba(8,31,62,.30);
 background:var(--glass);
 border:1px solid var(--glass-line);
 border-radius:26px;
-box-shadow:var(--shadow-soft),inset 0 1px 0 rgba(255,255,255,.18);
+box-shadow:var(--shadow-soft),inset 0 1px 0 rgba(255,255,255,.22);
 backdrop-filter:blur(22px) saturate(140%);
 -webkit-backdrop-filter:blur(22px) saturate(140%);
 }
@@ -531,7 +534,8 @@ margin:0;
 padding:10px;
 gap:8px;
 border-radius:16px;
-background:rgba(255,255,255,.10);
+background:rgba(255,255,255,.18);
+border:1px solid rgba(255,255,255,.14);
 }
 
 .legend-item img{flex:0 0 auto;}
@@ -540,7 +544,7 @@ background:rgba(255,255,255,.10);
 left:50%;
 width:min(100%,520px);
 height:min(56%,540px);
-padding:28px 22px calc(22px + var(--safe-bottom));
+padding:0;
 color:var(--text-main);
 background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(255,255,255,.15));
 border:1px solid rgba(255,255,255,.28);
@@ -550,8 +554,7 @@ box-shadow:0 -24px 70px rgba(8,31,62,.28),inset 0 1px 0 rgba(255,255,255,.28);
 backdrop-filter:blur(30px) saturate(160%);
 -webkit-backdrop-filter:blur(30px) saturate(160%);
 transform:translate(-50%,110%);
-overflow-y:auto;
--webkit-overflow-scrolling:touch;
+overflow:visible;
 }
 
 #panel.active{transform:translate(-50%,0);}
@@ -565,6 +568,15 @@ border:1px solid rgba(255,255,255,.62);
 box-shadow:0 14px 36px rgba(10,35,70,.28),inset 0 1px 0 rgba(255,255,255,.68);
 backdrop-filter:blur(18px) saturate(145%);
 -webkit-backdrop-filter:blur(18px) saturate(145%);
+}
+
+#panelContent{
+height:100%;
+padding:46px 22px calc(22px + var(--safe-bottom));
+box-sizing:border-box;
+overflow-y:auto;
+-webkit-overflow-scrolling:touch;
+border-radius:34px 34px 0 0;
 }
 
 #panelHeader{margin-bottom:4px;}
@@ -582,6 +594,9 @@ background:rgba(255,255,255,.10);
 .label{color:var(--text-soft);letter-spacing:.08em;text-transform:uppercase;}
 .value,#horaire,#info{color:var(--text-main);}
 #statut{font-size:17px;}
+#statut,.optionText span{
+text-shadow:0 1px 10px rgba(0,0,0,.20);
+}
 .scrollable{max-height:120px;}
 
 #reserveBox{
@@ -616,7 +631,7 @@ header h1{color:var(--text-strong);}
 #backBtn,#panelIcon{background:rgba(255,255,255,.18);}
 #panel{background:linear-gradient(160deg,rgba(22,40,65,.76),rgba(13,29,51,.64));}
 .label{color:var(--text-soft);}
-.value,.legend{color:var(--text-main);}
+.value{color:var(--text-main);}
 #map{filter:brightness(.96) contrast(.98);}
 .plan-btn{background:rgba(255,255,255,.68);}
 #reserveBox{background:linear-gradient(135deg,#f4a329,#c96d00);}
@@ -666,6 +681,8 @@ header h1{color:var(--text-strong);}
 
 </div>
 
+<div id="panelContent">
+
 <div id="panelHeader">
 <div id="panelTitle">---</div>
 <div id="closePanel">✕</div>
@@ -695,6 +712,8 @@ header h1{color:var(--text-strong);}
 </div>
 
 <div id="reserveBox" onclick="goReserve()">Réserver</div>
+
+</div>
 
 </div>
 
@@ -795,32 +814,32 @@ return map[t]||t;
 
 if(e.statut_auto==="ouvert"){
 statut.innerText="Ouvert";
-statut.style.color="green";
+statut.style.color="#33d17a";
 }
 
 if(e.statut_auto==="prevision"){
 statut.innerText="Ouverture prévue";
-statut.style.color="#E88B00";
+statut.style.color="#ffb23f";
 }
 
 if(e.statut_auto==="ferme"){
 statut.innerText="Fermé";
-statut.style.color="red";
+statut.style.color="#ff4d4d";
 }
 
 if(e.statut_auto==="hors-service"){
 statut.innerText="Hors service";
-statut.style.color="gray";
+statut.style.color="#d6dde8";
 }
 info.innerText=e.info||"Aucune info";
 
 /* couleur halo */
 
-let color="green";
+let color="#33d17a";
 
-if(e.statut_auto==="ferme") color="red";
-if(e.statut_auto==="prevision") color="#E88B00";
-if(e.statut_auto==="hors-service") color="gray";
+if(e.statut_auto==="ferme") color="#ff4d4d";
+if(e.statut_auto==="prevision") color="#ffb23f";
+if(e.statut_auto==="hors-service") color="#d6dde8";
 
 haloCircle.style.stroke=color;
 
@@ -837,7 +856,7 @@ haloCircle.style.strokeDashoffset="0";
 /* horaires */
 
 if(e.horaire_special && e.horaire_special.trim() !== ""){
-horaire.innerHTML = `<span style="color:#E88B00;font-weight:700">${e.horaire_special}</span>`;
+horaire.innerHTML = `<span style="color:#ffb23f;font-weight:700">${e.horaire_special}</span>`;
 }else{
 horaire.innerText = e.horaire_affiche||"---";
 }
@@ -846,12 +865,12 @@ horaire.innerText = e.horaire_affiche||"---";
 let show=false;
 
 if(e.liberte){
-liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"green":"red"};font-weight:700">${e.liberte.toUpperCase()}</span>`;
+liberte.innerHTML=`Liberté : <span style="color:${e.liberte==="oui"?"#33d17a":"#ff4d4d"};font-weight:800">${e.liberte.toUpperCase()}</span>`;
 show=true;
 }
 
 if(e.longe){
-longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"green":"red"};font-weight:700">${e.longe.toUpperCase()}</span>`;
+longe.innerHTML=`Longe : <span style="color:${e.longe==="oui"?"#33d17a":"#ff4d4d"};font-weight:800">${e.longe.toUpperCase()}</span>`;
 show=true;
 }
 
@@ -892,6 +911,14 @@ const latitude=48.391;
 const longitude=4.527;
 const timeZone="Europe/Paris";
 const radians=Math.PI/180;
+const themeColors={
+night:"#071328",
+dawn:"#26385d",
+morning:"#72caff",
+day:"#5fc6ff",
+golden:"#d58b65",
+dusk:"#26375f"
+};
 
 function localClock(date){
 const parts={};
@@ -908,11 +935,14 @@ return{minutes:Number(parts.hour)*60+Number(parts.minute),dayOfYear:Math.floor((
 }
 
 function solarTimes(clock){
-const declination=-23.44*Math.cos((2*Math.PI*(clock.dayOfYear+10))/365);
-const hourAngle=Math.acos(-Math.tan(latitude*radians)*Math.tan(declination*radians))/radians;
-const dayLength=(2*hourAngle)/15;
-const solarNoon=12+clock.offsetHours-(longitude/15);
-return{sunrise:(solarNoon-dayLength/2)*60,noon:solarNoon*60,sunset:(solarNoon+dayLength/2)*60};
+const gamma=(2*Math.PI/365)*(clock.dayOfYear-1);
+const equationOfTime=229.18*(.000075+.001868*Math.cos(gamma)-.032077*Math.sin(gamma)-.014615*Math.cos(2*gamma)-.040849*Math.sin(2*gamma));
+const declination=.006918-.399912*Math.cos(gamma)+.070257*Math.sin(gamma)-.006758*Math.cos(2*gamma)+.000907*Math.sin(2*gamma)-.002697*Math.cos(3*gamma)+.00148*Math.sin(3*gamma);
+const zenith=90.833*radians;
+const hourAngle=Math.acos((Math.cos(zenith)/(Math.cos(latitude*radians)*Math.cos(declination)))-Math.tan(latitude*radians)*Math.tan(declination));
+const solarNoon=720-4*longitude-equationOfTime+clock.offsetHours*60;
+const daylightMinutes=(hourAngle/radians)*8;
+return{sunrise:solarNoon-daylightMinutes/2,noon:solarNoon,sunset:solarNoon+daylightMinutes/2};
 }
 
 function phaseFor(minutes,times){
@@ -934,6 +964,8 @@ document.body.style.setProperty("--solar-x",(10+80*daylightProgress).toFixed(2)+
 document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
 document.body.dataset.sunrise=Math.round(times.sunrise);
 document.body.dataset.sunset=Math.round(times.sunset);
+const themeMeta=document.querySelector('meta[name="theme-color"]');
+if(themeMeta)themeMeta.setAttribute("content",themeColors[document.body.dataset.dayPhase]||themeColors.day);
 }
 
 updateAmbiance();
