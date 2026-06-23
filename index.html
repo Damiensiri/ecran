@@ -11,7 +11,7 @@
 
 <link rel="apple-touch-icon" href="image/icon-192x192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ecurie DS">
 <meta name="theme-color" content="#6fb7ff">
 
@@ -356,7 +356,7 @@ header h1{
   animation:contentReveal .75s cubic-bezier(.2,.85,.24,1) both;
 }
 
-#opening-status{
+.opening-status{
   width:max-content;
   max-width:calc(100% - 36px);
   min-height:30px;
@@ -377,27 +377,27 @@ header h1{
   animation:contentReveal .75s .08s cubic-bezier(.2,.85,.24,1) both;
 }
 
-#opening-status[style*="#2e7d32"]{
+.opening-status.open{
   border-color:rgba(185,255,212,.58);
-  color:#f8fff9 !important;
+  color:#f8fff9;
   background:
     radial-gradient(circle at 20% 0%,rgba(255,255,255,.30),transparent 42%),
     linear-gradient(145deg,rgba(34,156,92,.94),rgba(21,113,70,.82));
   box-shadow:0 14px 30px rgba(14,92,55,.28),inset 0 1px 0 rgba(255,255,255,.26);
 }
 
-#opening-status[style*="#c0392b"]{
+.opening-status.closed{
   border-color:rgba(255,205,198,.60);
-  color:#fffafa !important;
+  color:#fffafa;
   background:
     radial-gradient(circle at 20% 0%,rgba(255,255,255,.28),transparent 42%),
     linear-gradient(145deg,rgba(213,64,54,.95),rgba(157,34,43,.84));
   box-shadow:0 14px 30px rgba(132,28,36,.27),inset 0 1px 0 rgba(255,255,255,.24);
 }
 
-#opening-status[style*="#E88B00"]{
+.opening-status.exception{
   border-color:rgba(255,230,179,.66);
-  color:#fffdf8 !important;
+  color:#fffdf8;
   background:
     radial-gradient(circle at 20% 0%,rgba(255,255,255,.32),transparent 42%),
     linear-gradient(145deg,rgba(237,151,35,.96),rgba(190,95,22,.86));
@@ -604,9 +604,6 @@ header h1{
     --glass-line:rgba(255,255,255,.16);
     --shadow-card:0 24px 70px rgba(0,0,0,.34);
     --shadow-soft:0 14px 36px rgba(0,0,0,.26);
-    --sky-top:#071328;
-    --sky-mid:#16335d;
-    --sky-bottom:#386b96;
   }
 
 }
@@ -678,7 +675,7 @@ ECURIE DAMIEN SIRI
 
 <div id="welcome">BIENVENUE</div>
 
-<div id="opening-status"></div>
+<div id="opening-status" class="opening-status"></div>
 
 <div id="alert-box"></div>
 
@@ -755,6 +752,7 @@ function updateUI(horaires,exceptions,statuts){
 
 const status=document.getElementById("opening-status");
 const alertBox=document.getElementById("alert-box");
+status.classList.remove("open","closed","exception");
 
 const accueil=statuts.find(e=>e.espace==="accueil");
 
@@ -784,7 +782,7 @@ const ex = exceptions.find(e=>{
 });
 
 if(ex){
-status.style.color="#E88B00";
+status.classList.add("exception");
 status.textContent=ex.message;
 return;
 }
@@ -807,10 +805,10 @@ const o=new Date();o.setHours(oh,om,0,0);
 const c=new Date();c.setHours(ch,cm,0,0);
 
 if(nowTime>=o && nowTime<=c){
-status.style.color="#2e7d32";
+status.classList.add("open");
 status.textContent=`Écuries ouvertes ${open} – ${close}`;
 }else{
-status.style.color="#c0392b";
+status.classList.add("closed");
 status.textContent=`Écuries fermées ${open} – ${close}`;
 }
 
