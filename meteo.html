@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#6fb7ff">
+  <meta name="theme-color" content="#287fbd">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Météo</title>
   <style>
     /* ==========================================================
@@ -76,12 +77,13 @@
     }
 
     body {
+      position: relative;
       min-height: 100%;
       margin: 0;
       overflow-x: hidden;
       font-family: var(--font-main);
       color: var(--text-main);
-      background: #67baff;
+      background: transparent;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
@@ -178,7 +180,7 @@
     .weather-stage {
       position: fixed;
       inset: 0;
-      z-index: -3;
+      z-index: 0;
       overflow: hidden;
       pointer-events: none;
       background:
@@ -413,6 +415,7 @@
 
     .app-shell {
       position: relative;
+      z-index: 1;
       width: min(100%, 520px);
       min-height: 100svh;
       margin: 0 auto;
@@ -693,36 +696,122 @@
       letter-spacing: 0;
     }
 
-    .vigilance-widget-card {
+    .vigilance-card {
+      --vigilance-rgb: 49, 170, 53;
       padding-bottom: 18px;
     }
 
-    .vigilance-widget-frame {
-      width: 302px;
-      max-width: calc(100% - 36px);
-      height: var(--widget-height, 122px);
-      margin: 0 auto;
-      overflow: hidden;
+    .vigilance-panel {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      margin: 12px 18px 0;
+      padding: 16px;
       border-radius: var(--radius-lg);
-      background: rgba(255,255,255,0.14);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+      border: 1px solid rgba(var(--vigilance-rgb), 0.48);
+      background:
+        radial-gradient(circle at 88% 12%, rgba(var(--vigilance-rgb), 0.30), transparent 38%),
+        linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
     }
 
-    .vigilance-widget-frame iframe {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      display: block;
-      width: 302px;
-      max-width: none;
-      height: 122px;
-      border: 0;
-      transform: translateX(-50%) scale(var(--widget-scale, 1));
-      transform-origin: top center;
+    .vigilance-orb {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,0.86), transparent 24%),
+        rgb(var(--vigilance-rgb));
+      box-shadow:
+        0 14px 30px rgba(var(--vigilance-rgb), 0.38),
+        inset 0 1px 0 rgba(255,255,255,0.34);
     }
 
-    .vigilance-mobile-link {
-      display: none;
+    .vigilance-level {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 1.08rem;
+      font-weight: 820;
+      letter-spacing: -0.025em;
+    }
+
+    .vigilance-phenomenon {
+      margin: 5px 0 0;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .vigilance-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 18px 0;
+    }
+
+    .vigilance-detail {
+      min-height: 60px;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .vigilance-detail-label {
+      margin: 0 0 5px;
+      color: var(--text-muted);
+      font-size: 0.64rem;
+      font-weight: 820;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .vigilance-detail-value {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .vigilance-scale {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin: 14px 18px 0;
+    }
+
+    .vigilance-scale span {
+      height: 7px;
+      border-radius: 999px;
+      opacity: 0.28;
+    }
+
+    .vigilance-scale span.active {
+      opacity: 1;
+      box-shadow: 0 0 14px currentColor;
+      transform: scaleY(1.25);
+    }
+
+    .vigilance-scale-green { color: #31aa35; background: #31aa35; }
+    .vigilance-scale-yellow { color: #fff000; background: #fff000; }
+    .vigilance-scale-orange { color: #f18e00; background: #f18e00; }
+    .vigilance-scale-red { color: #e1000f; background: #e1000f; }
+
+    .vigilance-source {
+      margin: 11px 20px 0;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 620;
+      text-align: center;
+    }
+
+    .vigilance-source a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
     .forecast-card {
@@ -1169,27 +1258,6 @@
       92% { opacity: 0; }
     }
 
-    @media (max-width: 520px) {
-      .vigilance-widget-frame {
-        display: none;
-      }
-
-      .vigilance-mobile-link {
-        display: block;
-        width: calc(100% - 36px);
-        margin: 12px auto 0;
-        padding: 12px 14px;
-        border: 1px solid rgba(255,255,255,0.18);
-        border-radius: var(--radius-md);
-        color: var(--text-main);
-        background: rgba(255,255,255,0.12);
-        font-size: 0.78rem;
-        font-weight: 720;
-        text-align: center;
-        text-decoration: none;
-      }
-    }
-
     @media (max-width: 380px) {
       .app-shell {
         padding-left: 14px;
@@ -1260,11 +1328,8 @@
         <h2 class="city-name" id="cityName">Brienne-le-Château</h2>
         <div class="hero-meta">
           <span id="localTime">Europe/Paris</span>
-          <span>•</span>
-          <span id="coordinates">48.391, 4.527</span>
         </div>
         <p class="description" id="description">Chargement de la météo locale</p>
-        <p class="feels" id="summaryLine">Synchronisation avec Open-Meteo</p>
         <p class="app-error" id="errorBox"></p>
       </div>
     </section>
@@ -1301,7 +1366,7 @@
         </div>
       </article>
 
-      <article class="glass-card vigilance-widget-card" style="--delay: 180ms">
+      <article class="glass-card vigilance-card" id="vigilanceCard" style="--delay: 180ms">
         <div class="card-header">
           <p class="eyebrow">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1309,19 +1374,34 @@
               <path d="M12 8v5"></path>
               <path d="M12 17h.01"></path>
             </svg>
-            Vigilance Météo-France
+            Vigilance MeteoAlarm
           </p>
+          <span class="updated" id="vigilanceBadge">Vert</span>
         </div>
-        <div class="vigilance-widget-frame">
-          <iframe
-            src="https://vigilance.meteofrance.fr/fr/widget-vigilance/vigilance-departement/10"
-            width="302"
-            height="122"
-            frameborder="0"
-            title="Vigilance Météo-France pour l'Aube">
-          </iframe>
+        <div class="vigilance-panel">
+          <div class="vigilance-orb" aria-hidden="true"></div>
+          <div>
+            <h2 class="vigilance-level" id="vigilanceLevel">Vigilance verte</h2>
+            <p class="vigilance-phenomenon" id="vigilancePhenomenon">Aucun phénomène dangereux signalé pour l'Aube.</p>
+          </div>
         </div>
-        <a class="vigilance-mobile-link" href="https://vigilance.meteofrance.fr/fr/aube" target="_blank" rel="noopener">Afficher les cartes officielles J0 et J1</a>
+        <div class="vigilance-details">
+          <div class="vigilance-detail">
+            <p class="vigilance-detail-label">Période</p>
+            <p class="vigilance-detail-value" id="vigilancePeriod">Aucune alerte active</p>
+          </div>
+          <div class="vigilance-detail">
+            <p class="vigilance-detail-label">Mise à jour</p>
+            <p class="vigilance-detail-value" id="vigilanceUpdated">En attente</p>
+          </div>
+        </div>
+        <div class="vigilance-scale" aria-label="Échelle de vigilance">
+          <span class="vigilance-scale-green active" data-vigilance-level="green"></span>
+          <span class="vigilance-scale-yellow" data-vigilance-level="yellow"></span>
+          <span class="vigilance-scale-orange" data-vigilance-level="orange"></span>
+          <span class="vigilance-scale-red" data-vigilance-level="red"></span>
+        </div>
+        <p class="vigilance-source">Source : <a href="https://meteoalarm.org" target="_blank" rel="noopener">MeteoAlarm / EUMETNET</a> · Aube</p>
       </article>
 
       <article class="glass-card forecast-card" style="--delay: 280ms">
@@ -1349,7 +1429,7 @@
             </svg>
             Prévisions horaires
           </p>
-          <span class="updated">12 prochaines heures</span>
+          <span class="updated">24 prochaines heures</span>
         </div>
         <div class="hourly-strip" id="hourlyForecast" aria-live="polite"></div>
       </article>
@@ -1358,6 +1438,7 @@
     <p class="footer-note">Données météorologiques fourni par Open-météo</p>
   </main>
 
+  <script src="./vigilance-data.js"></script>
   <script>
     "use strict";
 
@@ -1405,17 +1486,18 @@
       cacheElements();
       initializeAnimations();
       initializeInteractions();
-      initializeVigilanceWidget();
+      renderVigilance(window.METEOALARM_VIGILANCE);
       loadWeather();
     });
 
     function cacheElements() {
       const ids = [
-        "app", "temperature", "heroIcon", "cityName", "description", "summaryLine",
-        "localTime", "coordinates", "updatedAt", "windSpeed",
+        "app", "temperature", "heroIcon", "cityName", "description",
+        "localTime", "updatedAt", "windSpeed",
         "windGust", "rainChance", "rainAmount",
         "dailyForecast", "hourlyForecast", "errorBox", "cloudField", "rainField",
-        "snowField", "starField", "backButton"
+        "snowField", "starField", "backButton", "vigilanceCard", "vigilanceBadge",
+        "vigilanceLevel", "vigilancePhenomenon", "vigilancePeriod", "vigilanceUpdated"
       ];
 
       ids.forEach((id) => {
@@ -1434,23 +1516,31 @@
       });
     }
 
-    function initializeVigilanceWidget() {
-      const frame = document.querySelector(".vigilance-widget-frame");
-      if (!frame) return;
-
-      const resizeWidget = () => {
-        const scale = Math.min(1, frame.clientWidth / 302);
-        frame.style.setProperty("--widget-scale", scale.toFixed(4));
-        frame.style.setProperty("--widget-height", (122 * scale).toFixed(2) + "px");
+    function renderVigilance(data) {
+      const levels = {
+        green: { label: "Vert", title: "Vigilance verte", rgb: "49, 170, 53" },
+        yellow: { label: "Jaune", title: "Vigilance jaune", rgb: "255, 240, 0" },
+        orange: { label: "Orange", title: "Vigilance orange", rgb: "241, 142, 0" },
+        red: { label: "Rouge", title: "Vigilance rouge", rgb: "225, 0, 15" }
       };
+      const current = data && levels[data.level] ? data : {
+        level: "green",
+        phenomenon: "Aucun phénomène dangereux signalé pour l'Aube.",
+        period: "Aucune alerte active",
+        updatedAt: "Données locales en attente"
+      };
+      const level = levels[current.level];
 
-      resizeWidget();
+      elements.vigilanceCard.style.setProperty("--vigilance-rgb", level.rgb);
+      elements.vigilanceBadge.textContent = level.label;
+      elements.vigilanceLevel.textContent = level.title;
+      elements.vigilancePhenomenon.textContent = current.phenomenon;
+      elements.vigilancePeriod.textContent = current.period;
+      elements.vigilanceUpdated.textContent = current.updatedAt;
 
-      if ("ResizeObserver" in window) {
-        new ResizeObserver(resizeWidget).observe(frame);
-      } else {
-        window.addEventListener("resize", resizeWidget);
-      }
+      document.querySelectorAll("[data-vigilance-level]").forEach((item) => {
+        item.classList.toggle("active", item.dataset.vigilanceLevel === current.level);
+      });
     }
 
     function initializeAnimations() {
@@ -1616,9 +1706,7 @@
       elements.cityName.textContent = WEATHER_CONFIG.city;
       elements.temperature.textContent = roundNumber(current.temperature_2m);
       elements.description.textContent = getWeatherDescription(weatherCode, isDay);
-      elements.summaryLine.textContent = buildSummaryLine(current.temperature_2m, current.wind_speed_10m, rainProbability);
       elements.localTime.textContent = formatLocalTime(current.time);
-      elements.coordinates.textContent = WEATHER_CONFIG.latitude.toFixed(3) + ", " + WEATHER_CONFIG.longitude.toFixed(3);
       elements.updatedAt.textContent = "Mis à jour " + formatShortTime(current.time);
       elements.windSpeed.textContent = roundNumber(current.wind_speed_10m);
       elements.windGust.textContent = roundNumber(current.wind_gusts_10m);
@@ -1637,7 +1725,6 @@
       renderWeatherIcon(elements.heroIcon, "sun");
       elements.temperature.textContent = "—";
       elements.description.textContent = "Connexion météo indisponible";
-      elements.summaryLine.textContent = "Vérifiez la connexion réseau puis rechargez la page.";
       elements.updatedAt.textContent = "Hors ligne";
       elements.windSpeed.textContent = "—";
       elements.windGust.textContent = "—";
@@ -1725,7 +1812,7 @@
       }
 
       const start = Math.max(0, startIndex);
-      const end = Math.min(hourly.time.length, start + 12);
+      const end = Math.min(hourly.time.length, start + 24);
 
       for (let i = start; i < end; i += 1) {
         const tile = document.createElement("div");
@@ -1772,11 +1859,6 @@
       if (!isDay && [0, 1].includes(code)) return "Nuit claire";
       if (!isDay && code === 2) return "Nuit peu nuageuse";
       return WEATHER_LABELS.get(code) || "Conditions météo variables";
-    }
-
-    function buildSummaryLine(temp, wind, rainProbability) {
-      const rain = rainProbability === null ? 0 : roundNumber(rainProbability);
-      return "Ressenti visuel " + roundNumber(temp) + "°, vent " + roundNumber(wind) + " km/h, pluie " + rain + "%.";
     }
 
     function findCurrentHourIndex(times, currentTime) {
@@ -1868,13 +1950,13 @@
 
     function updateMetaTheme(ambiance) {
       const colors = {
-        sun: "#6fc9ff",
-        clouds: "#8fcaff",
-        overcast: "#8799aa",
-        rain: "#416f94",
+        sun: "#287fbd",
+        clouds: "#2c86c5",
+        overcast: "#62798c",
+        rain: "#2e5b81",
         storm: "#18243b",
-        snow: "#acd2ef",
-        night: "#0c1a33"
+        snow: "#6f9fc5",
+        night: "#061225"
       };
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.setAttribute("content", colors[ambiance] || colors.sun);
