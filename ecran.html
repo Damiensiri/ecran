@@ -310,13 +310,14 @@ h1{
   gap:9px;
   align-items:flex-start;
   padding:9px 10px;
-  border:1px solid rgba(255,189,102,0.36);
+  border:1px solid rgba(255,255,255,0.2);
   border-radius:8px;
-  background:rgba(255,189,102,0.1);
-  color:var(--amber);
+  background:linear-gradient(135deg,#f29f31,#c77416);
+  color:white;
   font-size:13px;
   font-weight:800;
   line-height:1.35;
+  text-shadow:0 1px 2px rgba(0,0,0,0.35);
 }
 
 .alertBox.is-empty{
@@ -329,10 +330,12 @@ h1{
   flex:0 0 auto;
   border-radius:999px;
   padding:3px 8px;
-  background:var(--amber);
-  color:#111;
+  background:rgba(255,255,255,0.22);
+  color:white;
   font-size:11px;
   font-weight:800;
+  border:1px solid rgba(255,255,255,0.22);
+  text-shadow:none;
 }
 
 .horaire{
@@ -557,10 +560,9 @@ function buildStableCard(data){
   return `
     <div class="cardTop">
       <div class="titleWrap">
-        <img src="image/logo.png" alt="">
+        <img src="image/time.svg" alt="">
         <div class="cardTitle">Horaires Ecurie</div>
       </div>
-      <span class="statusText prevision">Info</span>
     </div>
     <div class="stableBody">
       <div class="stableHours">
