@@ -270,32 +270,57 @@ h1{
 .badge.non{background:var(--red);color:white}
 
 .stableCard{
-  grid-template-rows:auto 1fr;
+  grid-template-rows:42px minmax(0,1fr);
+  gap:8px;
+  padding:12px;
+}
+
+.stableCard .cardTop{
+  min-height:0;
+}
+
+.stableCard .titleWrap img{
+  width:26px;
+  height:26px;
+}
+
+.stableCard .cardTitle{
+  font-size:clamp(20px,2.2vw,30px);
 }
 
 .stableBody{
   min-height:0;
   display:grid;
-  grid-template-rows:auto 1fr;
-  gap:10px;
+  grid-template-rows:minmax(0,1fr) 54px;
+  gap:8px;
 }
 
 .stableHours{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:12px;
+  min-height:0;
+  display:grid;
+  place-items:center;
+  text-align:center;
 }
 
-.stableLabel{
+.todayText{
+  color:white;
+  text-align:right;
+  font-size:14px;
+  font-weight:800;
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+.stableMeta{
+  margin-top:4px;
   color:var(--muted);
-  font-size:13px;
+  font-size:11px;
   font-weight:800;
   text-transform:uppercase;
 }
 
 .stableTime{
-  font-size:clamp(20px,2.2vw,30px);
+  font-size:clamp(24px,2.8vw,38px);
   font-weight:800;
   color:#f5f7fb;
   font-variant-numeric:tabular-nums;
@@ -303,21 +328,25 @@ h1{
 }
 
 .alertBox{
-  min-height:42px;
-  max-height:62px;
+  min-height:0;
+  height:54px;
   overflow:auto;
   display:flex;
   gap:9px;
   align-items:flex-start;
-  padding:9px 10px;
+  padding:8px 10px;
   border:1px solid rgba(255,255,255,0.2);
   border-radius:8px;
   background:linear-gradient(135deg,#f29f31,#c77416);
   color:white;
-  font-size:13px;
+  font-size:12px;
   font-weight:800;
-  line-height:1.35;
+  line-height:1.25;
   text-shadow:0 1px 2px rgba(0,0,0,0.35);
+}
+
+.alertBox span:last-child{
+  min-width:0;
 }
 
 .alertBox.is-empty{
@@ -436,7 +465,10 @@ h1{
 </div>
 
 <script>
-const SHEET_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec?sheet=statuts";
+const BASE_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec";
+const STATUTS_URL=`${BASE_URL}?sheet=statuts`;
+const HORAIRES_URL=`${BASE_URL}?sheet=horaires`;
+const EXCEPTIONS_URL=`${BASE_URL}?sheet=exceptions`;
 const REFRESH=10000;
 
 const TITRES={
@@ -485,14 +517,6 @@ function badgeYN(v){
   return "";
 }
 
-function minutesFromTime(value){
-  const match=String(value || "").match(/(\d{1,2})[:h](\d{2})?/i);
-  if(!match) return null;
-  const hours=Number(match[1]);
-  const minutes=Number(match[2] || 0);
-  return hours*60+minutes;
-}
-
 function timeFromMinutes(value){
   if(value===null || value===undefined) return "";
   const hours=Math.floor(value/60);
@@ -500,13 +524,32 @@ function timeFromMinutes(value){
   return String(hours).padStart(2,"0")+":"+String(minutes).padStart(2,"0");
 }
 
-function parseRange(value){
-  const parts=String(value || "").split("-");
-  if(parts.length<2) return null;
-  const start=minutesFromTime(parts[0]);
-  const end=minutesFromTime(parts[1]);
-  if(start===null || end===null) return null;
-  return {start,end};
+function formatSheetTime(value){
+  if(!value) return "";
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return String(value);
+  const hours=String(date.getUTCHours()).padStart(2,"0");
+  const minutes=String(date.getUTCMinutes()).padStart(2,"0");
+  return `${hours}:${minutes}`;
+}
+
+function localIsoDate(date){
+  return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0");
+}
+
+function localIsoFromSheetDate(value){
+  if(!value) return "";
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime())) return "";
+  return localIsoDate(date);
+}
+
+function todayDayName(){
+  return new Date().toLocaleDateString("fr-FR",{weekday:"long"}).toLowerCase();
+}
+
+function displayHours(value){
+  return String(value || "").replace(/\s*-\s*/g," - ");
 }
 
 function buildCard(e){
@@ -546,16 +589,14 @@ function buildCard(e){
   `;
 }
 
-function buildStableCard(data){
-  const rows=ORDER.map(espace=>data.find(e=>e.espace===espace)).filter(Boolean);
-  const ranges=rows.map(row=>parseRange(row.horaire_affiche)).filter(Boolean);
-  const start=ranges.length ? Math.min(...ranges.map(range=>range.start)) : null;
-  const end=ranges.length ? Math.max(...ranges.map(range=>range.end)) : null;
-  const hours=start!==null && end!==null ? `${timeFromMinutes(start)} - ${timeFromMinutes(end)}` : "Horaires non definis";
-  const specials=[...new Set(rows.map(row=>row.horaire_special).filter(Boolean))];
+function buildStableCard(data,horaires,exceptions){
+  const today=localIsoDate(new Date());
+  const exception=exceptions.find(row=>localIsoFromSheetDate(row.date)===today && row.message);
+  const dayRow=horaires.find(row=>String(row.jour || "").toLowerCase()===todayDayName());
+  const hours=displayHours(exception?.message || (dayRow ? `${formatSheetTime(dayRow.ouvert)} - ${formatSheetTime(dayRow.ferme)}` : "Horaires non definis"));
   const alertRow=data.find(row=>row.espace==="accueil");
   const alertText=alertRow?.alerte || "";
-  const detail=specials.length ? specials.join(" · ") : "Ouverture generale du jour";
+  const sourceLabel=exception ? "Horaires adaptes" : "Horaires habituels";
 
   return `
     <div class="cardTop">
@@ -563,14 +604,12 @@ function buildStableCard(data){
         <img src="image/time.svg" alt="">
         <div class="cardTitle">Horaires Ecurie</div>
       </div>
+      <span class="todayText">Aujourd'hui</span>
     </div>
     <div class="stableBody">
       <div class="stableHours">
-        <div>
-          <div class="stableLabel">Aujourd'hui</div>
-          <div class="info">${escapeHTML(detail)}</div>
-        </div>
         <div class="stableTime">${escapeHTML(hours)}</div>
+        <div class="stableMeta">${escapeHTML(sourceLabel)}</div>
       </div>
       <div class="alertBox ${alertText ? "" : "is-empty"}">
         ${alertText ? `<span class="alertTag">Alerte</span><span>${escapeHTML(alertText)}</span>` : "<span>Aucune alerte</span>"}
@@ -587,7 +626,7 @@ function applyCardState(el,status){
   if(status==="hors-service") el.classList.add("is-hors-service");
 }
 
-function renderData(data){
+function renderData(data,horaires=[],exceptions=[]){
   ORDER.forEach(espace=>{
     const row=data.find(e=>e.espace===espace);
     const el=document.getElementById(espace);
@@ -602,17 +641,20 @@ function renderData(data){
   document.getElementById("paddockMeta").innerText=`${openPaddocks}/${PADDOCKS.length} ouverts`;
 
   const stable=document.getElementById("ecurie-hours");
-  if(stable) stable.innerHTML=buildStableCard(data);
+  if(stable) stable.innerHTML=buildStableCard(data,horaires,exceptions);
 }
 
 function loadData(){
-  fetch(SHEET_URL,{cache:"no-store"})
-  .then(r=>r.json())
-  .then(data=>{
-    const payload=JSON.stringify(data);
+  Promise.all([
+    fetch(STATUTS_URL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(HORAIRES_URL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(EXCEPTIONS_URL,{cache:"no-store"}).then(r=>r.json())
+  ])
+  .then(([data,horaires,exceptions])=>{
+    const payload=JSON.stringify({data,horaires,exceptions});
     if(payload===lastPayload) return;
     lastPayload=payload;
-    renderData(data);
+    renderData(data,horaires,exceptions);
   })
   .catch(()=>{
     document.getElementById("dateLabel").innerText="Connexion aux donnees en attente";
