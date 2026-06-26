@@ -363,11 +363,9 @@ content:"";
 position:absolute;
 inset:0;
 width:var(--progress);
-background:linear-gradient(90deg,var(--progress-color),rgba(255,255,255,0.08),var(--progress-color));
-background-size:220% 100%;
+background:linear-gradient(90deg,var(--progress-color),rgba(255,255,255,0.06));
 opacity:1;
 transition:width .8s cubic-bezier(.22,.8,.24,1),background-color .55s ease;
-animation:progressGlide 1.4s linear infinite;
 pointer-events:none;
 }
 
@@ -385,11 +383,6 @@ pointer-events:none;
 .horseLine > *{
 position:relative;
 z-index:1;
-}
-
-@keyframes progressGlide{
-from{background-position:0 0;}
-to{background-position:220% 0;}
 }
 
 .horseLine.inProgress{
