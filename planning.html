@@ -4,220 +4,675 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Planning Écurie</title>
+<title>Planning Ecurie</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+:root{
+--bg:#101215;
+--panel:#181b20;
+--panel2:#20242b;
+--line:#303641;
+--text:#f5f7fb;
+--muted:#aab3c2;
+--accent:#72d39f;
+--accent2:#ffd166;
+--danger:#ff7b7b;
+--blue:#8ecae6;
+--violet:#cdb4db;
+--shadow:0 14px 34px rgba(0,0,0,0.34);
+}
+
+*{box-sizing:border-box}
 
 body{
 margin:0;
 font-family:'Montserrat',sans-serif;
-background:#0f1115;
-color:white;
+background:
+radial-gradient(circle at top left,rgba(114,211,159,0.12),transparent 32rem),
+linear-gradient(135deg,#101215 0%,#151920 55%,#111317 100%);
+color:var(--text);
+min-height:100vh;
 }
 
-/* TITRE */
-
-.titleblock{
-text-align:center;
-margin-top:10px;
-}
-
-h1{
-margin:0;
-font-size:26px;
-}
-
-/* LIGNE SEMAINE */
-
-.weekline{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-margin-top:4px;
-}
-
-.weeknav{
-background:#1c1f26;
-color:white;
-border:none;
-padding:4px 8px;
-border-radius:6px;
+button{
+font:inherit;
+color:inherit;
+border:0;
 cursor:pointer;
+touch-action:manipulation;
 }
 
-.weeknav:hover{
-background:#2a2f38;
-}
-
-#weekLabel{
-font-size:14px;
-font-weight:600;
-opacity:0.9;
-}
-
-/* BARRE HAUT */
-
-.topbar{
+.app{
+height:100vh;
 display:grid;
-grid-template-columns:1fr auto 1fr;
+grid-template-rows:auto auto 1fr;
+gap:12px;
+padding:14px;
+overflow:hidden;
+}
+
+.header{
+display:grid;
+grid-template-columns:1fr auto;
+gap:14px;
 align-items:center;
-padding:0 10px;
-margin-top:6px;
 }
 
-.topbar button{
-background:#1c1f26;
-color:white;
-border:none;
-padding:6px 10px;
-border-radius:6px;
-cursor:pointer;
+.titleblock h1{
+margin:0;
+font-size:clamp(24px,3.4vw,38px);
+font-weight:800;
+letter-spacing:0;
+line-height:1.05;
 }
 
-.topbar button:hover{
-background:#2a2f38;
+.subtitle{
+display:flex;
+flex-wrap:wrap;
+gap:8px 14px;
+align-items:center;
+margin-top:8px;
+color:var(--muted);
+font-size:13px;
+font-weight:600;
 }
 
-.leftBtn{
-justify-self:start;
+.clock{
+font-size:42px;
+font-weight:800;
+line-height:1;
+font-variant-numeric:tabular-nums;
 }
 
-.centerBtn{
-justify-self:center;
+.statusdot{
+width:9px;
+height:9px;
+border-radius:50%;
+display:inline-block;
+background:var(--accent);
+box-shadow:0 0 0 5px rgba(114,211,159,0.12);
 }
 
-.rightBtn{
-justify-self:end;
+.headerActions{
+display:flex;
+justify-content:flex-end;
+gap:8px;
 }
 
-/* WRAPPER */
+.iconBtn,.modeBtn,.primaryBtn{
+min-height:44px;
+border-radius:8px;
+background:var(--panel2);
+border:1px solid var(--line);
+display:inline-flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+padding:0 13px;
+font-weight:800;
+box-shadow:0 8px 18px rgba(0,0,0,0.18);
+}
 
-.wrapper{
+.iconBtn{
+width:48px;
+padding:0;
+font-size:22px;
+}
+
+.primaryBtn{
+background:linear-gradient(135deg,#2f9e6f,#287d7a);
+border-color:rgba(255,255,255,0.1);
+}
+
+.toolbar{
+display:grid;
+grid-template-columns:auto 1fr auto;
+gap:12px;
+align-items:center;
+}
+
+.weekline,.segmented{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.weekLabel{
+min-width:150px;
+text-align:center;
+font-size:15px;
+font-weight:800;
+color:var(--text);
+}
+
+.segmented{
+justify-content:center;
+background:rgba(255,255,255,0.04);
+border:1px solid var(--line);
+border-radius:10px;
+padding:4px;
+}
+
+.modeBtn{
+box-shadow:none;
+background:transparent;
+border-color:transparent;
+min-width:126px;
+}
+
+.modeBtn.active{
+background:var(--panel2);
+border-color:var(--line);
+}
+
+.dashboard{
+min-height:0;
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+}
+
+.dashboard.weekMode .cards{
+display:none;
+}
+
+.main{
+min-width:0;
+display:grid;
+grid-template-rows:auto 1fr;
+gap:12px;
+min-height:0;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,minmax(0,1fr));
+gap:10px;
+}
+
+.stat{
+background:rgba(24,27,32,0.92);
+border:1px solid var(--line);
+border-radius:8px;
+padding:12px;
+min-height:86px;
+box-shadow:var(--shadow);
+}
+
+.statLabel{
+color:var(--muted);
+font-size:12px;
+font-weight:800;
+text-transform:uppercase;
+}
+
+.statValue{
+font-size:30px;
+font-weight:800;
+margin-top:8px;
+font-variant-numeric:tabular-nums;
+}
+
+.statNote{
+font-size:12px;
+color:var(--muted);
+margin-top:3px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.panel{
+background:rgba(24,27,32,0.92);
+border:1px solid var(--line);
+border-radius:8px;
+box-shadow:var(--shadow);
+min-height:0;
+overflow:hidden;
+}
+
+.panelHead{
+height:46px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:0 12px;
+border-bottom:1px solid var(--line);
+}
+
+.panelTitle{
+font-size:14px;
+font-weight:800;
+text-transform:uppercase;
+}
+
+.panelMeta{
+font-size:12px;
+font-weight:700;
+color:var(--muted);
+}
+
+.tableWrap{
+height:100%;
 overflow:auto;
-padding:10px;
-max-height:calc(100vh - 160px);
 }
 
-/* TABLE */
+#planningSurface{
+height:100%;
+min-height:0;
+}
 
 table{
-border-collapse:collapse;
+border-collapse:separate;
+border-spacing:0;
 width:100%;
 min-width:900px;
 }
 
-/* HEADER JOURS GELÉ */
-
 th{
-background:#1c1f26;
-padding:12px;
-border:1px solid #333;
+background:#20242b;
+padding:12px 10px;
+border-right:1px solid var(--line);
+border-bottom:1px solid var(--line);
 position:sticky;
 top:0;
 z-index:4;
+font-size:12px;
+text-transform:uppercase;
 }
 
-/* CELLULES */
-
 td{
-background:#1c1f26;
-border:1px solid #333;
+background:#181b20;
+border-right:1px solid var(--line);
+border-bottom:1px solid var(--line);
 vertical-align:top;
 padding:8px;
 width:140px;
+min-height:72px;
 }
-
-/* COLONNE CHEVAL FIXE */
 
 .horse{
 position:sticky;
 left:0;
-background:#181b21;
-font-weight:700;
+background:#15181d;
+font-weight:800;
 z-index:5;
-box-shadow:8px 0 12px rgba(0,0,0,0.6);
+box-shadow:8px 0 14px rgba(0,0,0,0.45);
 white-space:nowrap;
 width:1%;
-padding-right:20px;
+min-width:128px;
+max-width:178px;
 }
-
-/* AUJOURD'HUI */
 
 .today{
-background:#2a2f38 !important;
+background:#26313a !important;
+box-shadow:inset 0 3px 0 var(--accent);
 }
-
-/* PASSÉ */
 
 .past{
-opacity:0.35;
+opacity:0.36;
 }
-
-/* TACHES */
 
 .task{
-padding:4px 6px;
-margin:4px 0;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
+padding:8px 9px;
+margin:5px 0;
+border-radius:7px;
+font-size:12px;
+line-height:1.2;
+font-weight:800;
+color:#0b0d0f;
+min-height:34px;
+display:flex;
+align-items:center;
+gap:5px;
 }
 
-.travail{ background:#fff3b0;color:#000;}
-.paddock{ background:#b7e4c7;color:#000;}
-.repos{ background:#cdb4db;color:#000;}
-.proprio{ background:#cdb4db;color:#000;}
-.longe{ background:#bde0fe;color:#000;}
-.concours{ background:#ffb703;color:#000;}
+.travail{background:#fff3b0;}
+.paddock{background:#b7e4c7;}
+.repos{background:#d7c5e3;}
+.proprio{background:#d7c5e3;}
+.longe{background:#bde0fe;}
+.concours{background:#ffb703;}
 
 .task.done{
-background:#4caf50 !important;
+background:#3caa63 !important;
 color:white !important;
-font-weight:600;
 }
 
+.horseLine{
+border:1px solid var(--line);
+background:#20242b;
+border-radius:8px;
+padding:10px;
+margin-bottom:8px;
+}
+
+.horseLine.completed{
+background:rgba(76,175,80,0.22);
+border-color:rgba(114,211,159,0.62);
+box-shadow:inset 4px 0 0 #4caf50;
+}
+
+.horseLine.completed .badge{
+background:#4caf50;
+color:white;
+}
+
+.horseLineTop{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+font-size:13px;
+font-weight:800;
+}
+
+.horseName{
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.badge{
+border-radius:999px;
+padding:4px 8px;
+font-size:11px;
+font-weight:800;
+background:rgba(255,255,255,0.08);
+color:var(--muted);
+white-space:nowrap;
+}
+
+.miniTasks{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+margin-top:8px;
+}
+
+.mini{
+font-size:11px;
+font-weight:800;
+border-radius:999px;
+padding:5px 7px;
+color:#111;
+background:#e8eef5;
+max-width:100%;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.empty{
+height:100%;
+min-height:90px;
+display:grid;
+place-items:center;
+text-align:center;
+color:var(--muted);
+font-weight:700;
+font-size:13px;
+padding:18px;
+}
+
+.loading{
+height:100%;
+display:grid;
+place-items:center;
+color:var(--muted);
+font-weight:800;
+}
+
+.hidden{display:none !important}
+
+.dayBoard{
+height:100%;
+display:grid;
+grid-template-columns:minmax(360px,0.95fr) minmax(0,1.05fr);
+gap:12px;
+padding:12px;
+min-height:0;
+}
+
+.dayTasks{
+min-height:0;
+overflow:auto;
+border-right:1px solid var(--line);
+padding:0 12px 84px 0;
+scroll-padding-bottom:84px;
+}
+
+.dayTaskCard{
+border:1px solid var(--line);
+background:#20242b;
+border-radius:8px;
+padding:10px;
+margin-bottom:8px;
+}
+
+.paddockBoard{
+min-height:0;
+overflow:auto;
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:8px;
+}
+
+.paddockColumn{
+min-width:0;
+border:1px solid var(--line);
+border-radius:8px;
+background:#141820;
+overflow:hidden;
+display:flex;
+flex-direction:column;
+min-height:0;
+}
+
+.paddockTop{
+min-height:44px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+padding:8px;
+background:#20242b;
+border-bottom:1px solid var(--line);
+}
+
+.paddockTitle{
+font-weight:800;
+font-size:13px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.paddockHours{
+font-size:11px;
+font-weight:800;
+color:var(--muted);
+white-space:nowrap;
+}
+
+.slotList{
+padding:6px;
+overflow:auto;
+min-height:0;
+}
+
+.slotCard{
+display:grid;
+grid-template-columns:42px minmax(0,1fr) 30px;
+align-items:center;
+gap:6px;
+min-height:42px;
+margin-bottom:5px;
+padding:6px;
+border:1px solid var(--line);
+border-radius:8px;
+background:#20242b;
+}
+
+.slotCard.free{
+opacity:0.68;
+background:#171b21;
+}
+
+.slotCard.blocked{
+background:rgba(255,123,123,0.13);
+border-color:rgba(255,123,123,0.36);
+}
+
+.slotCard.booked{
+background:rgba(114,211,159,0.12);
+border-color:rgba(114,211,159,0.34);
+}
+
+.slotTime{
+font-size:11px;
+font-weight:800;
+color:var(--muted);
+font-variant-numeric:tabular-nums;
+}
+
+.slotTitle{
+font-size:12px;
+font-weight:800;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.slotMeta{
+font-size:11px;
+font-weight:700;
+color:var(--muted);
+margin-top:2px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.cancelBtn{
+width:28px;
+height:28px;
+min-height:28px;
+padding:0;
+border-radius:8px;
+background:rgba(255,123,123,0.15);
+border:1px solid rgba(255,123,123,0.42);
+font-size:15px;
+box-shadow:none;
+}
+
+.weekTable table{
+height:100%;
+}
+
+@media (max-width:980px){
+.app{padding:10px;gap:10px}
+.header{grid-template-columns:1fr}
+.headerActions{justify-content:stretch}
+.headerActions button{flex:1}
+.toolbar{grid-template-columns:1fr;gap:8px}
+.weekline{justify-content:center}
+.dashboard{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.clock{font-size:34px}
+.dayBoard{grid-template-columns:1fr;grid-template-rows:220px 1fr}
+.dayTasks{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:10px}
+}
+
+@media (max-width:720px){
+.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.modeBtn{min-width:0;flex:1}
+.paddockBoard{grid-template-columns:1fr}
+}
 </style>
 </head>
 
 <body>
+<div class="app">
 
+<header class="header">
 <div class="titleblock">
+<h1>Planning Ecurie</h1>
+<div class="subtitle">
+<span><span class="statusdot"></span> Donnees en direct</span>
+<span id="dateLabel"></span>
+<span id="returnLabel">Retour ecran info apres 60 s</span>
+</div>
+</div>
+<div class="headerActions">
+<div class="clock" id="clock">--:--</div>
+<button class="primaryBtn" onclick="goEcran()">Fermer</button>
+</div>
+</header>
 
-<h1>Planning Écurie</h1>
-
+<section class="toolbar">
 <div class="weekline">
-<button class="weeknav" onclick="changeWeek(-1)">←</button>
-<div id="weekLabel"></div>
-<button class="weeknav" onclick="changeWeek(1)">→</button>
+<button class="iconBtn" onclick="changeWeek(-1)" title="Semaine precedente">‹</button>
+<div class="weekLabel" id="weekLabel"></div>
+<button class="iconBtn" onclick="changeWeek(1)" title="Semaine suivante">›</button>
 </div>
 
+<div class="segmented">
+<button id="weekBtn" class="modeBtn" onclick="setView('week')">Semaine</button>
+<button id="dayBtn" class="modeBtn active" onclick="setView('day')">Aujourd'hui</button>
+<button id="paddockBtn" class="modeBtn" onclick="setView('paddock')">Paddocks</button>
 </div>
 
-<div class="topbar">
+<button class="iconBtn" onclick="loadPlanning()" title="Actualiser">↻</button>
+</section>
 
-<button id="viewBtn" class="leftBtn" onclick="toggleView()">Vue jour</button>
+<section class="dashboard">
+<main class="main">
+<div class="cards">
+<div class="stat">
+<div class="statLabel">Chevaux</div>
+<div class="statValue" id="horseCount">--</div>
+<div class="statNote">au planning</div>
+</div>
+<div class="stat">
+<div class="statLabel">Aujourd'hui</div>
+<div class="statValue" id="todayTaskCount">--</div>
+<div class="statNote" id="todayName">taches prevues</div>
+</div>
+<div class="stat">
+<div class="statLabel">Paddocks</div>
+<div class="statValue" id="paddockCount">--</div>
+<div class="statNote">sorties du jour</div>
+</div>
+<div class="stat">
+<div class="statLabel">Validees</div>
+<div class="statValue" id="doneCount">--</div>
+<div class="statNote" id="doneNote">cochees</div>
+</div>
+</div>
 
-<button class="centerBtn" onclick="openPaddock()">Paddock</button>
-
-<button class="rightBtn" onclick="goEcran()">FERMER</button>
+<section class="panel">
+<div class="panelHead">
+<div class="panelTitle" id="planningTitle">Planning semaine</div>
+<div class="panelMeta" id="planningMeta"></div>
+</div>
+<div class="tableWrap">
+<div id="planningSurface">
+<div class="loading">Chargement du planning...</div>
+</div>
+</div>
+</section>
+</main>
+</section>
 
 </div>
 
-<div class="wrapper">
-<table id="planning"></table>
-</div>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-
-/* BOUTON AGENDA WIX */
-
-function openPaddock(){window.location.href="planningpaddock.html";}
-
-/* CONFIG */
-
 const SHEET_PLANNING="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
 const SHEET_VALIDATIONS="1YfrSDkB9E_SNA1ojqMuoUXBJt9vd_z40Kej3oyOXV7A";
 
@@ -229,29 +684,78 @@ const ENTRY_DAY="entry.301329581";
 const ENTRY_TASK="entry.450632275";
 
 const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
-
-/* VEILLE 1 MIN */
+const dayLabels=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+const firebaseConfig={
+apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
+authDomain:"ecurie-paddock.firebaseapp.com",
+projectId:"ecurie-paddock",
+storageBucket:"ecurie-paddock.firebasestorage.app",
+messagingSenderId:"501153278739",
+appId:"1:501153278739:web:824b4344c381f2a94548e6"
+};
+const paddockDefs=[
+{id:"maison",label:"Maison"},
+{id:"grande",label:"Grande voie"},
+{id:"beudot",label:"Beudot"}
+];
+const firestoreDays=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+let horaires={
+maison:{
+lundi:{closed:false,open:"08:00",close:"21:00"},
+mardi:{closed:false,open:"08:00",close:"22:00"},
+mercredi:{closed:false,open:"07:00",close:"22:00"},
+jeudi:{closed:false,open:"07:00",close:"22:00"},
+vendredi:{closed:true,open:"08:00",close:"21:00"},
+samedi:{closed:true,open:"08:00",close:"19:00"},
+dimanche:{closed:true,open:"07:00",close:"21:00"}
+},
+grande:{
+lundi:{closed:false,open:"08:00",close:"20:00"},
+mardi:{closed:false,open:"08:00",close:"20:00"},
+mercredi:{closed:false,open:"08:00",close:"20:00"},
+jeudi:{closed:false,open:"08:00",close:"20:00"},
+vendredi:{closed:false,open:"08:00",close:"19:00"},
+samedi:{closed:false,open:"09:00",close:"18:00"},
+dimanche:{closed:true,open:"09:00",close:"18:00"}
+},
+beudot:{
+lundi:{closed:false,open:"09:00",close:"19:00"},
+mardi:{closed:false,open:"09:00",close:"19:00"},
+mercredi:{closed:false,open:"08:00",close:"20:00"},
+jeudi:{closed:false,open:"08:00",close:"20:00"},
+vendredi:{closed:false,open:"09:00",close:"18:00"},
+samedi:{closed:true,open:"09:00",close:"18:00"},
+dimanche:{closed:true,open:"09:00",close:"18:00"}
+}
+};
 
 let inactivityTimer;
+let countdownTimer;
+let secondsLeft=60;
 
 function resetTimer(){
 clearTimeout(inactivityTimer);
-inactivityTimer=setTimeout(()=>{
-location.href="ecran.html";
-},60000);
+secondsLeft=60;
+updateReturnLabel();
+inactivityTimer=setTimeout(()=>{location.href="ecran.html";},60000);
 }
 
-["click","touchstart","mousemove","keydown"].forEach(evt=>{
+["click","touchstart","mousemove","keydown","scroll"].forEach(evt=>{
 document.addEventListener(evt,resetTimer,true);
 });
 
-resetTimer();
-
-function goEcran(){
-location.href="ecran.html";
+function updateReturnLabel(){
+document.getElementById("returnLabel").innerText=`Retour ecran info apres ${secondsLeft} s`;
 }
 
-/* SEMAINE */
+countdownTimer=setInterval(()=>{
+secondsLeft=Math.max(0,secondsLeft-1);
+updateReturnLabel();
+},1000);
+
+resetTimer();
+
+function goEcran(){location.href="ecran.html";}
 
 function getWeekNumber(){
 const d=new Date();
@@ -262,248 +766,411 @@ return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
 }
 
 let currentWeek=getWeekNumber();
-
 let planningData=[];
 let validations=[];
-let viewMode="week";
-
-/* JOUR ACTUEL */
+let reservations=[];
+let blocages=[];
+let db=null;
+let viewMode="day";
 
 const todayIndex=new Date().getDay();
 const dayMap=[6,0,1,2,3,4,5];
 const todayColumn=dayMap[todayIndex];
 
-/* ICONES */
+function updateClock(){
+const now=new Date();
+document.getElementById("clock").innerText=now.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+document.getElementById("dateLabel").innerText=now.toLocaleDateString("fr-FR",{weekday:"long",day:"2-digit",month:"long"});
+}
+
+updateClock();
+setInterval(updateClock,15000);
 
 function taskIcon(text){
-
 const t=text.toLowerCase();
-
-if(t.includes("travail")) return {icon:"🐎 ",class:"travail"};
-if(t.includes("paddock")) return {icon:"🌿 ",class:"paddock"};
-if(t.includes("repos")) return {icon:"😴 ",class:"repos"};
-if(t.includes("concours")) return {icon:"🏆 ",class:"concours"};
-if(t.includes("propriétaire")) return {icon:"👤 ",class:"proprio"};
-if(t.includes("longe")) return {icon:"🪢 ",class:"longe"};
-
+if(t.includes("travail")) return {icon:"🐎",class:"travail"};
+if(t.includes("paddock")) return {icon:"🌿",class:"paddock"};
+if(t.includes("repos")) return {icon:"😴",class:"repos"};
+if(t.includes("concours")) return {icon:"🏆",class:"concours"};
+if(t.includes("propriétaire")) return {icon:"👤",class:"proprio"};
+if(t.includes("proprietaire")) return {icon:"👤",class:"proprio"};
+if(t.includes("longe")) return {icon:"🪢",class:"longe"};
 return {icon:"",class:""};
-
 }
 
-/* VALIDATION */
+function splitTasks(tasks){
+if(!tasks) return [];
+return String(tasks).split("/").map(t=>t.trim()).filter(Boolean);
+}
+
+function isRestTask(task){
+return String(task || "").trim().toLowerCase()==="repos";
+}
+
+function visibleTasks(tasks){
+return tasks.filter(task=>!isRestTask(task));
+}
+
+function escapeHTML(value){
+return String(value).replace(/[&<>"']/g,char=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+"\"":"&quot;",
+"'":"&#39;"
+}[char]));
+}
+
+function toIsoDate(date){
+return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0");
+}
+
+function parseIsoDate(value){
+const parts=String(value).split("-").map(Number);
+return new Date(parts[0],parts[1]-1,parts[2]);
+}
+
+function dayName(value){
+return firestoreDays[parseIsoDate(value).getDay()];
+}
+
+function minutes(time){
+if(!time || !String(time).includes(":")) return 0;
+const parts=String(time).split(":").map(Number);
+return parts[0]*60+parts[1];
+}
+
+function timeFromMinutes(value){
+const h=Math.floor(value/60);
+const m=value%60;
+return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
+}
+
+function formatTimeRange(item){
+const start=minutes(item.time);
+const end=start+Number(item.duration || 60);
+return `${timeFromMinutes(start)} - ${timeFromMinutes(end)}`;
+}
+
+function paddockLabel(id){
+return paddockDefs.find(paddock=>paddock.id===id)?.label || id;
+}
+
+function todayIso(){
+return toIsoDate(new Date());
+}
+
+function normalizeReservation(doc){
+const data=doc.data();
+return {
+id:doc.id,
+name:data.name || "",
+email:data.email || "",
+paddock:data.paddock || "",
+date:data.date || "",
+time:data.time || "",
+duration:Number(data.duration || 60),
+type:data.type || data.reservationType || ""
+};
+}
+
+function getPaddockSlots(date){
+const name=dayName(date);
+const slotSet=new Set();
+paddockDefs.forEach(paddock=>{
+const config=horaires[paddock.id]?.[name];
+if(!config || config.closed) return;
+for(let t=minutes(config.open);t<minutes(config.close);t+=60){
+slotSet.add(timeFromMinutes(t));
+}
+});
+return [...slotSet].sort((a,b)=>minutes(a)-minutes(b));
+}
+
+function paddockItemAt(date,paddock,time){
+return reservations.find(item=>item.date===date && item.paddock===paddock && item.time===time)
+|| blocages.find(item=>item.date===date && item.paddock===paddock && item.time===time);
+}
+
+function isCoveredByBlockage(date,paddock,time){
+const slotStart=minutes(time);
+return blocages.some(item=>{
+if(item.date!==date || item.paddock!==paddock || item.time===time) return false;
+const blockStart=minutes(item.time);
+const blockEnd=blockStart+Number(item.duration || 60);
+return slotStart>blockStart && slotStart<blockEnd;
+});
+}
 
 function isValidated(cheval,jour,tache){
-
 return validations.some(v=>
 String(v.Semaine)==String(currentWeek)
-&& v.Cheval.toLowerCase()==cheval.toLowerCase()
-&& v.Jour.toLowerCase()==jour.toLowerCase()
-&& v["Tâche"].toLowerCase()==tache.toLowerCase()
+&& String(v.Cheval || "").toLowerCase()==cheval.toLowerCase()
+&& String(v.Jour || "").toLowerCase()==jour.toLowerCase()
+&& String(v["Tâche"] || v["Tache"] || "").toLowerCase()==tache.toLowerCase()
 );
-
 }
 
-/* ENVOI FORM */
-
 function sendToForm(cheval,jour,tache){
-
 const data=new FormData();
-
 data.append(ENTRY_WEEK,currentWeek);
 data.append(ENTRY_HORSE,cheval);
 data.append(ENTRY_DAY,jour);
 data.append(ENTRY_TASK,tache);
-
 fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
-
 }
-
-/* FORMAT TACHES */
 
 function formatTasks(tasks,cheval,jour){
-
-if(!tasks) return "";
-
-const list=tasks.split("/");
-
-return list.map(t=>{
-
-const text=t.trim();
+const list=splitTasks(tasks);
+if(!list.length) return "";
+return list.map(text=>{
 const iconData=taskIcon(text);
-let done=isValidated(cheval,jour,text);
-
-return `<div class="task ${iconData.class} ${done?"done":""}" data-cheval="${cheval}" data-jour="${jour}" data-task="${text}">
-${done?"✔ ":""}${iconData.icon}${text}
-</div>`;
-
+const done=isValidated(cheval,jour,text);
+return `<button class="task ${iconData.class} ${done?"done":""}" data-cheval="${escapeHTML(cheval)}" data-jour="${escapeHTML(jour)}" data-task="${escapeHTML(text)}">
+<span>${done?"✔":iconData.icon}</span><span>${escapeHTML(text)}</span>
+</button>`;
 }).join("");
-
 }
-
-/* TABLEAU */
 
 function buildPlanning(){
-
-let html="<tr>";
-
-html+="<th class='horse'>Cheval</th>";
-
+let html="<tr><th class='horse'>Cheval</th>";
 days.forEach((day,i)=>{
-
 let cls="";
-
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
-
-html+=`<th class="${cls}">${day.toUpperCase()}</th>`;
-
+html+=`<th class="${cls}">${dayLabels[i]}</th>`;
 });
-
 html+="</tr>";
 
 planningData.forEach(row=>{
-
 html+="<tr>";
-
-html+=`<td class="horse">${row.cheval}</td>`;
-
+html+=`<td class="horse">${escapeHTML(row.cheval)}</td>`;
 days.forEach((day,i)=>{
-
 let cls="";
-
 if(i < todayColumn) cls="past";
 if(i === todayColumn) cls="today";
-
-html+=`<td class="${cls}">
-${formatTasks(row[day],row.cheval,day)}
-</td>`;
-
+html+=`<td class="${cls}">${formatTasks(row[day],row.cheval,day)}</td>`;
 });
-
 html+="</tr>";
-
 });
 
-document.getElementById("planning").innerHTML=html;
-
+document.getElementById("planningSurface").innerHTML=`<div class="weekTable"><table>${html}</table></div>`;
+document.getElementById("planningTitle").innerText="Planning semaine";
+document.getElementById("planningMeta").innerText=`${planningData.length} chevaux`;
 addTaskEvents();
-
 }
-
-/* VUE JOUR */
 
 function buildDayView(){
-
 const day=days[todayColumn];
-
-let html="<tr>";
-
-html+="<th class='horse'>Cheval</th>";
-html+=`<th>${day.toUpperCase()}</th>`;
-html+="</tr>";
-
-planningData.forEach(row=>{
-
-html+="<tr>";
-html+=`<td class="horse">${row.cheval}</td>`;
-html+=`<td>${formatTasks(row[day],row.cheval,day)}</td>`;
-html+="</tr>";
-
-});
-
-document.getElementById("planning").innerHTML=html;
-
+const todayRows=planningData.map(row=>{
+const tasks=visibleTasks(splitTasks(row[day]));
+return {cheval:row.cheval,tasks};
+}).filter(item=>item.tasks.length);
+const taskHtml=todayRows.length ? todayRows.map(renderLine).join("") : "<div class='empty'>Rien de prevu aujourd'hui.</div>";
+document.getElementById("planningSurface").innerHTML=`
+<div class="dayBoard">
+<section class="dayTasks">${taskHtml}</section>
+${renderPaddockBoard(todayIso())}
+</div>`;
+document.getElementById("planningTitle").innerText="Planning du jour";
+document.getElementById("planningMeta").innerText=`${dayLabels[todayColumn]} - paddocks en direct`;
 addTaskEvents();
-
+addCancelEvents();
 }
 
-/* CLIC TACHE */
+function buildPaddockView(){
+document.getElementById("planningSurface").innerHTML=`<div class="dayBoard" style="grid-template-columns:1fr">${renderPaddockBoard(todayIso())}</div>`;
+document.getElementById("planningTitle").innerText="Vue paddocks";
+document.getElementById("planningMeta").innerText="reservations Firebase aujourd'hui";
+addCancelEvents();
+}
+
+function renderPaddockBoard(date){
+const slots=getPaddockSlots(date);
+const currentDay=dayName(date);
+const columns=paddockDefs.map(paddock=>{
+const config=horaires[paddock.id]?.[currentDay];
+const hours=config?.closed ? "Ferme" : `${config?.open || "--:--"} - ${config?.close || "--:--"}`;
+const rows=slots.map(time=>renderPaddockSlot(date,paddock,config,time)).join("");
+return `<article class="paddockColumn">
+<div class="paddockTop"><div class="paddockTitle">${escapeHTML(paddock.label)}</div><div class="paddockHours">${escapeHTML(hours)}</div></div>
+<div class="slotList">${rows || "<div class='empty'>Aucun creneau visible</div>"}</div>
+</article>`;
+}).join("");
+return `<section class="paddockBoard">${columns}</section>`;
+}
+
+function renderPaddockSlot(date,paddock,config,time){
+if(isCoveredByBlockage(date,paddock.id,time)) return "";
+if(!config || config.closed || minutes(time)<minutes(config.open) || minutes(time)>=minutes(config.close)){
+return `<div class="slotCard free"><div class="slotTime">${time}</div><div><div class="slotTitle">Ferme</div></div><div></div></div>`;
+}
+const item=paddockItemAt(date,paddock.id,time);
+if(!item){
+return `<div class="slotCard free"><div class="slotTime">${time}</div><div><div class="slotTitle">Libre</div><div class="slotMeta">Creneau disponible</div></div><div></div></div>`;
+}
+const isBlock=String(item.name).toLowerCase().startsWith("blocage");
+const meta=isBlock ? formatTimeRange(item) : `${item.duration} min${item.type ? " - "+item.type : ""}`;
+const cancel=isBlock ? "" : `<button class="cancelBtn" data-cancel-reservation="${escapeHTML(item.id)}" title="Annuler la reservation">❌</button>`;
+return `<div class="slotCard ${isBlock ? "blocked" : "booked"}">
+<div class="slotTime">${escapeHTML(time)}</div>
+<div><div class="slotTitle">${escapeHTML(item.name)}</div><div class="slotMeta">${escapeHTML(meta)}</div></div>
+<div>${cancel}</div>
+</div>`;
+}
 
 function addTaskEvents(){
-
 document.querySelectorAll(".task").forEach(el=>{
-
 el.onclick=()=>{
-
 const cheval=el.dataset.cheval;
 const jour=el.dataset.jour;
 const task=el.dataset.task;
-
 if(!el.classList.contains("done")){
-
 sendToForm(cheval,jour,task);
-
 el.classList.add("done");
-
-if(!el.innerHTML.startsWith("✔")){
-el.innerHTML="✔ "+el.innerHTML;
+const first=el.querySelector("span");
+if(first) first.innerText="✔";
+setTimeout(loadPlanning,700);
 }
-
-}
-
 };
-
 });
-
 }
 
-/* NAV SEMAINE */
+function taskCountForDay(day){
+return planningData.reduce((total,row)=>total+visibleTasks(splitTasks(row[day])).length,0);
+}
+
+function paddockCountForDay(day){
+return planningData.reduce((total,row)=>total+splitTasks(row[day]).filter(t=>t.toLowerCase().includes("paddock")).length,0);
+}
+
+function doneCountForDay(day){
+return planningData.reduce((total,row)=>{
+return total+visibleTasks(splitTasks(row[day])).filter(t=>isValidated(row.cheval,day,t)).length;
+},0);
+}
+
+function renderLine(item){
+const done=item.tasks.filter(t=>isValidated(item.cheval,days[todayColumn],t)).length;
+const completed=item.tasks.length>0 && done===item.tasks.length;
+const chips=item.tasks.map(task=>{
+const iconData=taskIcon(task);
+return `<span class="mini ${iconData.class}">${iconData.icon} ${escapeHTML(task)}</span>`;
+}).join("");
+return `<div class="horseLine ${completed ? "completed" : ""}">
+<div class="horseLineTop"><span class="horseName">${escapeHTML(item.cheval)}</span><span class="badge">${done}/${item.tasks.length}</span></div>
+<div class="miniTasks">${chips}</div>
+</div>`;
+}
+
+function updateStats(){
+const day=days[todayColumn];
+const totalToday=taskCountForDay(day);
+const paddocks=reservations.filter(item=>item.date===todayIso()).length || paddockCountForDay(day);
+const done=doneCountForDay(day);
+document.getElementById("horseCount").innerText=planningData.length;
+document.getElementById("todayTaskCount").innerText=totalToday;
+document.getElementById("paddockCount").innerText=paddocks;
+document.getElementById("doneCount").innerText=done;
+document.getElementById("doneNote").innerText=totalToday ? `${Math.round(done*100/totalToday)}% du jour` : "aucune tache";
+document.getElementById("todayName").innerText=dayLabels[todayColumn].toLowerCase();
+}
+
+function updateWeekLabel(){
+document.getElementById("weekLabel").innerText=`Semaine ${String(currentWeek).padStart(2,"0")}`;
+}
+
+function setView(mode){
+viewMode=mode;
+document.getElementById("weekBtn").classList.toggle("active",mode==="week");
+document.getElementById("dayBtn").classList.toggle("active",mode==="day");
+document.getElementById("paddockBtn").classList.toggle("active",mode==="paddock");
+document.querySelector(".dashboard").classList.toggle("weekMode",mode==="week");
+if(mode==="week") buildPlanning();
+if(mode==="day") buildDayView();
+if(mode==="paddock") buildPaddockView();
+}
 
 function changeWeek(delta){
 currentWeek+=delta;
 loadPlanning();
 }
 
-/* VUE */
-
-function toggleView(){
-
-const btn=document.getElementById("viewBtn");
-
-if(viewMode==="week"){
-viewMode="day";
-btn.innerText="Vue semaine";
-buildDayView();
-}else{
-viewMode="week";
-btn.innerText="Vue jour";
-buildPlanning();
-}
-
-}
-
-/* LOAD */
-
 async function loadPlanning(){
-
-let week=String(currentWeek).padStart(2,"0");
-let year=new Date().getFullYear();
-
+updateWeekLabel();
+document.getElementById("planningSurface").innerHTML="<div class='loading'>Chargement du planning...</div>";
+try{
+const week=String(currentWeek).padStart(2,"0");
 const planningURL=`https://opensheet.elk.sh/${SHEET_PLANNING}/semaine_${week}`;
 const validationURL=`https://opensheet.elk.sh/${SHEET_VALIDATIONS}/1`;
-
-const res1=await fetch(planningURL);
+const [res1,res2]=await Promise.all([fetch(planningURL),fetch(validationURL)]);
 planningData=await res1.json();
-
-const res2=await fetch(validationURL);
 validations=await res2.json();
-
-if(viewMode==="week"){
-buildPlanning();
-}else{
-buildDayView();
+updateStats();
+setView(viewMode);
+}catch(error){
+document.getElementById("planningSurface").innerHTML="<div class='empty'>Impossible de charger les donnees. Verifie la connexion de la tablette.</div>";
+}
 }
 
+function addCancelEvents(){
+document.querySelectorAll("[data-cancel-reservation]").forEach(button=>{
+button.onclick=event=>{
+event.stopPropagation();
+cancelReservation(button.dataset.cancelReservation);
+};
+});
 }
 
+async function cancelReservation(id){
+if(!db){
+alert("Firebase n'est pas encore pret.");
+return;
+}
+const item=reservations.find(reservation=>reservation.id===id);
+if(!item){
+alert("Reservation introuvable.");
+return;
+}
+const label=`${item.name} - ${paddockLabel(item.paddock)} - ${item.time}`;
+if(!confirm(`Annuler cette reservation ?\n\n${label}`)) return;
+await db.collection("reservations").doc(id).delete();
+}
+
+function refreshFirebaseViews(){
+updateStats();
+if(viewMode==="day") buildDayView();
+if(viewMode==="paddock") buildPaddockView();
+}
+
+function subscribeFirebase(){
+if(!window.firebase || !firebase.firestore) return;
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+db=firebase.firestore();
+db.collection("reservations").onSnapshot(snapshot=>{
+const nextReservations=[];
+const nextBlocages=[];
+snapshot.forEach(doc=>{
+const item=normalizeReservation(doc);
+if(String(item.name).toLowerCase().startsWith("blocage")) nextBlocages.push(item);
+else nextReservations.push(item);
+});
+reservations=nextReservations;
+blocages=nextBlocages;
+refreshFirebaseViews();
+});
+db.collection("horaires").onSnapshot(snapshot=>{
+const nextHoraires={};
+snapshot.forEach(doc=>{nextHoraires[doc.id]=doc.data();});
+if(Object.keys(nextHoraires).length) horaires=nextHoraires;
+refreshFirebaseViews();
+});
+}
+
+subscribeFirebase();
 loadPlanning();
 
-/* REFRESH */
-
-setInterval(()=>{
-location.reload();
-},180000);
-
+setInterval(()=>{loadPlanning();},180000);
 </script>
 </body>
 </html>
