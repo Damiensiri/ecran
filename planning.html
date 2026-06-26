@@ -356,6 +356,8 @@ border-radius:8px;
 padding:10px;
 margin-bottom:8px;
 transition:border-color .55s ease,box-shadow .55s ease;
+animation:none !important;
+-webkit-animation:none !important;
 }
 
 .horseLine::before{
@@ -367,17 +369,15 @@ background:linear-gradient(90deg,var(--progress-color),rgba(255,255,255,0.06));
 opacity:1;
 transition:width .8s cubic-bezier(.22,.8,.24,1),background-color .55s ease;
 pointer-events:none;
+animation:none !important;
+-webkit-animation:none !important;
 }
 
 .horseLine::after{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(90deg,rgba(255,255,255,0.06),transparent 18%);
-transform:translateX(calc(var(--progress) - 100%));
-opacity:calc(var(--progress-value,0) / 100);
-transition:transform .8s cubic-bezier(.22,.8,.24,1),opacity .4s ease;
-pointer-events:none;
+display:none;
+content:none;
+animation:none !important;
+-webkit-animation:none !important;
 }
 
 .horseLine > *{
