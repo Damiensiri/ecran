@@ -328,32 +328,85 @@ min-height:34px;
 display:flex;
 align-items:center;
 gap:5px;
+outline:2px solid #f5a524;
+outline-offset:0;
+transition:outline-color .35s ease,box-shadow .35s ease,transform .2s ease;
 }
 
 .travail{background:#fff3b0;}
-.paddock{background:#b7e4c7;}
+.paddock{background:#cfe7ff;}
 .repos{background:#d7c5e3;}
 .proprio{background:#d7c5e3;}
 .longe{background:#bde0fe;}
 .concours{background:#ffb703;}
 
 .task.done{
-background:#3caa63 !important;
-color:white !important;
+outline:3px solid #4caf50;
+box-shadow:inset 0 0 0 2px rgba(255,255,255,0.55);
 }
 
 .horseLine{
+--progress:0%;
+--progress-color:rgba(245,165,36,0.22);
+position:relative;
+overflow:hidden;
 border:1px solid var(--line);
 background:#20242b;
 border-radius:8px;
 padding:10px;
 margin-bottom:8px;
+transition:border-color .55s ease,box-shadow .55s ease;
+}
+
+.horseLine::before{
+content:"";
+position:absolute;
+inset:0;
+width:var(--progress);
+background:linear-gradient(90deg,var(--progress-color),rgba(255,255,255,0.08),var(--progress-color));
+background-size:220% 100%;
+opacity:1;
+transition:width .8s cubic-bezier(.22,.8,.24,1),background-color .55s ease;
+animation:progressGlide 1.4s linear infinite;
+pointer-events:none;
+}
+
+.horseLine::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(90deg,rgba(255,255,255,0.06),transparent 18%);
+transform:translateX(calc(var(--progress) - 100%));
+opacity:calc(var(--progress-value,0) / 100);
+transition:transform .8s cubic-bezier(.22,.8,.24,1),opacity .4s ease;
+pointer-events:none;
+}
+
+.horseLine > *{
+position:relative;
+z-index:1;
+}
+
+@keyframes progressGlide{
+from{background-position:0 0;}
+to{background-position:220% 0;}
+}
+
+.horseLine.inProgress{
+border-color:rgba(245,165,36,0.58);
+box-shadow:inset 4px 0 0 #f5a524;
 }
 
 .horseLine.completed{
-background:rgba(76,175,80,0.22);
-border-color:rgba(114,211,159,0.62);
+--progress:100%;
+--progress-color:rgba(76,175,80,0.25);
+border-color:rgba(114,211,159,0.72);
 box-shadow:inset 4px 0 0 #4caf50;
+}
+
+.horseLine.inProgress .badge{
+background:#f5a524;
+color:#111;
 }
 
 .horseLine.completed .badge{
@@ -404,6 +457,15 @@ max-width:100%;
 overflow:hidden;
 text-overflow:ellipsis;
 white-space:nowrap;
+}
+
+.horseLine .task{
+display:inline-flex;
+width:auto;
+max-width:100%;
+min-height:32px;
+margin:0;
+padding:7px 9px;
 }
 
 .empty{
@@ -768,6 +830,7 @@ return 1+Math.round(((d-week1)/86400000-3+(week1.getDay()+6)%7)/7);
 let currentWeek=getWeekNumber();
 let planningData=[];
 let validations=[];
+let localValidations=[];
 let reservations=[];
 let blocages=[];
 let db=null;
@@ -809,6 +872,22 @@ return String(task || "").trim().toLowerCase()==="repos";
 
 function visibleTasks(tasks){
 return tasks.filter(task=>!isRestTask(task));
+}
+
+function normalizeText(value){
+return String(value || "")
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.replace(/\s+/g," ")
+.trim()
+.toLowerCase();
+}
+
+function validationMatches(v,cheval,jour,tache){
+return normalizeText(v.Semaine)===normalizeText(currentWeek)
+&& normalizeText(v.Cheval)===normalizeText(cheval)
+&& normalizeText(v.Jour)===normalizeText(jour)
+&& normalizeText(v["Tâche"] || v["Tache"])===normalizeText(tache);
 }
 
 function escapeHTML(value){
@@ -903,12 +982,8 @@ return slotStart>blockStart && slotStart<blockEnd;
 }
 
 function isValidated(cheval,jour,tache){
-return validations.some(v=>
-String(v.Semaine)==String(currentWeek)
-&& String(v.Cheval || "").toLowerCase()==cheval.toLowerCase()
-&& String(v.Jour || "").toLowerCase()==jour.toLowerCase()
-&& String(v["Tâche"] || v["Tache"] || "").toLowerCase()==tache.toLowerCase()
-);
+return validations.some(v=>validationMatches(v,cheval,jour,tache))
+|| localValidations.some(v=>validationMatches(v,cheval,jour,tache));
 }
 
 function sendToForm(cheval,jour,tache){
@@ -917,7 +992,8 @@ data.append(ENTRY_WEEK,currentWeek);
 data.append(ENTRY_HORSE,cheval);
 data.append(ENTRY_DAY,jour);
 data.append(ENTRY_TASK,tache);
-fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
+localValidations.push({Semaine:String(currentWeek),Cheval:cheval,Jour:jour,"Tâche":tache});
+return fetch(FORM_URL,{method:"POST",mode:"no-cors",body:data});
 }
 
 function formatTasks(tasks,cheval,jour){
@@ -962,10 +1038,7 @@ addTaskEvents();
 
 function buildDayView(){
 const day=days[todayColumn];
-const todayRows=planningData.map(row=>{
-const tasks=visibleTasks(splitTasks(row[day]));
-return {cheval:row.cheval,tasks};
-}).filter(item=>item.tasks.length);
+const todayRows=visibleRowsForDay(day);
 const taskHtml=todayRows.length ? todayRows.map(renderLine).join("") : "<div class='empty'>Rien de prevu aujourd'hui.</div>";
 document.getElementById("planningSurface").innerHTML=`
 <div class="dayBoard">
@@ -1030,14 +1103,41 @@ sendToForm(cheval,jour,task);
 el.classList.add("done");
 const first=el.querySelector("span");
 if(first) first.innerText="✔";
-setTimeout(loadPlanning,700);
+updateHorseLineState(el.closest(".horseLine"));
+updateStats();
 }
 };
 });
 }
 
+function updateHorseLineState(line){
+if(!line) return;
+const tasks=[...line.querySelectorAll(".task")];
+if(!tasks.length) return;
+const done=tasks.filter(task=>task.classList.contains("done")).length;
+const progress=Math.round(done*100/tasks.length);
+line.style.setProperty("--progress",`${progress}%`);
+line.style.setProperty("--progress-value",progress);
+line.style.setProperty("--progress-color",progress===100 ? "rgba(76,175,80,0.25)" : "rgba(245,165,36,0.22)");
+line.classList.toggle("inProgress",done>0 && done<tasks.length);
+line.classList.toggle("completed",done===tasks.length);
+const badge=line.querySelector(".badge");
+if(badge) badge.innerText=`${done}/${tasks.length}`;
+}
+
 function taskCountForDay(day){
 return planningData.reduce((total,row)=>total+visibleTasks(splitTasks(row[day])).length,0);
+}
+
+function visibleRowsForDay(day){
+return planningData.map(row=>{
+const tasks=visibleTasks(splitTasks(row[day]));
+return {cheval:row.cheval,tasks};
+}).filter(item=>item.tasks.length);
+}
+
+function horseCountForDay(day){
+return visibleRowsForDay(day).length;
 }
 
 function paddockCountForDay(day){
@@ -1053,11 +1153,11 @@ return total+visibleTasks(splitTasks(row[day])).filter(t=>isValidated(row.cheval
 function renderLine(item){
 const done=item.tasks.filter(t=>isValidated(item.cheval,days[todayColumn],t)).length;
 const completed=item.tasks.length>0 && done===item.tasks.length;
-const chips=item.tasks.map(task=>{
-const iconData=taskIcon(task);
-return `<span class="mini ${iconData.class}">${iconData.icon} ${escapeHTML(task)}</span>`;
-}).join("");
-return `<div class="horseLine ${completed ? "completed" : ""}">
+const inProgress=done>0 && !completed;
+const progress=item.tasks.length ? Math.round(done*100/item.tasks.length) : 0;
+const progressColor=completed ? "rgba(76,175,80,0.25)" : "rgba(245,165,36,0.22)";
+const chips=formatTasks(item.tasks.join(" / "),item.cheval,days[todayColumn]);
+return `<div class="horseLine ${inProgress ? "inProgress" : ""} ${completed ? "completed" : ""}" style="--progress:${progress}%;--progress-value:${progress};--progress-color:${progressColor};">
 <div class="horseLineTop"><span class="horseName">${escapeHTML(item.cheval)}</span><span class="badge">${done}/${item.tasks.length}</span></div>
 <div class="miniTasks">${chips}</div>
 </div>`;
@@ -1068,7 +1168,7 @@ const day=days[todayColumn];
 const totalToday=taskCountForDay(day);
 const paddocks=reservations.filter(item=>item.date===todayIso()).length || paddockCountForDay(day);
 const done=doneCountForDay(day);
-document.getElementById("horseCount").innerText=planningData.length;
+document.getElementById("horseCount").innerText=horseCountForDay(day);
 document.getElementById("todayTaskCount").innerText=totalToday;
 document.getElementById("paddockCount").innerText=paddocks;
 document.getElementById("doneCount").innerText=done;
@@ -1096,21 +1196,33 @@ currentWeek+=delta;
 loadPlanning();
 }
 
-async function loadPlanning(){
+async function loadPlanning(showLoading=false){
 updateWeekLabel();
+if(showLoading || !planningData.length){
 document.getElementById("planningSurface").innerHTML="<div class='loading'>Chargement du planning...</div>";
+}
 try{
 const week=String(currentWeek).padStart(2,"0");
 const planningURL=`https://opensheet.elk.sh/${SHEET_PLANNING}/semaine_${week}`;
 const validationURL=`https://opensheet.elk.sh/${SHEET_VALIDATIONS}/1`;
-const [res1,res2]=await Promise.all([fetch(planningURL),fetch(validationURL)]);
-planningData=await res1.json();
-validations=await res2.json();
+const [planningResult,validationResult]=await Promise.allSettled([
+fetchJSON(planningURL),
+fetchJSON(validationURL)
+]);
+if(planningResult.status!=="fulfilled") throw planningResult.reason;
+planningData=planningResult.value;
+if(validationResult.status==="fulfilled") validations=validationResult.value;
 updateStats();
 setView(viewMode);
 }catch(error){
-document.getElementById("planningSurface").innerHTML="<div class='empty'>Impossible de charger les donnees. Verifie la connexion de la tablette.</div>";
+document.getElementById("planningSurface").innerHTML="<div class='empty'>Impossible de charger le planning. Verifie la connexion de la tablette.</div>";
 }
+}
+
+async function fetchJSON(url){
+const response=await fetch(url,{cache:"no-store"});
+if(!response.ok) throw new Error(`Chargement impossible: ${response.status}`);
+return response.json();
 }
 
 function addCancelEvents(){
@@ -1139,8 +1251,18 @@ await db.collection("reservations").doc(id).delete();
 
 function refreshFirebaseViews(){
 updateStats();
-if(viewMode==="day") buildDayView();
 if(viewMode==="paddock") buildPaddockView();
+if(viewMode==="day") renderPaddockBoardIntoPage();
+}
+
+function renderPaddockBoardIntoPage(){
+const target=document.querySelector(".dayBoard .paddockBoard");
+if(!target) return;
+const next=document.createElement("div");
+next.innerHTML=renderPaddockBoard(todayIso());
+const fresh=next.firstElementChild;
+if(fresh) target.replaceWith(fresh);
+addCancelEvents();
 }
 
 function subscribeFirebase(){
@@ -1168,9 +1290,9 @@ refreshFirebaseViews();
 }
 
 subscribeFirebase();
-loadPlanning();
+loadPlanning(true);
 
-setInterval(()=>{loadPlanning();},180000);
+setInterval(()=>{loadPlanning(false);},180000);
 </script>
 </body>
 </html>
