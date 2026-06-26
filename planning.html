@@ -193,12 +193,42 @@ gap:10px;
 }
 
 .stat{
+--stat-progress:0%;
+--stat-progress-color:rgba(245,165,36,0.22);
+position:relative;
+overflow:hidden;
 background:rgba(24,27,32,0.92);
 border:1px solid var(--line);
 border-radius:8px;
 padding:12px;
 min-height:86px;
 box-shadow:var(--shadow);
+transition:border-color .55s ease,box-shadow .55s ease;
+}
+
+.stat::before{
+content:"";
+position:absolute;
+inset:0;
+width:var(--stat-progress);
+background:linear-gradient(90deg,var(--stat-progress-color),rgba(255,255,255,0.05));
+transition:width .8s cubic-bezier(.22,.8,.24,1),background-color .55s ease;
+pointer-events:none;
+}
+
+.stat > *{
+position:relative;
+z-index:1;
+}
+
+.stat.progressing{
+border-color:rgba(245,165,36,0.58);
+box-shadow:inset 4px 0 0 #f5a524,var(--shadow);
+}
+
+.stat.complete{
+border-color:rgba(114,211,159,0.72);
+box-shadow:inset 4px 0 0 #4caf50,var(--shadow);
 }
 
 .statLabel{
@@ -702,7 +732,7 @@ height:100%;
 <div class="statValue" id="paddockCount">--</div>
 <div class="statNote">sorties du jour</div>
 </div>
-<div class="stat">
+<div class="stat" id="doneStat">
 <div class="statLabel">Validees</div>
 <div class="statValue" id="doneCount">--</div>
 <div class="statNote" id="doneNote">cochees</div>
@@ -1143,6 +1173,14 @@ return total+visibleTasks(splitTasks(row[day])).filter(t=>isValidated(row.cheval
 },0);
 }
 
+function dayProgress(day){
+const rows=visibleRowsForDay(day);
+const total=rows.reduce((sum,row)=>sum+row.tasks.length,0);
+const done=rows.reduce((sum,row)=>sum+row.tasks.filter(t=>isValidated(row.cheval,day,t)).length,0);
+const percent=total ? Math.round(done*100/total) : 0;
+return {done,total,percent};
+}
+
 function renderLine(item){
 const done=item.tasks.filter(t=>isValidated(item.cheval,days[todayColumn],t)).length;
 const completed=item.tasks.length>0 && done===item.tasks.length;
@@ -1158,15 +1196,23 @@ return `<div class="horseLine ${inProgress ? "inProgress" : ""} ${completed ? "c
 
 function updateStats(){
 const day=days[todayColumn];
-const totalToday=taskCountForDay(day);
+const progress=dayProgress(day);
 const paddocks=reservations.filter(item=>item.date===todayIso()).length || paddockCountForDay(day);
-const done=doneCountForDay(day);
 document.getElementById("horseCount").innerText=horseCountForDay(day);
-document.getElementById("todayTaskCount").innerText=totalToday;
+document.getElementById("todayTaskCount").innerText=progress.total;
 document.getElementById("paddockCount").innerText=paddocks;
-document.getElementById("doneCount").innerText=done;
-document.getElementById("doneNote").innerText=totalToday ? `${Math.round(done*100/totalToday)}% du jour` : "aucune tache";
+document.getElementById("doneCount").innerText=`${progress.done}/${progress.total}`;
+document.getElementById("doneNote").innerText=progress.total ? `${progress.percent}% du jour` : "aucune tache";
 document.getElementById("todayName").innerText=dayLabels[todayColumn].toLowerCase();
+updateStatProgress(document.getElementById("doneStat"),progress.percent);
+}
+
+function updateStatProgress(el,percent){
+if(!el) return;
+el.style.setProperty("--stat-progress",`${percent}%`);
+el.style.setProperty("--stat-progress-color",percent===100 ? "rgba(76,175,80,0.25)" : "rgba(245,165,36,0.22)");
+el.classList.toggle("progressing",percent>0 && percent<100);
+el.classList.toggle("complete",percent===100);
 }
 
 function updateWeekLabel(){
