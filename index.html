@@ -117,7 +117,6 @@ html{
   width:100%;
   min-height:100%;
   background:#2f8fce;
-  transition:background-color 2.8s ease;
 }
 
 body{
@@ -1030,7 +1029,6 @@ setInterval(updateBell,60000);
     document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
     document.body.dataset.sunrise=Math.round(times.sunrise);
     document.body.dataset.sunset=Math.round(times.sunset);
-    document.documentElement.style.backgroundColor=themeColors[phase]||themeColors.day;
 
     const themeMeta=document.querySelector('meta[name="theme-color"]');
     if(themeMeta)themeMeta.setAttribute("content",themeColors[phase]||themeColors.day);
