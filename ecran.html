@@ -350,6 +350,11 @@ h1{
   min-width:0;
 }
 
+.alertBox.urgent{
+  background:linear-gradient(135deg,#e1000f,#b70015);
+  box-shadow:0 10px 24px rgba(130,0,15,0.24);
+}
+
 .alertBox.is-empty{
   color:var(--muted);
   border-color:rgba(255,255,255,0.12);
@@ -599,6 +604,7 @@ function buildStableCard(data,horaires,exceptions){
   const hours=displayHours(exception?.message || (dayRow ? `${formatSheetTime(dayRow.ouvert)} - ${formatSheetTime(dayRow.ferme)}` : "Horaires non definis"));
   const alertRow=data.find(row=>row.espace==="accueil");
   const alertText=alertRow?.alerte || "";
+  const alertIsUrgent=String(alertRow?.urgent || "").trim().toLowerCase()==="oui";
   const sourceLabel=exception ? "Horaires adaptes" : "Horaires habituels";
 
   return `
@@ -614,7 +620,7 @@ function buildStableCard(data,horaires,exceptions){
         <div class="stableTime">${escapeHTML(hours)}</div>
         <div class="stableMeta">${escapeHTML(sourceLabel)}</div>
       </div>
-      <div class="alertBox ${alertText ? "" : "is-empty"}">
+      <div class="alertBox ${alertText ? (alertIsUrgent ? "urgent" : "") : "is-empty"}">
         ${alertText ? `<span class="alertTag">Alerte</span><span>${escapeHTML(alertText)}</span>` : "<span>Aucune alerte</span>"}
       </div>
     </div>
