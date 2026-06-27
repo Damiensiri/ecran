@@ -117,7 +117,8 @@ html{
   width:100%;
   height:100%;
   min-height:100%;
-  background:transparent;
+  background:#8dcced;
+  transition:background-color 2.8s ease;
 }
 
 body{
@@ -195,10 +196,7 @@ body[data-day-phase="dusk"]{
 body::before{
   content:"";
   position:fixed;
-  top:0;
-  right:0;
-  bottom:calc(-1 * var(--safe-bottom));
-  left:0;
+  inset:0;
   z-index:0;
   pointer-events:none;
   background:
@@ -955,6 +953,14 @@ setInterval(updateBell,60000);
     golden:"#9b684f",
     dusk:"#1f3155"
   };
+  const canvasColors={
+    night:"#244d75",
+    dawn:"#c88a70",
+    morning:"#9bd5f0",
+    day:"#8dcced",
+    golden:"#e8b681",
+    dusk:"#b77670"
+  };
 
   function localClock(date){
     const parts={};
@@ -1038,6 +1044,7 @@ setInterval(updateBell,60000);
     document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
     document.body.dataset.sunrise=Math.round(times.sunrise);
     document.body.dataset.sunset=Math.round(times.sunset);
+    document.documentElement.style.backgroundColor=canvasColors[phase]||canvasColors.day;
 
     const themeMeta=document.querySelector('meta[name="theme-color"]');
     if(themeMeta)themeMeta.setAttribute("content",themeColors[phase]||themeColors.day);
