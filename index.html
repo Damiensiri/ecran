@@ -117,8 +117,15 @@ html{
   width:100%;
   height:100%;
   min-height:100%;
-  background:#8dcced;
-  transition:background-color 2.8s ease;
+  background:
+    radial-gradient(circle at 22% 12%,rgba(255,225,151,.22),transparent 32%),
+    radial-gradient(circle at 84% 20%,rgba(115,224,255,.16),transparent 34%),
+    radial-gradient(ellipse at 48% 88%,rgba(255,255,255,.10),transparent 38%),
+    linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 48%,var(--sky-bottom) 100%);
+  transition:
+    --sky-top 2.8s ease,
+    --sky-mid 2.8s ease,
+    --sky-bottom 2.8s ease;
 }
 
 body{
@@ -238,9 +245,9 @@ body::after{
 .scroll{
   position:absolute;
   top:calc(70px + var(--safe-top));
+  bottom:var(--safe-bottom);
   left:0;
   width:100%;
-  height:calc(100% - 70px - var(--safe-top));
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior-y:contain;
@@ -953,13 +960,13 @@ setInterval(updateBell,60000);
     golden:"#9b684f",
     dusk:"#1f3155"
   };
-  const canvasColors={
-    night:"#244d75",
-    dawn:"#c88a70",
-    morning:"#9bd5f0",
-    day:"#8dcced",
-    golden:"#e8b681",
-    dusk:"#b77670"
+  const skyPalettes={
+    night:["#061225","#102848","#244d75"],
+    dawn:["#1f3155","#705f84","#c88a70"],
+    morning:["#2c86c5","#45a6e4","#9bd5f0"],
+    day:["#287fbd","#3f9fdd","#8dcced"],
+    golden:["#346f9e","#be7d66","#e8b681"],
+    dusk:["#1f3155","#5f547b","#b77670"]
   };
 
   function localClock(date){
@@ -1044,7 +1051,10 @@ setInterval(updateBell,60000);
     document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
     document.body.dataset.sunrise=Math.round(times.sunrise);
     document.body.dataset.sunset=Math.round(times.sunset);
-    document.documentElement.style.backgroundColor=canvasColors[phase]||canvasColors.day;
+    const skyPalette=skyPalettes[phase]||skyPalettes.day;
+    document.documentElement.style.setProperty("--sky-top",skyPalette[0]);
+    document.documentElement.style.setProperty("--sky-mid",skyPalette[1]);
+    document.documentElement.style.setProperty("--sky-bottom",skyPalette[2]);
 
     const themeMeta=document.querySelector('meta[name="theme-color"]');
     if(themeMeta)themeMeta.setAttribute("content",themeColors[phase]||themeColors.day);
