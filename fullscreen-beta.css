@@ -98,6 +98,7 @@ body.fullscreen-standard .page > header{
   height:calc(70px + var(--safe-top)) !important;
   margin:0 !important;
   padding-top:var(--safe-top) !important;
+  box-sizing:border-box !important;
   transform:translateX(-50%) !important;
 }
 
@@ -114,7 +115,7 @@ body.fullscreen-standard .page.exit{
 
 body.fullscreen-standard header.plan-header h1{
   position:absolute !important;
-  top:50% !important;
+  top:calc(35px + var(--safe-top)) !important;
   left:50% !important;
   margin:0 !important;
   color:var(--text-strong) !important;
@@ -130,11 +131,12 @@ body.fullscreen-standard header.plan-header h1{
 
 body.fullscreen-standard header.plan-header #backBtn{
   position:absolute !important;
-  top:50% !important;
+  top:calc(35px + var(--safe-top)) !important;
   left:18px !important;
-  width:44px !important;
-  height:44px !important;
+  width:46px !important;
+  height:46px !important;
   margin:0 !important;
+  box-sizing:border-box !important;
   transform:translateY(-50%) !important;
 }
 
