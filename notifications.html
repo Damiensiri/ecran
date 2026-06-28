@@ -563,6 +563,9 @@ async function loadNotifications(){
         `;
         card.onclick=()=>{
           marquerLu(n.id);
+          try{
+            sessionStorage.setItem("alert_detail_cache",JSON.stringify(n));
+          }catch(e){}
           window.location.href="detail.html?id="+n.id;
         };
         container.appendChild(card);

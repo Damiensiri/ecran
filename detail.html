@@ -492,10 +492,22 @@ async function loadDetail(){
 
   try{
 
-    const res=await fetch(API_URL);
-    const data=await res.json();
+    let cachedNotif=null;
+    try{
+      const cached=JSON.parse(sessionStorage.getItem("alert_detail_cache")||"null");
+      if(cached&&String(cached.id)===String(id)) cachedNotif=cached;
+    }catch(e){}
 
-    const notif=data.find(n=>String(n.id)===String(id));
+    let data=[];
+    try{
+      const res=await fetch(API_URL);
+      data=await res.json();
+    }catch(fetchError){
+      if(cachedNotif) data=[cachedNotif];
+      else throw fetchError;
+    }
+
+    const notif=data.find(n=>String(n.id)===String(id))||cachedNotif;
 
     if(!notif){
       document.getElementById("titre").innerText="Notification introuvable";
