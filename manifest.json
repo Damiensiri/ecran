@@ -1,7 +1,7 @@
 {
   "name": "Ecurie Damien SIRI Beta",
   "short_name": "Ecurie DS Beta",
-  "start_url": "./index-fullscreen-beta.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#287fbd",
