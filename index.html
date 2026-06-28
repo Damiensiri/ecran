@@ -3,17 +3,17 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>Ecurie Damien Siri</title>
 
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest-beta.json">
 
 <link rel="apple-touch-icon" href="image/icon-192x192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ecurie DS">
-<meta name="theme-color" content="#6fb7ff">
+<meta name="theme-color" content="#287fbd">
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 
@@ -115,21 +115,17 @@ cancelButton:"Plus tard"
 
 html{
   width:100%;
+  height:100%;
   min-height:100%;
-  background:#2f8fce;
-}
-
-body{
-  position:relative;
-  min-height:100%;
-  margin:0;
+  min-height:100dvh;
   overflow:hidden;
-  font-family:var(--font-main);
-  color:var(--text-main);
-  background:transparent;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
+  background:
+    radial-gradient(circle at 22% 12%,rgba(255,225,151,.22),transparent 32%),
+    radial-gradient(circle at 84% 20%,rgba(115,224,255,.16),transparent 34%),
+    radial-gradient(ellipse at 48% 88%,rgba(255,255,255,.10),transparent 38%),
+    linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 48%,var(--sky-bottom) 100%);
   transition:
+    background-color 2.8s ease,
     --sky-top 2.8s ease,
     --sky-mid 2.8s ease,
     --sky-bottom 2.8s ease,
@@ -138,7 +134,21 @@ body{
     --solar-opacity 2.8s ease;
 }
 
-body[data-day-phase="night"]{
+body{
+  position:relative;
+  height:100%;
+  min-height:100%;
+  min-height:100dvh;
+  margin:0;
+  overflow:hidden;
+  font-family:var(--font-main);
+  color:var(--text-main);
+  background:transparent;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+:root[data-day-phase="night"]{
   --sky-top:#061225;
   --sky-mid:#102848;
   --sky-bottom:#244d75;
@@ -146,7 +156,7 @@ body[data-day-phase="night"]{
   --solar-opacity:.26;
 }
 
-body[data-day-phase="dawn"]{
+:root[data-day-phase="dawn"]{
   --sky-top:#1f3155;
   --sky-mid:#705f84;
   --sky-bottom:#c88a70;
@@ -154,7 +164,7 @@ body[data-day-phase="dawn"]{
   --solar-opacity:.34;
 }
 
-body[data-day-phase="morning"]{
+:root[data-day-phase="morning"]{
   --sky-top:#2c86c5;
   --sky-mid:#45a6e4;
   --sky-bottom:#9bd5f0;
@@ -162,7 +172,7 @@ body[data-day-phase="morning"]{
   --solar-opacity:.38;
 }
 
-body[data-day-phase="day"]{
+:root[data-day-phase="day"]{
   --sky-top:#287fbd;
   --sky-mid:#3f9fdd;
   --sky-bottom:#8dcced;
@@ -170,7 +180,7 @@ body[data-day-phase="day"]{
   --solar-opacity:.40;
 }
 
-body[data-day-phase="golden"]{
+:root[data-day-phase="golden"]{
   --sky-top:#346f9e;
   --sky-mid:#be7d66;
   --sky-bottom:#e8b681;
@@ -178,7 +188,7 @@ body[data-day-phase="golden"]{
   --solar-opacity:.44;
 }
 
-body[data-day-phase="dusk"]{
+:root[data-day-phase="dusk"]{
   --sky-top:#1f3155;
   --sky-mid:#5f547b;
   --sky-bottom:#b77670;
@@ -186,7 +196,7 @@ body[data-day-phase="dusk"]{
   --solar-opacity:.30;
 }
 
-body::before{
+html::before{
   content:"";
   position:fixed;
   inset:0;
@@ -201,7 +211,7 @@ body::before{
   animation:ambientBreath 18s ease-in-out infinite alternate;
 }
 
-body::after{
+html::after{
   content:"";
   position:fixed;
   inset:-24%;
@@ -225,6 +235,7 @@ body::after{
   z-index:1;
   width:min(100%,520px);
   height:100%;
+  height:100dvh;
   transform:translateX(-50%);
 }
 
@@ -1024,11 +1035,13 @@ setInterval(updateBell,60000);
     const daylightProgress=Math.max(0,Math.min(1,(clock.minutes-times.sunrise)/(times.sunset-times.sunrise)));
     const solarHeight=Math.sin(Math.PI*daylightProgress);
 
-    document.body.dataset.dayPhase=phase;
-    document.body.style.setProperty("--solar-x",(10+80*daylightProgress).toFixed(2)+"%");
-    document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
-    document.body.dataset.sunrise=Math.round(times.sunrise);
-    document.body.dataset.sunset=Math.round(times.sunset);
+    const root=document.documentElement;
+    root.dataset.dayPhase=phase;
+    root.style.setProperty("--solar-x",(10+80*daylightProgress).toFixed(2)+"%");
+    root.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
+    root.dataset.sunrise=Math.round(times.sunrise);
+    root.dataset.sunset=Math.round(times.sunset);
+    document.documentElement.style.backgroundColor=themeColors[phase]||themeColors.day;
 
     const themeMeta=document.querySelector('meta[name="theme-color"]');
     if(themeMeta)themeMeta.setAttribute("content",themeColors[phase]||themeColors.day);
