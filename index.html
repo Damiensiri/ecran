@@ -117,6 +117,7 @@ html{
   width:100%;
   min-height:100%;
   background:#2f8fce;
+  scrollbar-width:none;
 }
 
 body{
@@ -129,6 +130,7 @@ body{
   background:transparent;
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
+  scrollbar-width:none;
   transition:
     --sky-top 2.8s ease,
     --sky-mid 2.8s ease,
@@ -136,6 +138,13 @@ body{
     --solar-x 60s linear,
     --solar-y 60s linear,
     --solar-opacity 2.8s ease;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+  width:0;
+  height:0;
+  display:none;
 }
 
 body[data-day-phase="night"]{
