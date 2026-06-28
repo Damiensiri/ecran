@@ -59,9 +59,21 @@ body.fullscreen-standard > .ambient-stage{
   transform:translateZ(0);
 }
 
-body.fullscreen-standard.safe-area-extended > .ambient-stage{
-  bottom:calc(0px - var(--safe-bottom));
+html.safe-area-root{
+  min-height:100%;
+  background:transparent !important;
+}
+
+body.fullscreen-standard.safe-area-extended{
   min-height:calc(100dvh + var(--safe-bottom));
+  padding-bottom:var(--safe-bottom);
+  box-sizing:border-box;
+  background:linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-mid) 48%,
+    var(--sky-bottom) 100%
+  ) !important;
 }
 
 body.fullscreen-standard > .ambient-stage::before{
