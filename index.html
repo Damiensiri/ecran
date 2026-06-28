@@ -115,17 +115,21 @@ cancelButton:"Plus tard"
 
 html{
   width:100%;
-  height:100%;
   min-height:100%;
-  min-height:100dvh;
+  background:#2f8fce;
+}
+
+body{
+  position:relative;
+  min-height:100%;
+  margin:0;
   overflow-x:hidden;
-  background:
-    radial-gradient(circle at 22% 12%,rgba(255,225,151,.22),transparent 32%),
-    radial-gradient(circle at 84% 20%,rgba(115,224,255,.16),transparent 34%),
-    radial-gradient(ellipse at 48% 88%,rgba(255,255,255,.10),transparent 38%),
-    linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 48%,var(--sky-bottom) 100%);
+  font-family:var(--font-main);
+  color:var(--text-main);
+  background:transparent;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
   transition:
-    background-color 2.8s ease,
     --sky-top 2.8s ease,
     --sky-mid 2.8s ease,
     --sky-bottom 2.8s ease,
@@ -134,21 +138,7 @@ html{
     --solar-opacity 2.8s ease;
 }
 
-body{
-  position:relative;
-  height:100%;
-  min-height:100%;
-  min-height:100dvh;
-  margin:0;
-  overflow-x:hidden;
-  font-family:var(--font-main);
-  color:var(--text-main);
-  background:transparent;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-}
-
-:root[data-day-phase="night"]{
+body[data-day-phase="night"]{
   --sky-top:#061225;
   --sky-mid:#102848;
   --sky-bottom:#244d75;
@@ -156,7 +146,7 @@ body{
   --solar-opacity:.26;
 }
 
-:root[data-day-phase="dawn"]{
+body[data-day-phase="dawn"]{
   --sky-top:#1f3155;
   --sky-mid:#705f84;
   --sky-bottom:#c88a70;
@@ -164,7 +154,7 @@ body{
   --solar-opacity:.34;
 }
 
-:root[data-day-phase="morning"]{
+body[data-day-phase="morning"]{
   --sky-top:#2c86c5;
   --sky-mid:#45a6e4;
   --sky-bottom:#9bd5f0;
@@ -172,7 +162,7 @@ body{
   --solar-opacity:.38;
 }
 
-:root[data-day-phase="day"]{
+body[data-day-phase="day"]{
   --sky-top:#287fbd;
   --sky-mid:#3f9fdd;
   --sky-bottom:#8dcced;
@@ -180,7 +170,7 @@ body{
   --solar-opacity:.40;
 }
 
-:root[data-day-phase="golden"]{
+body[data-day-phase="golden"]{
   --sky-top:#346f9e;
   --sky-mid:#be7d66;
   --sky-bottom:#e8b681;
@@ -188,7 +178,7 @@ body{
   --solar-opacity:.44;
 }
 
-:root[data-day-phase="dusk"]{
+body[data-day-phase="dusk"]{
   --sky-top:#1f3155;
   --sky-mid:#5f547b;
   --sky-bottom:#b77670;
@@ -1042,12 +1032,11 @@ setInterval(updateBell,60000);
     const daylightProgress=Math.max(0,Math.min(1,(clock.minutes-times.sunrise)/(times.sunset-times.sunrise)));
     const solarHeight=Math.sin(Math.PI*daylightProgress);
 
-    const root=document.documentElement;
-    root.dataset.dayPhase=phase;
-    root.style.setProperty("--solar-x",(10+80*daylightProgress).toFixed(2)+"%");
-    root.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
-    root.dataset.sunrise=Math.round(times.sunrise);
-    root.dataset.sunset=Math.round(times.sunset);
+    document.body.dataset.dayPhase=phase;
+    document.body.style.setProperty("--solar-x",(10+80*daylightProgress).toFixed(2)+"%");
+    document.body.style.setProperty("--solar-y",(62-47*solarHeight).toFixed(2)+"%");
+    document.body.dataset.sunrise=Math.round(times.sunrise);
+    document.body.dataset.sunset=Math.round(times.sunset);
     document.documentElement.style.backgroundColor=themeColors[phase]||themeColors.day;
 
     const themeMeta=document.querySelector('meta[name="theme-color"]');
