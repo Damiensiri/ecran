@@ -488,9 +488,12 @@ transition-duration:1ms!important;
 }
 
 </style>
+<link rel="stylesheet" href="fullscreen-beta.css">
 </head>
 
-<body>
+<body class="fullscreen-standard">
+
+<div class="ambient-stage" aria-hidden="true"></div>
 
 <div class="page" id="page">
 
@@ -613,7 +616,7 @@ return String(value || "")
 .replace(/;/g,"\\;")
 }
 
-function addToCalendar(title,dateStr,timeStr,duration,description){
+async function addToCalendar(title,dateStr,timeStr,duration,description){
 const start=getReservationDateTime(dateStr,timeStr)
 const end=getReservationEndDateTime(dateStr,timeStr,duration)
 if(isNaN(start) || isNaN(end)) return
@@ -646,15 +649,10 @@ const ics=[
 "END:VCALENDAR"
 ].join("\r\n")+"\r\n"
 
+const filename=`reservation-${dateStr}.ics`
+
 if(isIOSCalendarTarget()){
-const dataUrl=`data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`
-const link=document.createElement("a")
-link.href=dataUrl
-link.target="_blank"
-link.rel="noopener"
-document.body.appendChild(link)
-link.click()
-link.remove()
+window.location.href=`data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`
 return
 }
 
@@ -662,17 +660,17 @@ const blob=new Blob([ics],{type:"text/calendar;charset=utf-8"})
 const url=URL.createObjectURL(blob)
 const link=document.createElement("a")
 link.href=url
-link.download=`reservation-${dateStr}.ics`
+link.download=filename
 document.body.appendChild(link)
 link.click()
 link.remove()
 setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
 
-function addReservationToCalendar(id){
+async function addReservationToCalendar(id){
 const reservation=calendarReservations[id]
 if(!reservation) return
-addToCalendar(
+await addToCalendar(
 reservation.title,
 reservation.date,
 reservation.time,
