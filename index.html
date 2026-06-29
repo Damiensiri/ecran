@@ -712,13 +712,13 @@ ECURIE DAMIEN SIRI
 <div class="card" onclick="go('paddocks.html?ui=20260628-3')"><img src="image/paddock.svg"><div>PADDOCK</div></div>
 </div>
 
-<div class="list-btn" onclick="go('plan.html?ui=20260628-3')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
+<div class="list-btn" onclick="go('plan.html?ui=20260629-2')"><img src="image/plan.svg"> PLAN INTERACTIF</div>
 
 <div class="section-title">PRATIQUE</div>
 
 <div class="grid">
 <div class="card" onclick="go('horaires.html?ui=20260628-6')"><img src="image/time.svg"><div>HORAIRES</div></div>
-<div class="card" onclick="go('meteo.html')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
+<div class="card" onclick="go('meteo.html?ui=20260629-2')"><img src="image/meteo.svg"><div>MÉTÉO</div></div>
 <div class="card" onclick="openExternal('https://ce-grand-rang.cavasoft.fr')"><img src="image/cavasoft.svg"><div>COURS</div></div>
 <div class="card" onclick="go('service.html?ui=20260628-3')"><img src="image/service.svg"><div>SERVICES</div></div>
 <div class="card" onclick="go('concours.html?ui=20260628-3')"><img src="image/concours.svg"><div>CONCOURS</div></div>
@@ -858,7 +858,7 @@ status.textContent=`Écuries fermées ${open} – ${close}`;
 load();
 setInterval(load,10000);
 
-["paddocks.html?ui=20260628-3","travail.html?ui=20260628-3","plan.html?ui=20260628-3","horaires.html?ui=20260628-6"].forEach(p=>{
+["paddocks.html?ui=20260628-3","travail.html?ui=20260628-3","plan.html?ui=20260629-2","horaires.html?ui=20260628-6"].forEach(p=>{
 fetch(p,{cache:"force-cache"}).catch(()=>{});
 });
 
