@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="safe-area-root">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -917,13 +917,16 @@ transition-duration:1ms!important;
 }
 }
 </style>
+<link rel="stylesheet" href="fullscreen-beta.css?ui=20260629-1">
 </head>
 
-<body>
+<body class="fullscreen-standard safe-area-extended">
+
+<div class="ambient-stage" aria-hidden="true"></div>
 
 <div class="page">
 
-<header>
+<header class="plan-header">
 <div id="backBtn" onclick="location.href='index.html'">
 <img src="image/back.svg">
 </div>
