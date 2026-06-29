@@ -930,7 +930,7 @@ transition-duration:1ms!important;
 <div id="backBtn" onclick="location.href='index.html'">
 <img src="image/back.svg">
 </div>
-<h1 id="title">PADDOCK</h1>
+<h1 id="title">RÉSERVATION</h1>
 </header>
 
 <div class="card">
@@ -1060,14 +1060,14 @@ const pass=prompt("Mot de passe admin")
 
 if(pass==="0359140"){
 adminMode=true
-title.innerHTML="PADDOCK 🔧"
+title.innerHTML="RÉSERVATION 🔧"
 generate()
 }
 
 }else{
 
 adminMode=false
-title.innerHTML="PADDOCK"
+title.innerHTML="RÉSERVATION"
 generate()
 
 }
@@ -1843,21 +1843,6 @@ duration:selected.duration
 })
 
 let email = document.getElementById("email").value.trim()
-
-// 👉 toujours envoyer à toi
-emailjs.send("service_mkpsbdf","template_0qhjhhg",{
-title: "📥 Nouvelle réservation paddock",
-message: `
-📍 <strong>Paddock :</strong> ${selected.paddock}<br>
-📅 <strong>Jour :</strong> ${selected.date}<br>
-⏰ <strong>Heure :</strong> ${selected.time}<br><br>
-
-👤 <strong>Client :</strong> ${name}<br>
-📧 <strong>Email :</strong> ${email || "Non renseigné"}
-`,
-prenom: name,
-email: "damiensiri.pro@hotmail.fr"
-})
 
 // 👉 envoi client uniquement si email
 if(email && email.includes("@")){
