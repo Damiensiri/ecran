@@ -471,11 +471,20 @@ h1{
 </div>
 
 <script>
-const BASE_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec";
-const STATUTS_URL=`${BASE_URL}?sheet=statuts`;
-const HORAIRES_URL=`${BASE_URL}?sheet=horaires`;
-const EXCEPTIONS_URL=`${BASE_URL}?sheet=exceptions`;
-const REFRESH=10000;
+const LEGACY_BASE_URL="https://script.google.com/macros/s/AKfycbzWEB8PPqSQ4rinnTbh4414U3QPX836XtPOPBmKr0Bw2W4mRFWAl7Chv6WKHOjrcWoZew/exec";
+const STATUTS_URL=`${LEGACY_BASE_URL}?sheet=statuts`;
+const HORAIRES_URL=`${LEGACY_BASE_URL}?sheet=horaires`;
+const EXCEPTIONS_URL=`${LEGACY_BASE_URL}?sheet=exceptions`;
+const DEFAULT_WORKER_BASE_URL="https://ecurie-notifications-prod.damiensiri-pro.workers.dev";
+const WORKER_QUERY_BASE=new URLSearchParams(window.location.search).get("worker");
+const WORKER_BASE_URL=WORKER_QUERY_BASE || DEFAULT_WORKER_BASE_URL;
+const WORKER_STATUSES_PATH="/api/statuses";
+const WORKER_SCHEDULES_PATH="/api/schedules";
+const WORKER_EXCEPTIONS_PATH="/api/exceptions";
+const WORKER_WS_PATH="/api/realtime";
+const REFRESH=60000;
+const WS_RECONNECT_MIN=2000;
+const WS_RECONNECT_MAX=30000;
 
 const TITRES={
   "carriere":"Carriere",
@@ -490,6 +499,9 @@ const WORK=["carriere","manege"];
 const PADDOCKS=["maison","grande-voie","beudot"];
 
 let lastPayload="";
+let workerSocket=null;
+let workerSocketRetry=0;
+let workerSocketTimer=null;
 
 function escapeHTML(value){
   return String(value || "").replace(/[&<>"']/g,char=>({
@@ -653,25 +665,121 @@ function renderData(data,horaires=[],exceptions=[]){
   if(stable) stable.innerHTML=buildStableCard(data,horaires,exceptions);
 }
 
-function loadData(){
-  Promise.all([
+function configuredWorkerBase(){
+  return String(WORKER_BASE_URL || "").trim().replace(/\/+$/,"");
+}
+
+function workerWebSocketURL(){
+  const base=configuredWorkerBase();
+  if(!base) return "";
+  const url=new URL(WORKER_WS_PATH,base);
+  url.protocol=url.protocol==="https:" ? "wss:" : "ws:";
+  return url.toString();
+}
+
+function workerURL(path){
+  const base=configuredWorkerBase();
+  return base ? `${base}${path}` : "";
+}
+
+function normalizePayload(payload){
+  if(!payload) return null;
+  const source=payload.payload || payload.data || payload;
+  const statuts=source.statuts || source.data || [];
+  const horaires=source.horaires || [];
+  const exceptions=source.exceptions || [];
+  if(!Array.isArray(statuts)) return null;
+  return {data:statuts,horaires:Array.isArray(horaires) ? horaires : [],exceptions:Array.isArray(exceptions) ? exceptions : []};
+}
+
+function applyPayload(payload){
+  const normalized=normalizePayload(payload);
+  if(!normalized) return false;
+  const nextPayload=JSON.stringify(normalized);
+  if(nextPayload===lastPayload) return true;
+  lastPayload=nextPayload;
+  renderData(normalized.data,normalized.horaires,normalized.exceptions);
+  return true;
+}
+
+async function loadLegacyData(){
+  const [data,horaires,exceptions]=await Promise.all([
     fetch(STATUTS_URL,{cache:"no-store"}).then(r=>r.json()),
     fetch(HORAIRES_URL,{cache:"no-store"}).then(r=>r.json()),
     fetch(EXCEPTIONS_URL,{cache:"no-store"}).then(r=>r.json())
-  ])
-  .then(([data,horaires,exceptions])=>{
-    const payload=JSON.stringify({data,horaires,exceptions});
-    if(payload===lastPayload) return;
-    lastPayload=payload;
-    renderData(data,horaires,exceptions);
-  })
-  .catch(()=>{
-    document.getElementById("dateLabel").innerText="Connexion aux donnees en attente";
-  });
+  ]);
+  applyPayload({data,horaires,exceptions});
+}
+
+async function loadWorkerData(){
+  const statusesURL=workerURL(WORKER_STATUSES_PATH);
+  const schedulesURL=workerURL(WORKER_SCHEDULES_PATH);
+  const exceptionsURL=workerURL(WORKER_EXCEPTIONS_PATH);
+  if(!statusesURL || !schedulesURL || !exceptionsURL) return false;
+  const [data,horaires,exceptions]=await Promise.all([
+    fetch(statusesURL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(schedulesURL,{cache:"no-store"}).then(r=>r.json()),
+    fetch(exceptionsURL,{cache:"no-store"}).then(r=>r.json())
+  ]);
+  return applyPayload({data,horaires,exceptions});
+}
+
+async function loadData(){
+  try{
+    if(await loadWorkerData()) return;
+    await loadLegacyData();
+  }catch(error){
+    try{
+      await loadLegacyData();
+    }catch(legacyError){
+      document.getElementById("dateLabel").innerText="Connexion aux donnees en attente";
+    }
+  }
+}
+
+function scheduleWorkerSocketReconnect(){
+  const url=workerWebSocketURL();
+  if(!url) return;
+  clearTimeout(workerSocketTimer);
+  const delay=Math.min(WS_RECONNECT_MIN*Math.pow(1.7,workerSocketRetry),WS_RECONNECT_MAX);
+  workerSocketRetry+=1;
+  workerSocketTimer=setTimeout(connectWorkerSocket,delay);
+}
+
+function connectWorkerSocket(){
+  const url=workerWebSocketURL();
+  if(!url || workerSocket?.readyState===WebSocket.OPEN || workerSocket?.readyState===WebSocket.CONNECTING) return;
+  try{
+    workerSocket=new WebSocket(url);
+    workerSocket.addEventListener("open",()=>{
+      workerSocketRetry=0;
+      loadData();
+    });
+    workerSocket.addEventListener("message",event=>{
+      if(event.data==="pong") return;
+      try{
+        const message=JSON.parse(event.data);
+        if(message.payload || message.data) applyPayload(message);
+        else loadData();
+      }catch(error){
+        loadData();
+      }
+    });
+    workerSocket.addEventListener("close",scheduleWorkerSocketReconnect);
+    workerSocket.addEventListener("error",()=>{
+      workerSocket?.close();
+    });
+  }catch(error){
+    scheduleWorkerSocketReconnect();
+  }
 }
 
 loadData();
-setInterval(loadData,REFRESH);
+connectWorkerSocket();
+setInterval(()=>{
+  loadData();
+  if(!workerSocket || workerSocket.readyState===WebSocket.CLOSED) connectWorkerSocket();
+},REFRESH);
 
 function updateClock(){
   const d=new Date();
