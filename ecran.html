@@ -684,10 +684,10 @@ function workerURL(path){
 
 function normalizePayload(payload){
   if(!payload) return null;
-  const source=payload.payload || payload.data || payload;
-  const statuts=source.statuts || source.data || [];
-  const horaires=source.horaires || [];
-  const exceptions=source.exceptions || [];
+  const source=payload.payload || payload;
+  const statuts=Array.isArray(source) ? source : source.statuts || source.data || [];
+  const horaires=Array.isArray(source) ? [] : source.horaires || [];
+  const exceptions=Array.isArray(source) ? [] : source.exceptions || [];
   if(!Array.isArray(statuts)) return null;
   return {data:statuts,horaires:Array.isArray(horaires) ? horaires : [],exceptions:Array.isArray(exceptions) ? exceptions : []};
 }
