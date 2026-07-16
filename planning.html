@@ -957,6 +957,10 @@ const m=value%60;
 return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
 }
 
+function normalizeTime(value){
+return timeFromMinutes(minutes(value));
+}
+
 function formatTimeRange(item){
 const start=minutes(item.time);
 const end=start+Number(item.duration || 60);
@@ -979,8 +983,8 @@ name:data.name || "",
 email:data.email || "",
 paddock:data.paddock || "",
 date:data.date || "",
-time:data.time || "",
-duration:Number(data.duration || 60),
+time:normalizeTime(data.time || ""),
+duration:Number(data.duration || data.durationMinutes || data.duree || 60),
 type:data.type || data.reservationType || ""
 };
 }
@@ -995,22 +999,41 @@ for(let t=minutes(config.open);t<minutes(config.close);t+=60){
 slotSet.add(timeFromMinutes(t));
 }
 });
+reservations.concat(blocages).forEach(item=>{
+if(item.date!==date) return;
+const config=horaires[item.paddock]?.[name];
+const start=minutes(item.time);
+const open=config ? minutes(config.open) : 0;
+const close=config ? minutes(config.close) : 24*60;
+if(!config || config.closed || (start>=open && start<close)){
+slotSet.add(timeFromMinutes(start));
+}
+});
 return [...slotSet].sort((a,b)=>minutes(a)-minutes(b));
 }
 
 function paddockItemAt(date,paddock,time){
-return reservations.find(item=>item.date===date && item.paddock===paddock && item.time===time)
-|| blocages.find(item=>item.date===date && item.paddock===paddock && item.time===time);
+const target=minutes(time);
+return reservations.find(item=>item.date===date && item.paddock===paddock && minutes(item.time)===target)
+|| blocages.find(item=>item.date===date && item.paddock===paddock && minutes(item.time)===target);
 }
 
-function isCoveredByBlockage(date,paddock,time){
+function isCoveredByTimedItem(date,paddock,time,items){
 const slotStart=minutes(time);
-return blocages.some(item=>{
-if(item.date!==date || item.paddock!==paddock || item.time===time) return false;
+return items.some(item=>{
+if(item.date!==date || item.paddock!==paddock || minutes(item.time)===slotStart) return false;
 const blockStart=minutes(item.time);
 const blockEnd=blockStart+Number(item.duration || 60);
 return slotStart>blockStart && slotStart<blockEnd;
 });
+}
+
+function isCoveredByBlockage(date,paddock,time){
+return isCoveredByTimedItem(date,paddock,time,blocages);
+}
+
+function isCoveredByReservation(date,paddock,time){
+return isCoveredByTimedItem(date,paddock,time,reservations);
 }
 
 function isValidated(cheval,jour,tache){
@@ -1106,11 +1129,11 @@ return `<section class="paddockBoard">${columns}</section>`;
 }
 
 function renderPaddockSlot(date,paddock,config,time){
-if(isCoveredByBlockage(date,paddock.id,time)) return "";
-if(!config || config.closed || minutes(time)<minutes(config.open) || minutes(time)>=minutes(config.close)){
+if(isCoveredByBlockage(date,paddock.id,time) || isCoveredByReservation(date,paddock.id,time)) return "";
+const item=paddockItemAt(date,paddock.id,time);
+if(!item && (!config || config.closed || minutes(time)<minutes(config.open) || minutes(time)>=minutes(config.close))){
 return `<div class="slotCard free"><div class="slotTime">${time}</div><div><div class="slotTitle">Ferme</div></div><div></div></div>`;
 }
-const item=paddockItemAt(date,paddock.id,time);
 if(!item){
 return `<div class="slotCard free"><div class="slotTime">${time}</div><div><div class="slotTitle">Libre</div><div class="slotMeta">Creneau disponible</div></div><div></div></div>`;
 }
