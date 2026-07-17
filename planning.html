@@ -764,9 +764,10 @@ height:auto;
 
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+const PADDOCK_API="https://ecurie-notifications-prod.damiensiri-pro.workers.dev";
+const PADDOCK_DISPLAY_URL=`${PADDOCK_API}/api/paddocks/display`;
+const PADDOCK_REALTIME_URL=PADDOCK_API.replace(/^http/,"ws")+"/api/realtime";
 const SHEET_PLANNING="10oblXf2vLsgXWJba-hkuUlpOquFEoDHKXNJ0L1Wk_DE";
 const SHEET_VALIDATIONS="1YfrSDkB9E_SNA1ojqMuoUXBJt9vd_z40Kej3oyOXV7A";
 
@@ -779,20 +780,12 @@ const ENTRY_TASK="entry.450632275";
 
 const days=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
 const dayLabels=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
-const firebaseConfig={
-apiKey:"AIzaSyBn6Hgu-xvsWqpwJ-i4lZyI0QjKMBvOeXA",
-authDomain:"ecurie-paddock.firebaseapp.com",
-projectId:"ecurie-paddock",
-storageBucket:"ecurie-paddock.firebasestorage.app",
-messagingSenderId:"501153278739",
-appId:"1:501153278739:web:824b4344c381f2a94548e6"
-};
 const paddockDefs=[
 {id:"maison",label:"Maison"},
 {id:"grande",label:"Grande voie"},
 {id:"beudot",label:"Beudot"}
 ];
-const firestoreDays=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const calendarDays=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 let horaires={
 maison:{
 lundi:{closed:false,open:"08:00",close:"21:00"},
@@ -865,8 +858,9 @@ let validations=[];
 let localValidations=[];
 let reservations=[];
 let blocages=[];
-let db=null;
 let viewMode="day";
+let paddockSocket=null;
+let paddockSocketTimer=null;
 
 const todayIndex=new Date().getDay();
 const dayMap=[6,0,1,2,3,4,5];
@@ -942,7 +936,7 @@ return new Date(parts[0],parts[1]-1,parts[2]);
 }
 
 function dayName(value){
-return firestoreDays[parseIsoDate(value).getDay()];
+return calendarDays[parseIsoDate(value).getDay()];
 }
 
 function minutes(time){
@@ -975,10 +969,9 @@ function todayIso(){
 return toIsoDate(new Date());
 }
 
-function normalizeReservation(doc){
-const data=doc.data();
+function normalizeReservation(data){
 return {
-id:doc.id,
+id:String(data.id || ""),
 name:data.name || "",
 email:data.email || "",
 paddock:data.paddock || "",
@@ -1103,14 +1096,12 @@ ${renderPaddockBoard(todayIso())}
 document.getElementById("planningTitle").innerText="Planning du jour";
 document.getElementById("planningMeta").innerText=`${dayLabels[todayColumn]} - paddocks en direct`;
 addTaskEvents();
-addCancelEvents();
 }
 
 function buildPaddockView(){
 document.getElementById("planningSurface").innerHTML=`<div class="dayBoard" style="grid-template-columns:1fr">${renderPaddockBoard(todayIso())}</div>`;
 document.getElementById("planningTitle").innerText="Vue paddocks";
-document.getElementById("planningMeta").innerText="reservations Firebase aujourd'hui";
-addCancelEvents();
+document.getElementById("planningMeta").innerText="réservations D1 aujourd’hui";
 }
 
 function renderPaddockBoard(date){
@@ -1139,11 +1130,10 @@ return `<div class="slotCard free"><div class="slotTime">${time}</div><div><div 
 }
 const isBlock=String(item.name).toLowerCase().startsWith("blocage");
 const meta=isBlock ? formatTimeRange(item) : `${item.duration} min${item.type ? " - "+item.type : ""}`;
-const cancel=isBlock ? "" : `<button class="cancelBtn" data-cancel-reservation="${escapeHTML(item.id)}" title="Annuler la reservation">❌</button>`;
 return `<div class="slotCard ${isBlock ? "blocked" : "booked"}">
 <div class="slotTime">${escapeHTML(time)}</div>
 <div><div class="slotTitle">${escapeHTML(item.name)}</div><div class="slotMeta">${escapeHTML(meta)}</div></div>
-<div>${cancel}</div>
+<div></div>
 </div>`;
 }
 
@@ -1296,31 +1286,7 @@ if(!response.ok) throw new Error(`Chargement impossible: ${response.status}`);
 return response.json();
 }
 
-function addCancelEvents(){
-document.querySelectorAll("[data-cancel-reservation]").forEach(button=>{
-button.onclick=event=>{
-event.stopPropagation();
-cancelReservation(button.dataset.cancelReservation);
-};
-});
-}
-
-async function cancelReservation(id){
-if(!db){
-alert("Firebase n'est pas encore pret.");
-return;
-}
-const item=reservations.find(reservation=>reservation.id===id);
-if(!item){
-alert("Reservation introuvable.");
-return;
-}
-const label=`${item.name} - ${paddockLabel(item.paddock)} - ${item.time}`;
-if(!confirm(`Annuler cette reservation ?\n\n${label}`)) return;
-await db.collection("reservations").doc(id).delete();
-}
-
-function refreshFirebaseViews(){
+function refreshPaddockViews(){
 updateStats();
 if(viewMode==="paddock") buildPaddockView();
 if(viewMode==="day") renderPaddockBoardIntoPage();
@@ -1333,37 +1299,55 @@ const next=document.createElement("div");
 next.innerHTML=renderPaddockBoard(todayIso());
 const fresh=next.firstElementChild;
 if(fresh) target.replaceWith(fresh);
-addCancelEvents();
 }
 
-function subscribeFirebase(){
-if(!window.firebase || !firebase.firestore) return;
-if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-db=firebase.firestore();
-db.collection("reservations").onSnapshot(snapshot=>{
+async function loadPaddocks(){
+try{
+const response=await fetch(`${PADDOCK_DISPLAY_URL}?date=${encodeURIComponent(todayIso())}`,{cache:"no-store"});
+if(!response.ok) throw new Error(`Chargement paddocks impossible: ${response.status}`);
+const payload=await response.json();
 const nextReservations=[];
 const nextBlocages=[];
-snapshot.forEach(doc=>{
-const item=normalizeReservation(doc);
+(payload.reservations || []).map(normalizeReservation).forEach(item=>{
 if(String(item.name).toLowerCase().startsWith("blocage")) nextBlocages.push(item);
 else nextReservations.push(item);
 });
 reservations=nextReservations;
 blocages=nextBlocages;
-refreshFirebaseViews();
-});
-db.collection("horaires").onSnapshot(snapshot=>{
-const nextHoraires={};
-snapshot.forEach(doc=>{nextHoraires[doc.id]=doc.data();});
-if(Object.keys(nextHoraires).length) horaires=nextHoraires;
-refreshFirebaseViews();
-});
+if(payload.horaires && Object.keys(payload.horaires).length) horaires=payload.horaires;
+refreshPaddockViews();
+}catch(error){
+document.getElementById("planningMeta").innerText="connexion D1 en attente";
+}
 }
 
-subscribeFirebase();
+function connectPaddockRealtime(){
+clearTimeout(paddockSocketTimer);
+try{
+paddockSocket=new WebSocket(PADDOCK_REALTIME_URL);
+paddockSocket.addEventListener("open",loadPaddocks);
+paddockSocket.addEventListener("message",event=>{
+if(event.data==="pong") return;
+try{
+const message=JSON.parse(event.data);
+if(["paddocks","all"].includes(message.channel)) loadPaddocks();
+}catch(error){loadPaddocks();}
+});
+paddockSocket.addEventListener("close",()=>{
+paddockSocketTimer=setTimeout(connectPaddockRealtime,3000);
+});
+paddockSocket.addEventListener("error",()=>paddockSocket.close());
+}catch(error){
+paddockSocketTimer=setTimeout(connectPaddockRealtime,3000);
+}
+}
+
+loadPaddocks();
+connectPaddockRealtime();
 loadPlanning(true);
 
 setInterval(()=>{loadPlanning(false);},180000);
+setInterval(loadPaddocks,60000);
 </script>
 </body>
 </html>
